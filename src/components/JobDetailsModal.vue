@@ -247,14 +247,14 @@
                   </span>
                   <button
                     v-if="operation.status === 'pending'"
-                    @click="startOperation(operation.id)"
+                    @click="startOperation(operation)"
                     class="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700 transition-colors duration-200"
                   >
                     Start
                   </button>
                   <button
                     v-else-if="operation.status === 'running'"
-                    @click="completeOperation(operation.id)"
+                    @click="completeOperation(operation)"
                     class="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 transition-colors duration-200"
                   >
                     Complete
@@ -850,13 +850,13 @@ const getQualityChecks = (requirementId: string) => {
     .slice(0, 3);
 };
 
-const startOperation = (operationId: string) => {
-  console.log('Starting operation:', operationId);
+const startOperation = (operation: JobOperation) => {
+  console.log('Starting operation:', operation.id);
   // Implementation would update operation status
 };
 
-const completeOperation = (operationId: string) => {
-  console.log('Completing operation:', operationId);
+const completeOperation = (operation: JobOperation) => {
+  console.log('Completing operation:', operation.id);
   // Implementation would update operation status
 };
 

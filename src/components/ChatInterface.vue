@@ -185,7 +185,7 @@
           class="hidden"
         />
         <button
-          @click="$refs.imageInput?.click()"
+          @click="imageInput?.click()"
           class="mt-2 px-3 py-1 bg-primary-600 text-white rounded text-sm hover:bg-primary-700 transition-colors duration-200"
         >
           Choose Image

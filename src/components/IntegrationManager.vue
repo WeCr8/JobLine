@@ -205,8 +205,7 @@ import type { IntegrationConfig } from '../types/chat';
 import {
   ChatBubbleLeftRightIcon,
   BoltIcon,
-  EnvelopeIcon,
-  GlobeAltIcon
+  EnvelopeIcon
 } from '@heroicons/vue/24/outline';
 
 const chatStore = useChatStore();
@@ -215,12 +214,13 @@ const testing = ref<string | null>(null);
 const emailRecipients = ref('');
 const selectedTriggers = ref<string[]>([]);
 
-const newIntegration = reactive({
+const newIntegration = reactive<IntegrationConfig>({
+  id: '',
   name: '',
-  type: 'slack' as any,
+  type: 'slack',
   enabled: true,
-  config: {} as any,
-  triggers: [] as any[]
+  config: {},
+  triggers: []
 });
 
 const availableTriggers = [
@@ -285,6 +285,7 @@ const handleAddIntegration = async () => {
 const cancelAdd = () => {
   showAddModal.value = false;
   Object.assign(newIntegration, {
+    id: '',
     name: '',
     type: 'slack',
     enabled: true,
