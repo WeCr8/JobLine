@@ -65,13 +65,13 @@ const router = createRouter({
       path: '/integration',
       name: 'Integration',
       component: () => import('../views/IntegrationView.vue'),
-      meta: { requiresAuth: true, requiresRole: ['admin', 'manager'] }
+      meta: { requiresAuth: true, requiresRole: ['admin', 'manager', 'organization_admin'] }
     },
     {
       path: '/optimization',
       name: 'Optimization',
       component: () => import('../views/OptimizationView.vue'),
-      meta: { requiresAuth: true, requiresRole: ['lead', 'supervisor', 'manager', 'admin'] }
+      meta: { requiresAuth: true, requiresRole: ['lead', 'supervisor', 'manager', 'admin', 'organization_admin'] }
     },
     {
       path: '/performance',
@@ -100,6 +100,18 @@ const router = createRouter({
         {
           path: 'subscriptions',
           component: () => import('../admin/subscriptions.vue')
+        },
+        {
+          path: 'plans',
+          component: () => import('../admin/plans.vue')
+        },
+        {
+          path: 'settings',
+          component: () => import('../admin/settings.vue')
+        },
+        {
+          path: 'logs',
+          component: () => import('../admin/logs.vue')
         },
         {
           path: '',
@@ -148,6 +160,26 @@ const router = createRouter({
         {
           path: 'dashboard',
           component: () => import('../team/dashboard.vue')
+        },
+        {
+          path: 'jobs',
+          component: () => import('../views/JobsView.vue')
+        },
+        {
+          path: 'chat',
+          component: () => import('../views/ChatView.vue')
+        },
+        {
+          path: 'machines',
+          component: () => import('../views/MachinesView.vue')
+        },
+        {
+          path: 'passdown',
+          component: () => import('../views/PassdownView.vue')
+        },
+        {
+          path: 'performance',
+          component: () => import('../views/PerformanceView.vue')
         },
         {
           path: '',

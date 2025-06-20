@@ -154,7 +154,7 @@
 import { ref, onMounted } from 'vue';
 import { format } from 'date-fns';
 import { useAdminStore } from '../stores/admin';
-import type { Organization } from '../stores/admin';
+import type { Organization } from '../types';
 import {
   CurrencyDollarIcon,
   UserGroupIcon,
@@ -184,4 +184,3 @@ onMounted(async () => {
   }
 });
 </script>
-```

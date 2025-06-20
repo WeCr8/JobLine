@@ -190,6 +190,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { format } from 'date-fns';
+import { useOrganizationStore } from '../stores/organization';
 import {
   UserGroupIcon,
   BuildingOfficeIcon,
@@ -201,8 +202,10 @@ import {
   BellIcon
 } from '@heroicons/vue/24/outline';
 
-// Mock data - in a real app, this would come from the database
-const organization = ref({
+const organizationStore = useOrganizationStore();
+
+// Use the organization store data
+const organization = ref(organizationStore.organization || {
   id: 'org-1',
   name: 'Acme Manufacturing',
   industry: 'Manufacturing',
@@ -282,8 +285,21 @@ const recentActivity = ref([
 ]);
 
 const refreshData = async () => {
-  // In a real app, you would fetch data from the database
-  console.log('Refreshing data...');
+  try {
+    await organizationStore.fetchOrganization();
+    await organizationStore.fetchUsers();
+    await organizationStore.fetchDepartments();
+    
+    // Update local refs with store data
+    if (organizationStore.organization) {
+      organization.value = organizationStore.organization;
+    }
+    if (organizationStore.departments.length > 0) {
+      departments.value = organizationStore.departments;
+    }
+  } catch (error) {
+    console.error('Error refreshing data:', error);
+  }
 };
 
 const formatTime = (dateString: string) => {
@@ -327,4 +343,3 @@ onMounted(async () => {
   await refreshData();
 });
 </script>
-```

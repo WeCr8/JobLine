@@ -152,7 +152,7 @@
                   <div class="text-sm text-gray-900">{{ getDepartmentName(invite.department) }}</div>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {{ formatDate(invite.created_at) }}
+                  {{ formatDate(invite.createdAt) }}
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   <button
@@ -329,77 +329,14 @@
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted } from 'vue';
 import { format } from 'date-fns';
-import type { User } from '../types';
+import { useOrganizationStore } from '../stores/organization';
+import type { User, Invite } from '../types';
 import { ArrowPathIcon, EnvelopeIcon } from '@heroicons/vue/24/outline';
 
-// Mock data - in a real app, this would come from the database
-const users = ref<User[]>([
-  {
-    id: 'user-1',
-    name: 'John Smith',
-    email: 'john@acme-manufacturing.com',
-    role: 'organization_admin',
-    department: 'administration',
-    is_active: true,
-    created_at: '2024-01-01T00:00:00Z'
-  },
-  {
-    id: 'user-2',
-    name: 'Sarah Johnson',
-    email: 'sarah@acme-manufacturing.com',
-    role: 'manager',
-    department: 'cnc-machining',
-    is_active: true,
-    created_at: '2024-01-05T00:00:00Z'
-  },
-  {
-    id: 'user-3',
-    name: 'Mike Wilson',
-    email: 'mike@acme-manufacturing.com',
-    role: 'operator',
-    department: 'cnc-machining',
-    is_active: true,
-    created_at: '2024-01-10T00:00:00Z'
-  }
-]);
-
-const departments = ref([
-  {
-    id: 'cnc-machining',
-    name: 'CNC Machining',
-    description: 'Computer-controlled precision machining operations',
-    department_type: 'production',
-    supervisor: 'Sarah Johnson',
-    supervisor_id: 'user-2'
-  },
-  {
-    id: 'quality-control',
-    name: 'Quality Control',
-    description: 'Quality assurance and inspection',
-    department_type: 'support',
-    supervisor: 'John Smith',
-    supervisor_id: 'user-1'
-  },
-  {
-    id: 'administration',
-    name: 'Administration',
-    description: 'Administrative functions',
-    department_type: 'support',
-    supervisor: 'John Smith',
-    supervisor_id: 'user-1'
-  }
-]);
-
-const pendingInvites = ref([
-  {
-    id: 'invite-1',
-    email: 'david@acme-manufacturing.com',
-    role: 'supervisor',
-    department: 'cnc-machining',
-    status: 'pending',
-    created_at: '2024-01-11T00:00:00Z'
-  }
-]);
+const organizationStore = useOrganizationStore();
+const users = ref<User[]>([]);
+const pendingInvites = ref<Invite[]>([]);
+const departments = ref<any[]>([]);
 
 const searchQuery = ref('');
 const roleFilter = ref('all');
@@ -445,8 +382,17 @@ const filteredUsers = computed(() => {
 });
 
 const refreshData = async () => {
-  // In a real app, you would fetch data from the database
-  console.log('Refreshing data...');
+  try {
+    await organizationStore.fetchUsers();
+    await organizationStore.fetchInvites();
+    await organizationStore.fetchDepartments();
+    
+    users.value = organizationStore.users;
+    pendingInvites.value = organizationStore.invites;
+    departments.value = organizationStore.departments;
+  } catch (error) {
+    console.error('Error refreshing data:', error);
+  }
 };
 
 const formatDate = (dateString: string) => {
@@ -478,18 +424,11 @@ const getDepartmentName = (departmentId: string | undefined) => {
 const sendInvite = async () => {
   sendingInvite.value = true;
   try {
-    // In a real app, you would implement this
-    console.log('Sending invitation:', newInvite);
-    
-    // Simulate adding an invitation
-    pendingInvites.value.push({
-      id: `invite-${Date.now()}`,
-      email: newInvite.email,
-      role: newInvite.role,
-      department: newInvite.department,
-      status: 'pending',
-      created_at: new Date().toISOString()
-    });
+    await organizationStore.inviteUser(
+      newInvite.email,
+      newInvite.role,
+      newInvite.department
+    );
     
     showInviteModal.value = false;
     
@@ -499,6 +438,10 @@ const sendInvite = async () => {
       role: 'operator',
       department: ''
     });
+    
+    // Refresh invites
+    await organizationStore.fetchInvites();
+    pendingInvites.value = organizationStore.invites;
   } catch (error) {
     console.error('Error sending invitation:', error);
   } finally {
@@ -506,22 +449,22 @@ const sendInvite = async () => {
   }
 };
 
-const resendInvite = async (invite: any) => {
+const resendInvite = async (invite: Invite) => {
   try {
     // In a real app, you would implement this
     console.log('Resending invitation:', invite);
+    
+    // This would typically involve:
+    // 1. Updating the invite's expiration date
+    // 2. Sending a new email
   } catch (error) {
     console.error('Error resending invitation:', error);
   }
 };
 
-const cancelInvite = async (invite: any) => {
+const cancelInvite = async (invite: Invite) => {
   try {
-    // In a real app, you would implement this
-    console.log('Cancelling invitation:', invite);
-    
-    // Simulate removing the invitation
-    pendingInvites.value = pendingInvites.value.filter(i => i.id !== invite.id);
+    await organizationStore.cancelInvite(invite.id);
   } catch (error) {
     console.error('Error cancelling invitation:', error);
   }
@@ -535,14 +478,12 @@ const editUser = (user: User) => {
 const saveUser = async () => {
   savingUser.value = true;
   try {
-    // In a real app, you would implement this
-    console.log('Saving user:', editingUser);
-    
-    // Simulate saving user
-    const index = users.value.findIndex(u => u.id === editingUser.id);
-    if (index !== -1) {
-      users.value[index] = { ...editingUser };
-    }
+    await organizationStore.updateUser(editingUser.id, {
+      name: editingUser.name,
+      role: editingUser.role,
+      department: editingUser.department,
+      is_active: editingUser.is_active
+    });
     
     showEditUserModal.value = false;
   } catch (error) {
@@ -554,10 +495,11 @@ const saveUser = async () => {
 
 const toggleUserStatus = async (user: User) => {
   try {
-    // In a real app, you would implement this
-    console.log('Toggle user status:', user);
+    await organizationStore.updateUser(user.id, {
+      is_active: !user.is_active
+    });
     
-    // Simulate toggling user status
+    // Update local state
     const index = users.value.findIndex(u => u.id === user.id);
     if (index !== -1) {
       users.value[index].is_active = !users.value[index].is_active;
@@ -571,4 +513,3 @@ onMounted(async () => {
   await refreshData();
 });
 </script>
-```

@@ -382,4 +382,3 @@ onMounted(async () => {
   await refreshData();
 });
 </script>
-```
