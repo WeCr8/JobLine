@@ -78,6 +78,12 @@ const router = createRouter({
       name: 'Performance',
       component: () => import('../views/PerformanceView.vue'),
       meta: { requiresAuth: true }
+    },
+    {
+      path: '/admin',
+      name: 'Admin',
+      component: () => import('../views/AdminView.vue'),
+      meta: { requiresAuth: true, requiresRole: ['admin'] }
     }
   ]
 });

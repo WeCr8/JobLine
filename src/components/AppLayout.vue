@@ -92,6 +92,14 @@
                 >
                   Subscription
                 </router-link>
+                <router-link
+                  v-if="isAdmin"
+                  to="/admin"
+                  @click="showUserMenu = false"
+                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200"
+                >
+                  Admin Panel
+                </router-link>
                 <button
                   @click="handleLogout"
                   class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200"
@@ -130,7 +138,8 @@ import {
   CircleStackIcon,
   LightBulbIcon,
   TrophyIcon,
-  CheckCircleIcon
+  CheckCircleIcon,
+  Cog6ToothIcon
 } from '@heroicons/vue/24/outline';
 
 const router = useRouter();
@@ -148,11 +157,16 @@ const navigation = [
   { name: 'Performance', href: '/performance', icon: TrophyIcon, roles: ['operator', 'lead', 'supervisor', 'manager', 'admin'] },
   { name: 'Optimization', href: '/optimization', icon: LightBulbIcon, roles: ['lead', 'supervisor', 'manager', 'admin'] },
   { name: 'Integration', href: '/integration', icon: CircleStackIcon, roles: ['manager', 'admin'] },
+  { name: 'Admin', href: '/admin', icon: Cog6ToothIcon, roles: ['admin'] },
 ];
 
 const visibleNavigation = computed(() => {
   if (!authStore.user) return [];
   return navigation.filter(item => item.roles.includes(authStore.user!.role));
+});
+
+const isAdmin = computed(() => {
+  return authStore.user?.role === 'admin';
 });
 
 const handleLogout = async () => {
