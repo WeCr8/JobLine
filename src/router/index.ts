@@ -82,14 +82,78 @@ const router = createRouter({
     {
       path: '/admin',
       name: 'Admin',
-      component: () => import('../views/AdminView.vue'),
-      meta: { requiresAuth: true, requiresRole: ['admin'], requiresPlatformAdmin: true }
+      component: () => import('../admin/index.vue'),
+      meta: { requiresAuth: true, requiresRole: ['admin'], requiresPlatformAdmin: true },
+      children: [
+        {
+          path: 'dashboard',
+          component: () => import('../admin/dashboard.vue')
+        },
+        {
+          path: 'organizations',
+          component: () => import('../admin/organizations.vue')
+        },
+        {
+          path: 'users',
+          component: () => import('../admin/users.vue')
+        },
+        {
+          path: 'subscriptions',
+          component: () => import('../admin/subscriptions.vue')
+        },
+        {
+          path: '',
+          redirect: '/admin/dashboard'
+        }
+      ]
     },
     {
-      path: '/organization-admin',
+      path: '/org',
       name: 'OrganizationAdmin',
-      component: () => import('../views/OrganizationAdminView.vue'),
-      meta: { requiresAuth: true, requiresRole: ['organization_admin', 'admin'] }
+      component: () => import('../org/index.vue'),
+      meta: { requiresAuth: true, requiresRole: ['organization_admin', 'admin'] },
+      children: [
+        {
+          path: 'dashboard',
+          component: () => import('../org/dashboard.vue')
+        },
+        {
+          path: 'users',
+          component: () => import('../org/users.vue')
+        },
+        {
+          path: 'departments',
+          component: () => import('../org/departments.vue')
+        },
+        {
+          path: 'integrations',
+          component: () => import('../org/integrations.vue')
+        },
+        {
+          path: 'settings',
+          component: () => import('../org/settings.vue')
+        },
+        {
+          path: '',
+          redirect: '/org/dashboard'
+        }
+      ]
+    },
+    {
+      path: '/team',
+      name: 'TeamMember',
+      component: () => import('../team/index.vue'),
+      meta: { requiresAuth: true },
+      children: [
+        {
+          path: 'dashboard',
+          component: () => import('../team/dashboard.vue')
+        },
+        {
+          path: '',
+          redirect: '/team/dashboard'
+        }
+      ]
     }
   ]
 });
