@@ -3,6 +3,7 @@ export interface SubscriptionPlan {
   name: string;
   description: string;
   price: number; // in cents
+  displayPrice?: number; // for UI display
   interval: 'monthly' | 'yearly';
   stripePriceId: string;
   active: boolean;
@@ -40,7 +41,7 @@ export interface Invoice {
   status: string;
 }
 
-export interface AdminUser {
+export interface User {
   id: string;
   name: string;
   email: string;
@@ -49,9 +50,43 @@ export interface AdminUser {
   is_active: boolean;
   last_login?: string;
   created_at: string;
+  organization_id?: string;
 }
 
-export interface AdminAnalytics {
+export interface Organization {
+  id: string;
+  name: string;
+  industry?: string;
+  address?: string;
+  phone?: string;
+  website?: string;
+  logoUrl?: string;
+  primaryContactName?: string;
+  primaryContactEmail?: string;
+  subscriptionId?: string;
+  subscriptionStatus?: string;
+  planId?: string;
+  planName?: string;
+  maxUsers: number;
+  currentUserCount: number;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export interface OrganizationUser {
+  id: string;
+  organizationId: string;
+  userId: string;
+  userName: string;
+  userEmail: string;
+  role: string;
+  isAdmin: boolean;
+  isPrimary: boolean;
+  joinedAt: string;
+}
+
+export interface Analytics {
   totalRevenue: number;
   revenueGrowth: number;
   activeUsers: number;
@@ -80,6 +115,41 @@ export interface SystemSettings {
     frequency: string;
     retentionDays: number;
   };
+}
+
+export interface SystemLog {
+  id: string;
+  level: 'INFO' | 'WARN' | 'ERROR' | 'DEBUG';
+  message: string;
+  context?: any;
+  userId?: string;
+  ipAddress?: string;
+  timestamp: string;
+}
+
+export interface AdminUser {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  department?: string;
+  is_active: boolean;
+  last_login?: string;
+  created_at: string;
+}
+
+export interface AdminAnalytics {
+  totalRevenue: number;
+  revenueGrowth: number;
+  activeUsers: number;
+  userGrowth: number;
+  conversionRate: number;
+  conversionGrowth: number;
+  churnRate: number;
+  churnChange: number;
+  monthlyRevenue: number[];
+  monthlyUsers: number[];
+  planDistribution: Record<string, number>;
 }
 
 export interface AppSettings {
@@ -111,10 +181,4 @@ export interface SystemInfo {
     lastBackup: string;
   };
   logs: SystemLog[];
-}
-
-export interface SystemLog {
-  level: 'INFO' | 'WARN' | 'ERROR' | 'DEBUG';
-  timestamp: string;
-  message: string;
 }
