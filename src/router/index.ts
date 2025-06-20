@@ -83,7 +83,13 @@ const router = createRouter({
       path: '/admin',
       name: 'Admin',
       component: () => import('../views/AdminView.vue'),
-      meta: { requiresAuth: true, requiresRole: ['admin'] }
+      meta: { requiresAuth: true, requiresRole: ['admin'], requiresPlatformAdmin: true }
+    },
+    {
+      path: '/organization-admin',
+      name: 'OrganizationAdmin',
+      component: () => import('../views/OrganizationAdminView.vue'),
+      meta: { requiresAuth: true, requiresRole: ['organization_admin', 'admin'] }
     }
   ]
 });
@@ -97,8 +103,12 @@ router.beforeEach((to, from, next) => {
     next('/dashboard');
   } else if (to.meta.requiresRole && authStore.user) {
     const requiredRoles = to.meta.requiresRole as string[];
-    if (!requiredRoles.includes(authStore.user.role)) {
-      next('/dashboard'); // Redirect to dashboard if user doesn't have required role
+    
+    // Check if route requires platform admin (no organization)
+    if (to.meta.requiresPlatformAdmin && authStore.user.organization_id) {
+      next('/dashboard'); // Redirect if user is not a platform admin
+    } else if (!requiredRoles.includes(authStore.user.role)) {
+      next('/dashboard'); // Redirect if user doesn't have required role
     } else {
       next();
     }

@@ -3,27 +3,21 @@
     <!-- Header -->
     <div class="flex items-center justify-between">
       <div>
-        <h1 class="text-2xl font-bold text-gray-900">SaaS Administration</h1>
-        <p class="text-gray-600">Platform management for JobLine.ai owners</p>
+        <h1 class="text-2xl font-bold text-gray-900">Platform Administration</h1>
+        <p class="text-gray-600">Manage subscriptions, organizations, and system settings</p>
       </div>
       <div class="flex space-x-3">
         <button
           @click="refreshData"
           class="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors duration-200"
         >
-          Refresh Data
-        </button>
-        <button
-          @click="triggerBackup"
-          :disabled="adminStore.loading"
-          class="bg-primary-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary-700 transition-colors duration-200"
-        >
-          {{ adminStore.loading ? 'Processing...' : 'Backup Database' }}
+          <ArrowPathIcon class="w-4 h-4 inline mr-1" />
+          Refresh
         </button>
       </div>
     </div>
 
-    <!-- Tabs -->
+    <!-- Admin Navigation Tabs -->
     <div class="border-b border-gray-200">
       <nav class="flex space-x-8">
         <button
@@ -48,7 +42,7 @@
         <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <div class="flex items-center justify-between">
             <div>
-              <p class="text-sm font-medium text-gray-600">Monthly Recurring Revenue</p>
+              <p class="text-sm font-medium text-gray-600">Total Revenue</p>
               <p class="text-2xl font-bold text-gray-900">${{ (adminStore.analytics.totalRevenue / 100).toFixed(2) }}</p>
             </div>
             <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
@@ -69,11 +63,11 @@
         <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <div class="flex items-center justify-between">
             <div>
-              <p class="text-sm font-medium text-gray-600">Active Subscribers</p>
+              <p class="text-sm font-medium text-gray-600">Active Users</p>
               <p class="text-2xl font-bold text-gray-900">{{ adminStore.analytics.activeUsers }}</p>
             </div>
             <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-              <UsersIcon class="w-6 h-6 text-blue-600" />
+              <UserGroupIcon class="w-6 h-6 text-blue-600" />
             </div>
           </div>
           <div class="mt-2">
@@ -123,7 +117,7 @@
               class="text-sm font-medium"
               :class="adminStore.analytics.churnChange < 0 ? 'text-green-600' : 'text-red-600'"
             >
-              {{ adminStore.analytics.churnChange > 0 ? '+' : '' }}{{ adminStore.analytics.churnChange }}%
+              {{ adminStore.analytics.churnChange < 0 ? '' : '+' }}{{ adminStore.analytics.churnChange }}%
             </span>
             <span class="text-sm text-gray-500 ml-1">from last month</span>
           </div>
@@ -133,179 +127,290 @@
       <!-- Charts -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <h3 class="text-lg font-semibold text-gray-900 mb-4">Revenue Growth</h3>
+          <h3 class="text-lg font-semibold text-gray-900 mb-4">Monthly Revenue</h3>
           <div class="h-64">
-            <canvas ref="revenueChart"></canvas>
+            <!-- Chart would go here -->
+            <div class="h-full bg-gray-50 rounded flex items-end space-x-1 p-2">
+              <div
+                v-for="(revenue, index) in adminStore.analytics.monthlyRevenue"
+                :key="index"
+                class="flex-1 bg-green-500 rounded-t"
+                :style="{ height: `${(revenue / Math.max(...adminStore.analytics.monthlyRevenue)) * 100}%` }"
+              ></div>
+            </div>
           </div>
         </div>
 
         <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <h3 class="text-lg font-semibold text-gray-900 mb-4">User Growth</h3>
+          <h3 class="text-lg font-semibold text-gray-900 mb-4">Plan Distribution</h3>
           <div class="h-64">
-            <canvas ref="userChart"></canvas>
+            <!-- Chart would go here -->
+            <div class="h-full flex items-center justify-center">
+              <div class="space-y-4 w-full">
+                <div
+                  v-for="(count, plan) in adminStore.analytics.planDistribution"
+                  :key="plan"
+                  class="space-y-1"
+                >
+                  <div class="flex justify-between text-sm">
+                    <span>{{ plan }}</span>
+                    <span>{{ count }} users</span>
+                  </div>
+                  <div class="w-full bg-gray-200 rounded-full h-2">
+                    <div 
+                      class="bg-blue-600 h-2 rounded-full"
+                      :style="{ width: `${(count / adminStore.analytics.activeUsers) * 100}%` }"
+                    ></div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Plan Distribution -->
-      <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <h3 class="text-lg font-semibold text-gray-900 mb-4">Subscription Plan Distribution</h3>
-        <div class="h-64">
-          <canvas ref="planDistributionChart"></canvas>
-        </div>
-      </div>
-    </div>
-
-    <!-- Subscription Plans Tab -->
-    <div v-if="activeTab === 'plans'" class="space-y-6">
-      <div class="flex justify-end">
-        <button
-          @click="showPlanModal = true; editingPlan = null"
-          class="bg-primary-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary-700 transition-colors duration-200"
-        >
-          Add New Plan
-        </button>
-      </div>
-
+      <!-- Recent Activity -->
       <div class="bg-white rounded-lg shadow-sm border border-gray-200">
         <div class="p-6 border-b border-gray-200">
-          <h3 class="text-lg font-semibold text-gray-900">Subscription Plans</h3>
+          <h3 class="text-lg font-semibold text-gray-900">Recent Activity</h3>
         </div>
-        
-        <div class="overflow-x-auto">
-          <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
-              <tr>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Interval</th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Subscribers</th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-              </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
-              <tr v-for="plan in adminStore.subscriptionPlans" :key="plan.id">
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm font-medium text-gray-900">{{ plan.name }}</div>
-                  <div class="text-sm text-gray-500">{{ plan.description }}</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-900">${{ (plan.price / 100).toFixed(2) }}</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-900 capitalize">{{ plan.interval }}</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <span 
-                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
-                    :class="plan.active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'"
-                  >
-                    {{ plan.active ? 'Active' : 'Inactive' }}
-                  </span>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {{ plan.subscriberCount || 0 }}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                  <button
-                    @click="editPlan(plan)"
-                    class="text-primary-600 hover:text-primary-900 mr-3"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    @click="togglePlanStatus(plan)"
-                    class="text-gray-600 hover:text-gray-900"
-                  >
-                    {{ plan.active ? 'Deactivate' : 'Activate' }}
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+        <div class="p-6">
+          <div class="space-y-4">
+            <div
+              v-for="(log, index) in adminStore.systemLogs.slice(0, 5)"
+              :key="index"
+              class="flex items-start space-x-3 p-4 bg-gray-50 rounded-lg"
+            >
+              <div class="flex-shrink-0">
+                <div 
+                  class="w-8 h-8 rounded-full flex items-center justify-center"
+                  :class="getLogLevelClass(log.level)"
+                >
+                  <component :is="getLogLevelIcon(log.level)" class="w-4 h-4" />
+                </div>
+              </div>
+              <div class="flex-1">
+                <div class="flex items-center justify-between">
+                  <p class="text-sm font-medium text-gray-900">{{ log.message }}</p>
+                  <span class="text-xs text-gray-500">{{ formatTime(log.timestamp) }}</span>
+                </div>
+                <div class="mt-1 text-xs text-gray-600">
+                  <span v-if="log.user_id">User: {{ log.user_id }}</span>
+                  <span v-if="log.ip_address" class="ml-2">IP: {{ log.ip_address }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
 
     <!-- Subscriptions Tab -->
     <div v-if="activeTab === 'subscriptions'" class="space-y-6">
+      <!-- Subscription Plans -->
       <div class="bg-white rounded-lg shadow-sm border border-gray-200">
         <div class="p-6 border-b border-gray-200">
           <div class="flex items-center justify-between">
-            <h3 class="text-lg font-semibold text-gray-900">Active Subscriptions</h3>
-            <div class="flex space-x-2">
-              <input
-                v-model="subscriptionSearch"
-                type="text"
-                placeholder="Search by name or email"
-                class="px-3 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
-              />
-            </div>
+            <h3 class="text-lg font-semibold text-gray-900">Subscription Plans</h3>
+            <button
+              @click="showPlanModal = true"
+              class="bg-primary-600 text-white px-3 py-1 rounded text-sm hover:bg-primary-700 transition-colors duration-200"
+            >
+              Add Plan
+            </button>
           </div>
         </div>
-        
-        <div class="overflow-x-auto">
-          <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
-              <tr>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Plan</th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Next Billing</th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-              </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
-              <tr v-for="subscription in filteredSubscriptions" :key="subscription.id">
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm font-medium text-gray-900">{{ subscription.userName }}</div>
-                  <div class="text-sm text-gray-500">{{ subscription.userEmail }}</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-900">{{ subscription.planName }}</div>
-                  <div class="text-sm text-gray-500">Since {{ formatDate(subscription.startDate) }}</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <span 
-                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
-                    :class="getStatusClass(subscription.status)"
-                  >
-                    {{ subscription.status.toUpperCase() }}
-                  </span>
-                  <div v-if="subscription.cancelAtPeriodEnd" class="text-xs text-red-600 mt-1">
-                    Cancels at period end
-                  </div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-900">${{ (subscription.amount / 100).toFixed(2) }}</div>
-                  <div class="text-sm text-gray-500 capitalize">{{ subscription.interval }}</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-900">{{ formatDate(subscription.nextBillingDate) }}</div>
-                  <div v-if="subscription.paymentMethodLast4" class="text-sm text-gray-500">
-                    {{ subscription.paymentMethodBrand?.toUpperCase() }} •••• {{ subscription.paymentMethodLast4 }}
-                  </div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                  <button
-                    @click="viewSubscription(subscription)"
-                    class="text-primary-600 hover:text-primary-900 mr-3"
-                  >
-                    View
-                  </button>
-                  <button
-                    v-if="subscription.status === 'active' && !subscription.cancelAtPeriodEnd"
-                    @click="confirmCancelSubscription(subscription)"
-                    class="text-red-600 hover:text-red-900"
-                  >
-                    Cancel
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+        <div class="p-6">
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Interval</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Subscribers</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200">
+                <tr v-for="plan in adminStore.subscriptionPlans" :key="plan.id">
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm font-medium text-gray-900">{{ plan.name }}</div>
+                    <div class="text-sm text-gray-500">{{ plan.description }}</div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm text-gray-900">${{ (plan.price / 100).toFixed(2) }}</div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm text-gray-900 capitalize">{{ plan.interval }}</div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm text-gray-900">{{ plan.subscriberCount || 0 }}</div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <span 
+                      class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
+                      :class="plan.active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'"
+                    >
+                      {{ plan.active ? 'Active' : 'Inactive' }}
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <button
+                      @click="editPlan(plan)"
+                      class="text-primary-600 hover:text-primary-900 mr-3"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      @click="togglePlanStatus(plan)"
+                      :class="plan.active ? 'text-red-600 hover:text-red-900' : 'text-green-600 hover:text-green-900'"
+                    >
+                      {{ plan.active ? 'Deactivate' : 'Activate' }}
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Active Subscriptions -->
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div class="p-6 border-b border-gray-200">
+          <h3 class="text-lg font-semibold text-gray-900">Active Subscriptions</h3>
+        </div>
+        <div class="p-6">
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Plan</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Start Date</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Next Billing</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200">
+                <tr v-for="subscription in adminStore.activeSubscriptions" :key="subscription.id">
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm font-medium text-gray-900">{{ subscription.userName }}</div>
+                    <div class="text-sm text-gray-500">{{ subscription.userEmail }}</div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm text-gray-900">{{ subscription.planName }}</div>
+                    <div class="text-sm text-gray-500">${{ (subscription.amount / 100).toFixed(2) }}/{{ subscription.interval }}</div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <span 
+                      class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
+                      :class="getSubscriptionStatusClass(subscription.status)"
+                    >
+                      {{ subscription.status }}
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm text-gray-900">{{ formatDate(subscription.startDate) }}</div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm text-gray-900">{{ formatDate(subscription.nextBillingDate) }}</div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <button
+                      @click="viewSubscriptionDetails(subscription)"
+                      class="text-primary-600 hover:text-primary-900 mr-3"
+                    >
+                      View
+                    </button>
+                    <button
+                      v-if="subscription.status === 'active' && !subscription.cancelAtPeriodEnd"
+                      @click="cancelSubscription(subscription)"
+                      class="text-red-600 hover:text-red-900"
+                    >
+                      Cancel
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Organizations Tab -->
+    <div v-if="activeTab === 'organizations'" class="space-y-6">
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div class="p-6 border-b border-gray-200">
+          <div class="flex items-center justify-between">
+            <h3 class="text-lg font-semibold text-gray-900">Organizations</h3>
+            <button
+              @click="showOrgModal = true"
+              class="bg-primary-600 text-white px-3 py-1 rounded text-sm hover:bg-primary-700 transition-colors duration-200"
+            >
+              Add Organization
+            </button>
+          </div>
+        </div>
+        <div class="p-6">
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Industry</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Users</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Subscription</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200">
+                <tr v-for="org in adminStore.organizations" :key="org.id">
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm font-medium text-gray-900">{{ org.name }}</div>
+                    <div class="text-sm text-gray-500">{{ org.primaryContactName || 'No primary contact' }}</div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm text-gray-900">{{ org.industry || 'N/A' }}</div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm text-gray-900">{{ org.currentUserCount }} / {{ org.maxUsers }}</div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm text-gray-900">{{ org.planName || 'No plan' }}</div>
+                    <div v-if="org.subscriptionStatus" class="text-sm text-gray-500">{{ org.subscriptionStatus }}</div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <span 
+                      class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
+                      :class="org.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
+                    >
+                      {{ org.isActive ? 'Active' : 'Inactive' }}
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <button
+                      @click="editOrganization(org)"
+                      class="text-primary-600 hover:text-primary-900 mr-3"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      @click="viewOrganizationUsers(org)"
+                      class="text-blue-600 hover:text-blue-900"
+                    >
+                      Users
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
@@ -315,86 +420,85 @@
       <div class="bg-white rounded-lg shadow-sm border border-gray-200">
         <div class="p-6 border-b border-gray-200">
           <div class="flex items-center justify-between">
-            <h3 class="text-lg font-semibold text-gray-900">User Management</h3>
+            <h3 class="text-lg font-semibold text-gray-900">Platform Users</h3>
             <div class="flex space-x-2">
-              <input
-                v-model="userSearch"
-                type="text"
-                placeholder="Search by name or email"
-                class="px-3 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
-              />
               <select
-                v-model="userRoleFilter"
-                class="px-3 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
+                v-model="userFilters.role"
+                class="text-sm border border-gray-300 rounded-md px-2 py-1 focus:ring-primary-500 focus:border-primary-500"
               >
                 <option value="">All Roles</option>
-                <option value="operator">Operator</option>
-                <option value="lead">Lead</option>
-                <option value="supervisor">Supervisor</option>
-                <option value="manager">Manager</option>
-                <option value="admin">Admin</option>
-                <option value="customer">Customer</option>
+                <option value="admin">Platform Admin</option>
                 <option value="organization_admin">Organization Admin</option>
+                <option value="manager">Manager</option>
+                <option value="operator">Operator</option>
               </select>
+              <input
+                v-model="userFilters.search"
+                type="text"
+                placeholder="Search users..."
+                class="text-sm border border-gray-300 rounded-md px-2 py-1 focus:ring-primary-500 focus:border-primary-500"
+              />
             </div>
           </div>
         </div>
-        
-        <div class="overflow-x-auto">
-          <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
-              <tr>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Department</th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created</th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-              </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
-              <tr v-for="user in filteredUsers" :key="user.id">
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm font-medium text-gray-900">{{ user.name }}</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-900">{{ user.email }}</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-900 capitalize">{{ user.role }}</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-900">{{ user.department || 'N/A' }}</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <span 
-                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
-                    :class="user.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
-                  >
-                    {{ user.is_active ? 'Active' : 'Inactive' }}
-                  </span>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-900">{{ formatDate(user.created_at) }}</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                  <button
-                    @click="editUser(user)"
-                    class="text-primary-600 hover:text-primary-900 mr-3"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    @click="toggleUserStatus(user)"
-                    class="text-gray-600 hover:text-gray-900"
-                  >
-                    {{ user.is_active ? 'Deactivate' : 'Activate' }}
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+        <div class="p-6">
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Organization</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200">
+                <tr v-for="user in filteredUsers" :key="user.id">
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm font-medium text-gray-900">{{ user.name }}</div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm text-gray-900">{{ user.email }}</div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <span 
+                      class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
+                      :class="getRoleClass(user.role)"
+                    >
+                      {{ formatRole(user.role) }}
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm text-gray-900">{{ getUserOrganization(user) }}</div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <span 
+                      class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
+                      :class="user.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
+                    >
+                      {{ user.is_active ? 'Active' : 'Inactive' }}
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <button
+                      @click="editUser(user)"
+                      class="text-primary-600 hover:text-primary-900 mr-3"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      @click="toggleUserStatus(user)"
+                      :class="user.is_active ? 'text-red-600 hover:text-red-900' : 'text-green-600 hover:text-green-900'"
+                    >
+                      {{ user.is_active ? 'Deactivate' : 'Activate' }}
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
@@ -403,100 +507,48 @@
     <div v-if="activeTab === 'settings'" class="space-y-6">
       <div class="bg-white rounded-lg shadow-sm border border-gray-200">
         <div class="p-6 border-b border-gray-200">
-          <h3 class="text-lg font-semibold text-gray-900">API Keys</h3>
+          <h3 class="text-lg font-semibold text-gray-900">System Settings</h3>
         </div>
         <div class="p-6">
-          <form @submit.prevent="saveSettings" class="space-y-4">
+          <form @submit.prevent="saveSettings" class="space-y-6">
+            <!-- Payment Settings -->
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Stripe Secret Key</label>
-              <div class="flex">
-                <input
-                  v-if="showStripeKey"
-                  v-model="settings.stripeSecretKey"
-                  type="text"
-                  class="flex-1 px-3 py-2 border border-gray-300 rounded-l-md focus:ring-primary-500 focus:border-primary-500"
-                  placeholder="sk_live_..."
-                />
-                <input
-                  v-else
-                  type="text"
-                  class="flex-1 px-3 py-2 border border-gray-300 rounded-l-md focus:ring-primary-500 focus:border-primary-500"
-                  placeholder="sk_live_..."
-                  value="••••••••••••••••••••••••••••••"
-                  disabled
-                />
-                <button
-                  type="button"
-                  @click="showStripeKey = !showStripeKey"
-                  class="px-3 py-2 bg-gray-100 border border-l-0 border-gray-300 rounded-r-md text-gray-600 hover:bg-gray-200"
-                >
-                  <EyeIcon v-if="showStripeKey" class="w-5 h-5" />
-                  <EyeSlashIcon v-else class="w-5 h-5" />
-                </button>
-              </div>
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Stripe Webhook Secret</label>
-              <div class="flex">
-                <input
-                  v-if="showWebhookSecret"
-                  v-model="settings.stripeWebhookSecret"
-                  type="text"
-                  class="flex-1 px-3 py-2 border border-gray-300 rounded-l-md focus:ring-primary-500 focus:border-primary-500"
-                  placeholder="whsec_..."
-                />
-                <input
-                  v-else
-                  type="text"
-                  class="flex-1 px-3 py-2 border border-gray-300 rounded-l-md focus:ring-primary-500 focus:border-primary-500"
-                  placeholder="whsec_..."
-                  value="••••••••••••••••••••••••••••••"
-                  disabled
-                />
-                <button
-                  type="button"
-                  @click="showWebhookSecret = !showWebhookSecret"
-                  class="px-3 py-2 bg-gray-100 border border-l-0 border-gray-300 rounded-r-md text-gray-600 hover:bg-gray-200"
-                >
-                  <EyeIcon v-if="showWebhookSecret" class="w-5 h-5" />
-                  <EyeSlashIcon v-else class="w-5 h-5" />
-                </button>
-              </div>
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">OpenAI API Key</label>
-              <div class="flex">
-                <input
-                  v-if="showOpenAIKey"
-                  v-model="settings.openaiApiKey"
-                  type="text"
-                  class="flex-1 px-3 py-2 border border-gray-300 rounded-l-md focus:ring-primary-500 focus:border-primary-500"
-                  placeholder="sk-..."
-                />
-                <input
-                  v-else
-                  type="text"
-                  class="flex-1 px-3 py-2 border border-gray-300 rounded-l-md focus:ring-primary-500 focus:border-primary-500"
-                  placeholder="sk-..."
-                  value="••••••••••••••••••••••••••••••"
-                  disabled
-                />
-                <button
-                  type="button"
-                  @click="showOpenAIKey = !showOpenAIKey"
-                  class="px-3 py-2 bg-gray-100 border border-l-0 border-gray-300 rounded-r-md text-gray-600 hover:bg-gray-200"
-                >
-                  <EyeIcon v-if="showOpenAIKey" class="w-5 h-5" />
-                  <EyeSlashIcon v-else class="w-5 h-5" />
-                </button>
-              </div>
-            </div>
-
-            <div class="pt-4 border-t border-gray-200">
-              <h4 class="text-md font-medium text-gray-900 mb-4">AI Configuration</h4>
+              <h4 class="text-md font-medium text-gray-900 mb-4">Payment Settings</h4>
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Stripe Secret Key</label>
+                  <input
+                    v-model="settings.stripeSecretKey"
+                    type="password"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
+                    placeholder="sk_live_..."
+                  />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Stripe Webhook Secret</label>
+                  <input
+                    v-model="settings.stripeWebhookSecret"
+                    type="password"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
+                    placeholder="whsec_..."
+                  />
+                </div>
+              </div>
+            </div>
+
+            <!-- AI Settings -->
+            <div>
+              <h4 class="text-md font-medium text-gray-900 mb-4">AI Settings</h4>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">OpenAI API Key</label>
+                  <input
+                    v-model="settings.openaiApiKey"
+                    type="password"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
+                    placeholder="sk-..."
+                  />
+                </div>
                 <div>
                   <label class="block text-sm font-medium text-gray-700 mb-2">Default Model</label>
                   <select
@@ -530,40 +582,29 @@
                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
                   />
                 </div>
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">Timeout (ms)</label>
-                  <input
-                    v-model.number="settings.ai.timeout"
-                    type="number"
-                    min="5000"
-                    max="120000"
-                    step="1000"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
-                  />
-                </div>
               </div>
             </div>
 
-            <div class="pt-4 border-t border-gray-200">
-              <h4 class="text-md font-medium text-gray-900 mb-4">Database Backup</h4>
-              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <!-- Backup Settings -->
+            <div>
+              <h4 class="text-md font-medium text-gray-900 mb-4">Backup Settings</h4>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">Automatic Backups</label>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Enable Automatic Backups</label>
                   <div class="flex items-center">
                     <input
                       v-model="settings.backup.enabled"
                       type="checkbox"
                       class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
                     />
-                    <span class="ml-2 text-sm text-gray-700">Enable automatic backups</span>
+                    <span class="ml-2 text-sm text-gray-700">Enable</span>
                   </div>
                 </div>
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">Frequency</label>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Backup Frequency</label>
                   <select
                     v-model="settings.backup.frequency"
-                    :disabled="!settings.backup.enabled"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500 disabled:bg-gray-100 disabled:text-gray-500"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
                   >
                     <option value="hourly">Hourly</option>
                     <option value="daily">Daily</option>
@@ -571,177 +612,106 @@
                   </select>
                 </div>
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">Retention (days)</label>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Retention Period (days)</label>
                   <input
                     v-model.number="settings.backup.retentionDays"
                     type="number"
                     min="1"
                     max="365"
-                    :disabled="!settings.backup.enabled"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500 disabled:bg-gray-100 disabled:text-gray-500"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
                   />
+                </div>
+                <div class="flex items-end">
+                  <button
+                    type="button"
+                    @click="triggerBackup"
+                    :disabled="backupInProgress"
+                    class="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors duration-200"
+                  >
+                    {{ backupInProgress ? 'Backing up...' : 'Trigger Manual Backup' }}
+                  </button>
                 </div>
               </div>
             </div>
 
-            <div class="flex justify-end pt-4">
+            <div class="flex justify-end">
               <button
                 type="submit"
-                class="bg-primary-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary-700 transition-colors duration-200"
+                :disabled="savingSettings"
+                class="bg-primary-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-primary-700 disabled:opacity-50 transition-colors duration-200"
               >
-                Save Settings
+                {{ savingSettings ? 'Saving...' : 'Save Settings' }}
               </button>
             </div>
           </form>
         </div>
       </div>
-
-      <div class="bg-white rounded-lg shadow-sm border border-gray-200">
-        <div class="p-6 border-b border-gray-200">
-          <h3 class="text-lg font-semibold text-gray-900">System Information</h3>
-        </div>
-        <div class="p-6">
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <h4 class="text-md font-medium text-gray-900 mb-4">Application</h4>
-              <div class="space-y-2">
-                <div class="flex justify-between">
-                  <span class="text-sm text-gray-500">Version:</span>
-                  <span class="text-sm font-medium text-gray-900">1.0.0</span>
-                </div>
-                <div class="flex justify-between">
-                  <span class="text-sm text-gray-500">Environment:</span>
-                  <span class="text-sm font-medium text-gray-900">Production</span>
-                </div>
-                <div class="flex justify-between">
-                  <span class="text-sm text-gray-500">Last Updated:</span>
-                  <span class="text-sm font-medium text-gray-900">Jan 15, 2024</span>
-                </div>
-              </div>
-            </div>
-            <div>
-              <h4 class="text-md font-medium text-gray-900 mb-4">Database</h4>
-              <div class="space-y-2">
-                <div class="flex justify-between">
-                  <span class="text-sm text-gray-500">Status:</span>
-                  <span class="text-sm font-medium text-green-600">Healthy</span>
-                </div>
-                <div class="flex justify-between">
-                  <span class="text-sm text-gray-500">Size:</span>
-                  <span class="text-sm font-medium text-gray-900">256 MB</span>
-                </div>
-                <div class="flex justify-between">
-                  <span class="text-sm text-gray-500">Last Backup:</span>
-                  <span class="text-sm font-medium text-gray-900">Jan 12, 2024 14:30</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="mt-6">
-            <h4 class="text-md font-medium text-gray-900 mb-4">System Logs</h4>
-            <div class="bg-gray-50 rounded-lg p-4 h-64 overflow-y-auto font-mono text-xs">
-              <div class="text-green-600">
-                [INFO] 2024-01-12 14:30:00 - Database backup completed successfully
-              </div>
-              <div class="text-blue-600">
-                [DEBUG] 2024-01-12 14:29:58 - Starting database backup process
-              </div>
-              <div class="text-yellow-600">
-                [WARN] 2024-01-12 10:15:22 - High CPU usage detected (85%)
-              </div>
-              <div class="text-green-600">
-                [INFO] 2024-01-12 08:00:00 - System startup completed
-              </div>
-              <div class="text-red-600">
-                [ERROR] 2024-01-11 23:45:12 - Failed to connect to Stripe API: timeout
-              </div>
-              <div class="text-green-600">
-                [INFO] 2024-01-11 23:46:05 - Reconnected to Stripe API successfully
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
 
-    <!-- Organization Management Tab -->
-    <div v-if="activeTab === 'organizations'" class="space-y-6">
+    <!-- Logs Tab -->
+    <div v-if="activeTab === 'logs'" class="space-y-6">
       <div class="bg-white rounded-lg shadow-sm border border-gray-200">
         <div class="p-6 border-b border-gray-200">
           <div class="flex items-center justify-between">
-            <h3 class="text-lg font-semibold text-gray-900">Customer Organizations</h3>
+            <h3 class="text-lg font-semibold text-gray-900">System Logs</h3>
             <div class="flex space-x-2">
-              <input
-                v-model="organizationSearch"
-                type="text"
-                placeholder="Search organizations"
-                class="px-3 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
-              />
-              <button
-                @click="showOrgModal = true"
-                class="bg-primary-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary-700 transition-colors duration-200"
+              <select
+                v-model="logFilters.level"
+                class="text-sm border border-gray-300 rounded-md px-2 py-1 focus:ring-primary-500 focus:border-primary-500"
               >
-                Add Organization
-              </button>
+                <option value="">All Levels</option>
+                <option value="INFO">Info</option>
+                <option value="WARN">Warning</option>
+                <option value="ERROR">Error</option>
+                <option value="DEBUG">Debug</option>
+              </select>
+              <input
+                v-model="logFilters.search"
+                type="text"
+                placeholder="Search logs..."
+                class="text-sm border border-gray-300 rounded-md px-2 py-1 focus:ring-primary-500 focus:border-primary-500"
+              />
             </div>
           </div>
         </div>
-        
-        <div class="overflow-x-auto">
-          <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
-              <tr>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Organization</th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Admin</th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Users</th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Subscription</th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created</th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-              </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
-              <tr v-for="org in organizations" :key="org.id">
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm font-medium text-gray-900">{{ org.name }}</div>
-                  <div class="text-sm text-gray-500">{{ org.industry }}</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-900">{{ org.adminName }}</div>
-                  <div class="text-sm text-gray-500">{{ org.adminEmail }}</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {{ org.userCount }}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <span 
-                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
-                    :class="org.subscriptionStatus === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
-                  >
-                    {{ org.subscriptionStatus.toUpperCase() }}
-                  </span>
-                  <div class="text-sm text-gray-500 mt-1">{{ org.planName }}</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {{ formatDate(org.createdAt) }}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                  <button
-                    @click="viewOrganization(org)"
-                    class="text-primary-600 hover:text-primary-900 mr-3"
-                  >
-                    View
-                  </button>
-                  <button
-                    @click="toggleOrgStatus(org)"
-                    class="text-gray-600 hover:text-gray-900"
-                  >
-                    {{ org.isActive ? 'Deactivate' : 'Activate' }}
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+        <div class="p-6">
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Level</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Message</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">IP</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Timestamp</th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200">
+                <tr v-for="log in filteredLogs" :key="log.id">
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <span 
+                      class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
+                      :class="getLogLevelClass(log.level)"
+                    >
+                      {{ log.level }}
+                    </span>
+                  </td>
+                  <td class="px-6 py-4">
+                    <div class="text-sm text-gray-900">{{ log.message }}</div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm text-gray-900">{{ log.user_id || 'System' }}</div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm text-gray-900">{{ log.ip_address || 'N/A' }}</div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm text-gray-900">{{ formatTime(log.timestamp) }}</div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
@@ -750,55 +720,51 @@
     <div v-if="showPlanModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div class="bg-white rounded-lg p-6 w-full max-w-2xl mx-4">
         <h3 class="text-lg font-semibold text-gray-900 mb-4">
-          {{ editingPlan ? 'Edit Subscription Plan' : 'Add New Subscription Plan' }}
+          {{ editingPlan.id ? 'Edit Plan' : 'Add New Plan' }}
         </h3>
         
         <form @submit.prevent="savePlan" class="space-y-4">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Plan Name</label>
-            <input
-              v-model="planForm.name"
-              type="text"
-              required
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
-              placeholder="Basic Plan"
-            />
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Plan Name</label>
+              <input
+                v-model="editingPlan.name"
+                type="text"
+                required
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
+                placeholder="Basic Plan"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Price (USD)</label>
+              <input
+                v-model.number="editingPlan.displayPrice"
+                type="number"
+                min="0"
+                step="0.01"
+                required
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
+                placeholder="29.99"
+              />
+            </div>
           </div>
 
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
-            <input
-              v-model="planForm.description"
-              type="text"
+            <textarea
+              v-model="editingPlan.description"
+              rows="2"
               required
               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
               placeholder="Essential features for small teams"
-            />
+            ></textarea>
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Price (USD)</label>
-              <div class="relative">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <span class="text-gray-500 sm:text-sm">$</span>
-                </div>
-                <input
-                  v-model="planForm.displayPrice"
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  required
-                  class="w-full pl-7 px-3 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
-                  placeholder="29.99"
-                />
-              </div>
-            </div>
-
-            <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">Billing Interval</label>
               <select
-                v-model="planForm.interval"
+                v-model="editingPlan.interval"
                 required
                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
               >
@@ -806,24 +772,23 @@
                 <option value="yearly">Yearly</option>
               </select>
             </div>
-          </div>
-
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Stripe Price ID</label>
-            <input
-              v-model="planForm.stripePriceId"
-              type="text"
-              required
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
-              placeholder="price_1RbnOfE7qtcuEIptjDemZiVn"
-            />
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Stripe Price ID</label>
+              <input
+                v-model="editingPlan.stripePriceId"
+                type="text"
+                required
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
+                placeholder="price_1RbnOfE7qtcuEIptjDemZiVn"
+              />
+            </div>
           </div>
 
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">Features (one per line)</label>
             <textarea
-              v-model="planFeaturesText"
-              rows="5"
+              v-model="featuresText"
+              rows="4"
               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
               placeholder="AI-powered job tracking
 Real-time machine monitoring
@@ -833,21 +798,20 @@ Performance analytics"
 
           <div class="flex items-center">
             <input
-              v-model="planForm.active"
+              v-model="editingPlan.active"
               type="checkbox"
               class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
             />
-            <label class="ml-2 block text-sm text-gray-900">
-              Plan is active and available for purchase
-            </label>
+            <label class="ml-2 block text-sm text-gray-900">Active</label>
           </div>
 
           <div class="flex space-x-3 mt-6">
             <button
               type="submit"
-              class="flex-1 bg-primary-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-primary-700 transition-colors duration-200"
+              :disabled="savingPlan"
+              class="flex-1 bg-primary-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-primary-700 disabled:opacity-50 transition-colors duration-200"
             >
-              {{ editingPlan ? 'Update Plan' : 'Create Plan' }}
+              {{ savingPlan ? 'Saving...' : 'Save Plan' }}
             </button>
             <button
               type="button"
@@ -861,77 +825,227 @@ Performance analytics"
       </div>
     </div>
 
-    <!-- User Edit Modal -->
-    <div v-if="showUserModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div class="bg-white rounded-lg p-6 w-full max-w-md mx-4">
-        <h3 class="text-lg font-semibold text-gray-900 mb-4">Edit User</h3>
+    <!-- Organization Modal -->
+    <div v-if="showOrgModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div class="bg-white rounded-lg p-6 w-full max-w-2xl mx-4">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">
+          {{ editingOrg.id ? 'Edit Organization' : 'Add New Organization' }}
+        </h3>
         
-        <form @submit.prevent="saveUser" class="space-y-4">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Name</label>
-            <input
-              v-model="userForm.name"
-              type="text"
-              required
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
-            />
+        <form @submit.prevent="saveOrganization" class="space-y-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Organization Name</label>
+              <input
+                v-model="editingOrg.name"
+                type="text"
+                required
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
+                placeholder="Acme Manufacturing"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Industry</label>
+              <input
+                v-model="editingOrg.industry"
+                type="text"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
+                placeholder="Manufacturing"
+              />
+            </div>
           </div>
 
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
-            <input
-              v-model="userForm.email"
-              type="email"
-              required
-              disabled
-              class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100"
-            />
-            <p class="text-xs text-gray-500 mt-1">Email cannot be changed</p>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Primary Contact Name</label>
+              <input
+                v-model="editingOrg.primaryContactName"
+                type="text"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
+                placeholder="John Smith"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Primary Contact Email</label>
+              <input
+                v-model="editingOrg.primaryContactEmail"
+                type="email"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
+                placeholder="john@example.com"
+              />
+            </div>
           </div>
 
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Role</label>
-            <select
-              v-model="userForm.role"
-              required
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
-            >
-              <option value="operator">Operator</option>
-              <option value="lead">Lead</option>
-              <option value="supervisor">Supervisor</option>
-              <option value="manager">Manager</option>
-              <option value="admin">Admin</option>
-              <option value="customer">Customer</option>
-              <option value="organization_admin">Organization Admin</option>
-            </select>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Phone</label>
+              <input
+                v-model="editingOrg.phone"
+                type="text"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
+                placeholder="(555) 123-4567"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Website</label>
+              <input
+                v-model="editingOrg.website"
+                type="text"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
+                placeholder="https://example.com"
+              />
+            </div>
           </div>
 
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Department</label>
-            <input
-              v-model="userForm.department"
-              type="text"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
-            />
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Max Users</label>
+              <input
+                v-model.number="editingOrg.maxUsers"
+                type="number"
+                min="1"
+                required
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
+                placeholder="10"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Subscription Plan</label>
+              <select
+                v-model="editingOrg.planId"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
+              >
+                <option value="">No Plan</option>
+                <option 
+                  v-for="plan in adminStore.subscriptionPlans.filter(p => p.active)" 
+                  :key="plan.id" 
+                  :value="plan.id"
+                >
+                  {{ plan.name }}
+                </option>
+              </select>
+            </div>
           </div>
 
           <div class="flex items-center">
             <input
-              v-model="userForm.is_active"
+              v-model="editingOrg.isActive"
               type="checkbox"
               class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
             />
-            <label class="ml-2 block text-sm text-gray-900">
-              User is active
-            </label>
+            <label class="ml-2 block text-sm text-gray-900">Active</label>
           </div>
 
           <div class="flex space-x-3 mt-6">
             <button
               type="submit"
-              class="flex-1 bg-primary-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-primary-700 transition-colors duration-200"
+              :disabled="savingOrg"
+              class="flex-1 bg-primary-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-primary-700 disabled:opacity-50 transition-colors duration-200"
             >
-              Save Changes
+              {{ savingOrg ? 'Saving...' : 'Save Organization' }}
+            </button>
+            <button
+              type="button"
+              @click="showOrgModal = false"
+              class="flex-1 bg-gray-100 text-gray-700 px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-200 transition-colors duration-200"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- User Modal -->
+    <div v-if="showUserModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div class="bg-white rounded-lg p-6 w-full max-w-2xl mx-4">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">Edit User</h3>
+        
+        <form @submit.prevent="saveUser" class="space-y-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Name</label>
+              <input
+                v-model="editingUser.name"
+                type="text"
+                required
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
+                placeholder="John Smith"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+              <input
+                v-model="editingUser.email"
+                type="email"
+                required
+                disabled
+                class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100"
+                placeholder="john@example.com"
+              />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Role</label>
+              <select
+                v-model="editingUser.role"
+                required
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
+              >
+                <option value="admin">Platform Admin</option>
+                <option value="organization_admin">Organization Admin</option>
+                <option value="manager">Manager</option>
+                <option value="supervisor">Supervisor</option>
+                <option value="lead">Lead</option>
+                <option value="operator">Operator</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Department</label>
+              <input
+                v-model="editingUser.department"
+                type="text"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
+                placeholder="Manufacturing"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Organization</label>
+            <select
+              v-model="editingUser.organization_id"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
+            >
+              <option value="">No Organization (Platform Admin)</option>
+              <option 
+                v-for="org in adminStore.organizations" 
+                :key="org.id" 
+                :value="org.id"
+              >
+                {{ org.name }}
+              </option>
+            </select>
+          </div>
+
+          <div class="flex items-center">
+            <input
+              v-model="editingUser.is_active"
+              type="checkbox"
+              class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+            />
+            <label class="ml-2 block text-sm text-gray-900">Active</label>
+          </div>
+
+          <div class="flex space-x-3 mt-6">
+            <button
+              type="submit"
+              :disabled="savingUser"
+              class="flex-1 bg-primary-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-primary-700 disabled:opacity-50 transition-colors duration-200"
+            >
+              {{ savingUser ? 'Saving...' : 'Save User' }}
             </button>
             <button
               type="button"
@@ -945,13 +1059,156 @@ Performance analytics"
       </div>
     </div>
 
-    <!-- Subscription View Modal -->
-    <div v-if="showSubscriptionModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div class="bg-white rounded-lg p-6 w-full max-w-3xl mx-4">
+    <!-- Organization Users Modal -->
+    <div v-if="showOrgUsersModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div class="bg-white rounded-lg p-6 w-full max-w-4xl mx-4 max-h-[90vh] overflow-y-auto">
+        <div class="flex items-center justify-between mb-6">
+          <h3 class="text-lg font-semibold text-gray-900">{{ selectedOrg?.name }} - Users</h3>
+          <button
+            @click="showOrgUsersModal = false"
+            class="text-gray-400 hover:text-gray-600"
+          >
+            <XMarkIcon class="w-6 h-6" />
+          </button>
+        </div>
+        
+        <div class="mb-6">
+          <button
+            @click="showAddOrgUserModal = true"
+            class="bg-primary-600 text-white px-3 py-1 rounded text-sm hover:bg-primary-700 transition-colors duration-200"
+          >
+            Add User
+          </button>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Admin</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Joined</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              <tr v-for="user in orgUsers" :key="user.id">
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm font-medium text-gray-900">{{ user.userName }}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm text-gray-900">{{ user.userEmail }}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <span 
+                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
+                    :class="getRoleClass(user.role)"
+                  >
+                    {{ formatRole(user.role) }}
+                  </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <span 
+                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
+                    :class="user.isAdmin ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-800'"
+                  >
+                    {{ user.isAdmin ? 'Admin' : 'User' }}
+                  </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm text-gray-900">{{ formatDate(user.joinedAt) }}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <button
+                    @click="editOrgUser(user)"
+                    class="text-primary-600 hover:text-primary-900 mr-3"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    @click="removeOrgUser(user)"
+                    class="text-red-600 hover:text-red-900"
+                  >
+                    Remove
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add Organization User Modal -->
+    <div v-if="showAddOrgUserModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div class="bg-white rounded-lg p-6 w-full max-w-md mx-4">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">Add User to {{ selectedOrg?.name }}</h3>
+        
+        <form @submit.prevent="addOrgUser" class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+            <input
+              v-model="newOrgUser.email"
+              type="email"
+              required
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
+              placeholder="user@example.com"
+            />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Role</label>
+            <select
+              v-model="newOrgUser.role"
+              required
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
+            >
+              <option value="organization_admin">Organization Admin</option>
+              <option value="manager">Manager</option>
+              <option value="supervisor">Supervisor</option>
+              <option value="lead">Lead</option>
+              <option value="operator">Operator</option>
+            </select>
+          </div>
+
+          <div class="flex items-center">
+            <input
+              v-model="newOrgUser.isAdmin"
+              type="checkbox"
+              class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+            />
+            <label class="ml-2 block text-sm text-gray-900">Organization Admin</label>
+          </div>
+
+          <div class="flex space-x-3 mt-6">
+            <button
+              type="submit"
+              :disabled="addingOrgUser"
+              class="flex-1 bg-primary-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-primary-700 disabled:opacity-50 transition-colors duration-200"
+            >
+              {{ addingOrgUser ? 'Adding...' : 'Add User' }}
+            </button>
+            <button
+              type="button"
+              @click="showAddOrgUserModal = false"
+              class="flex-1 bg-gray-100 text-gray-700 px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-200 transition-colors duration-200"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Subscription Details Modal -->
+    <div v-if="showSubscriptionDetailsModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div class="bg-white rounded-lg p-6 w-full max-w-4xl mx-4 max-h-[90vh] overflow-y-auto">
         <div class="flex items-center justify-between mb-6">
           <h3 class="text-lg font-semibold text-gray-900">Subscription Details</h3>
           <button
-            @click="showSubscriptionModal = false"
+            @click="showSubscriptionDetailsModal = false"
             class="text-gray-400 hover:text-gray-600"
           >
             <XMarkIcon class="w-6 h-6" />
@@ -959,64 +1216,71 @@ Performance analytics"
         </div>
         
         <div v-if="selectedSubscription" class="space-y-6">
+          <!-- Customer Info -->
           <div class="bg-gray-50 rounded-lg p-4">
+            <h4 class="text-md font-medium text-gray-900 mb-2">Customer Information</h4>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <h4 class="text-sm font-medium text-gray-500">Customer</h4>
-                <p class="text-lg font-medium text-gray-900">{{ selectedSubscription.userName }}</p>
-                <p class="text-sm text-gray-600">{{ selectedSubscription.userEmail }}</p>
+                <span class="text-sm text-gray-500">Name:</span>
+                <p class="text-sm font-medium text-gray-900">{{ selectedSubscription.userName }}</p>
               </div>
               <div>
-                <h4 class="text-sm font-medium text-gray-500">Subscription</h4>
-                <p class="text-lg font-medium text-gray-900">{{ selectedSubscription.planName }}</p>
-                <div class="flex items-center space-x-2">
-                  <span 
-                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
-                    :class="getStatusClass(selectedSubscription.status)"
-                  >
-                    {{ selectedSubscription.status.toUpperCase() }}
-                  </span>
-                  <span class="text-sm text-gray-600">
-                    ${{ (selectedSubscription.amount / 100).toFixed(2) }}/{{ selectedSubscription.interval }}
-                  </span>
-                </div>
+                <span class="text-sm text-gray-500">Email:</span>
+                <p class="text-sm font-medium text-gray-900">{{ selectedSubscription.userEmail }}</p>
+              </div>
+              <div>
+                <span class="text-sm text-gray-500">Customer Since:</span>
+                <p class="text-sm font-medium text-gray-900">{{ formatDate(selectedSubscription.customerSince) }}</p>
+              </div>
+              <div>
+                <span class="text-sm text-gray-500">Customer ID:</span>
+                <p class="text-sm font-medium text-gray-900">{{ selectedSubscription.customerId }}</p>
               </div>
             </div>
           </div>
 
-          <div>
-            <h4 class="text-md font-medium text-gray-900 mb-3">Subscription Timeline</h4>
-            <div class="space-y-2">
-              <div class="flex justify-between">
-                <span class="text-sm text-gray-500">Started:</span>
-                <span class="text-sm font-medium text-gray-900">{{ formatDate(selectedSubscription.startDate) }}</span>
+          <!-- Subscription Info -->
+          <div class="bg-gray-50 rounded-lg p-4">
+            <h4 class="text-md font-medium text-gray-900 mb-2">Subscription Details</h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <span class="text-sm text-gray-500">Plan:</span>
+                <p class="text-sm font-medium text-gray-900">{{ selectedSubscription.planName }}</p>
               </div>
-              <div class="flex justify-between">
-                <span class="text-sm text-gray-500">Next billing:</span>
-                <span class="text-sm font-medium text-gray-900">{{ formatDate(selectedSubscription.nextBillingDate) }}</span>
+              <div>
+                <span class="text-sm text-gray-500">Status:</span>
+                <span 
+                  class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
+                  :class="getSubscriptionStatusClass(selectedSubscription.status)"
+                >
+                  {{ selectedSubscription.status }}
+                </span>
               </div>
-              <div class="flex justify-between">
-                <span class="text-sm text-gray-500">Customer since:</span>
-                <span class="text-sm font-medium text-gray-900">{{ formatDate(selectedSubscription.customerSince) }}</span>
+              <div>
+                <span class="text-sm text-gray-500">Start Date:</span>
+                <p class="text-sm font-medium text-gray-900">{{ formatDate(selectedSubscription.startDate) }}</p>
+              </div>
+              <div>
+                <span class="text-sm text-gray-500">Next Billing:</span>
+                <p class="text-sm font-medium text-gray-900">{{ formatDate(selectedSubscription.nextBillingDate) }}</p>
+              </div>
+              <div>
+                <span class="text-sm text-gray-500">Amount:</span>
+                <p class="text-sm font-medium text-gray-900">${{ (selectedSubscription.amount / 100).toFixed(2) }}/{{ selectedSubscription.interval }}</p>
+              </div>
+              <div>
+                <span class="text-sm text-gray-500">Payment Method:</span>
+                <p class="text-sm font-medium text-gray-900">
+                  {{ selectedSubscription.paymentMethodBrand || 'N/A' }} 
+                  {{ selectedSubscription.paymentMethodLast4 ? `(**** ${selectedSubscription.paymentMethodLast4})` : '' }}
+                </p>
               </div>
             </div>
           </div>
 
+          <!-- Invoices -->
           <div>
-            <h4 class="text-md font-medium text-gray-900 mb-3">Payment Method</h4>
-            <div v-if="selectedSubscription.paymentMethodLast4" class="flex items-center space-x-2">
-              <CreditCardIcon class="w-5 h-5 text-gray-400" />
-              <span class="text-sm text-gray-900">
-                {{ selectedSubscription.paymentMethodBrand?.toUpperCase() }} •••• {{ selectedSubscription.paymentMethodLast4 }}
-              </span>
-            </div>
-            <div v-else class="text-sm text-gray-500">
-              No payment method on file
-            </div>
-          </div>
-
-          <div>
-            <h4 class="text-md font-medium text-gray-900 mb-3">Invoice History</h4>
+            <h4 class="text-md font-medium text-gray-900 mb-2">Invoices</h4>
             <div class="overflow-x-auto">
               <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
@@ -1029,15 +1293,21 @@ Performance analytics"
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
                   <tr v-for="invoice in selectedSubscription.invoices" :key="invoice.id">
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ invoice.id }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ formatDate(invoice.date) }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${{ (invoice.amount / 100).toFixed(2) }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <div class="text-sm text-gray-900">{{ invoice.id }}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <div class="text-sm text-gray-900">{{ formatDate(invoice.date) }}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <div class="text-sm text-gray-900">${{ (invoice.amount / 100).toFixed(2) }}</div>
+                    </td>
                     <td class="px-6 py-4 whitespace-nowrap">
                       <span 
                         class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
                         :class="invoice.status === 'paid' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'"
                       >
-                        {{ invoice.status.toUpperCase() }}
+                        {{ invoice.status }}
                       </span>
                     </td>
                   </tr>
@@ -1045,45 +1315,6 @@ Performance analytics"
               </table>
             </div>
           </div>
-
-          <div class="flex justify-end space-x-3 pt-4 border-t border-gray-200">
-            <button
-              v-if="selectedSubscription.status === 'active' && !selectedSubscription.cancelAtPeriodEnd"
-              @click="confirmCancelSubscription(selectedSubscription)"
-              class="bg-red-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-red-700 transition-colors duration-200"
-            >
-              Cancel Subscription
-            </button>
-            <button
-              @click="showSubscriptionModal = false"
-              class="bg-gray-100 text-gray-700 px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-200 transition-colors duration-200"
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Confirmation Modal -->
-    <div v-if="showConfirmModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div class="bg-white rounded-lg p-6 w-full max-w-md mx-4">
-        <h3 class="text-lg font-semibold text-gray-900 mb-4">{{ confirmTitle }}</h3>
-        <p class="text-gray-700 mb-6">{{ confirmMessage }}</p>
-        
-        <div class="flex space-x-3">
-          <button
-            @click="confirmAction"
-            class="flex-1 bg-red-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-red-700 transition-colors duration-200"
-          >
-            Confirm
-          </button>
-          <button
-            @click="showConfirmModal = false"
-            class="flex-1 bg-gray-100 text-gray-700 px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-200 transition-colors duration-200"
-          >
-            Cancel
-          </button>
         </div>
       </div>
     </div>
@@ -1091,72 +1322,110 @@ Performance analytics"
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue';
+import { ref, computed, onMounted, reactive } from 'vue';
 import { format } from 'date-fns';
 import { useAdminStore } from '../stores/admin';
-import type { SubscriptionPlan, Subscription, User, SystemSettings } from '../types/admin';
+import type { SubscriptionPlan, Subscription, Organization, OrganizationUser, User, SystemSettings, SystemLog } from '../stores/admin';
 import {
   CurrencyDollarIcon,
-  UsersIcon,
+  UserGroupIcon,
   ArrowTrendingUpIcon,
   ArrowTrendingDownIcon,
-  ChartBarIcon,
+  ArrowPathIcon,
+  XMarkIcon,
   CreditCardIcon,
-  Cog6ToothIcon,
   BuildingOfficeIcon,
-  EyeIcon,
-  EyeSlashIcon,
-  XMarkIcon
+  UserIcon,
+  Cog6ToothIcon,
+  DocumentTextIcon,
+  ExclamationCircleIcon,
+  InformationCircleIcon,
+  ExclamationTriangleIcon
 } from '@heroicons/vue/24/outline';
-import Chart from 'chart.js/auto';
 
 const adminStore = useAdminStore();
 const activeTab = ref('dashboard');
 const showPlanModal = ref(false);
-const showUserModal = ref(false);
-const showSubscriptionModal = ref(false);
-const showConfirmModal = ref(false);
 const showOrgModal = ref(false);
-const editingPlan = ref<SubscriptionPlan | null>(null);
-const selectedSubscription = ref<Subscription | null>(null);
-const confirmTitle = ref('');
-const confirmMessage = ref('');
-const confirmCallback = ref<() => void>(() => {});
-const subscriptionSearch = ref('');
-const userSearch = ref('');
-const userRoleFilter = ref('');
-const organizationSearch = ref('');
+const showUserModal = ref(false);
+const showOrgUsersModal = ref(false);
+const showAddOrgUserModal = ref(false);
+const showSubscriptionDetailsModal = ref(false);
+const savingPlan = ref(false);
+const savingOrg = ref(false);
+const savingUser = ref(false);
+const addingOrgUser = ref(false);
+const savingSettings = ref(false);
+const backupInProgress = ref(false);
 
-// Chart references
-const revenueChart = ref<HTMLCanvasElement | null>(null);
-const userChart = ref<HTMLCanvasElement | null>(null);
-const planDistributionChart = ref<HTMLCanvasElement | null>(null);
+const tabs = [
+  { id: 'dashboard', name: 'Dashboard', icon: CreditCardIcon },
+  { id: 'subscriptions', name: 'Subscriptions', icon: CreditCardIcon },
+  { id: 'organizations', name: 'Organizations', icon: BuildingOfficeIcon },
+  { id: 'users', name: 'Users', icon: UserIcon },
+  { id: 'settings', name: 'Settings', icon: Cog6ToothIcon },
+  { id: 'logs', name: 'System Logs', icon: DocumentTextIcon }
+];
 
-// Form states
-const planForm = ref<SubscriptionPlan>({
+const userFilters = reactive({
+  role: '',
+  search: ''
+});
+
+const logFilters = reactive({
+  level: '',
+  search: ''
+});
+
+const editingPlan = reactive<SubscriptionPlan & { displayPrice?: number }>({
   id: '',
   name: '',
   description: '',
   price: 0,
+  displayPrice: 0,
   interval: 'monthly',
   stripePriceId: '',
   active: true,
   features: []
 });
 
-const planFeaturesText = ref('');
+const editingOrg = reactive<Organization>({
+  id: '',
+  name: '',
+  industry: '',
+  address: '',
+  phone: '',
+  website: '',
+  logoUrl: '',
+  primaryContactName: '',
+  primaryContactEmail: '',
+  subscriptionId: '',
+  subscriptionStatus: '',
+  planId: '',
+  planName: '',
+  maxUsers: 10,
+  currentUserCount: 0,
+  isActive: true,
+  createdAt: new Date().toISOString()
+});
 
-const userForm = ref<User>({
+const editingUser = reactive<User>({
   id: '',
   name: '',
   email: '',
-  role: 'operator',
+  role: '',
   department: '',
   is_active: true,
-  created_at: ''
+  created_at: new Date().toISOString()
 });
 
-const settings = ref<SystemSettings>({
+const newOrgUser = reactive({
+  email: '',
+  role: 'operator',
+  isAdmin: false
+});
+
+const settings = reactive<SystemSettings>({
   stripeSecretKey: '',
   stripeWebhookSecret: '',
   openaiApiKey: '',
@@ -1173,95 +1442,84 @@ const settings = ref<SystemSettings>({
   }
 });
 
-// Security toggles
-const showStripeKey = ref(false);
-const showWebhookSecret = ref(false);
-const showOpenAIKey = ref(false);
-
-// Mock organizations data
-const organizations = ref([
-  {
-    id: '1',
-    name: 'Acme Manufacturing',
-    industry: 'Aerospace',
-    adminName: 'John Smith',
-    adminEmail: 'john@acme.com',
-    userCount: 25,
-    subscriptionStatus: 'active',
-    planName: 'Enterprise Plan',
-    isActive: true,
-    createdAt: '2024-01-01T00:00:00Z'
-  },
-  {
-    id: '2',
-    name: 'TechCorp Industries',
-    industry: 'Automotive',
-    adminName: 'Sarah Johnson',
-    adminEmail: 'sarah@techcorp.com',
-    userCount: 18,
-    subscriptionStatus: 'active',
-    planName: 'Pro Plan',
-    isActive: true,
-    createdAt: '2024-01-05T00:00:00Z'
-  },
-  {
-    id: '3',
-    name: 'Precision Machining Co',
-    industry: 'Medical Devices',
-    adminName: 'Mike Wilson',
-    adminEmail: 'mike@precision.com',
-    userCount: 12,
-    subscriptionStatus: 'past_due',
-    planName: 'Basic Plan',
-    isActive: true,
-    createdAt: '2024-01-10T00:00:00Z'
-  }
-]);
-
-const tabs = [
-  { id: 'dashboard', name: 'Dashboard', icon: ChartBarIcon },
-  { id: 'plans', name: 'Subscription Plans', icon: CreditCardIcon },
-  { id: 'subscriptions', name: 'Active Subscriptions', icon: CurrencyDollarIcon },
-  { id: 'users', name: 'User Management', icon: UsersIcon },
-  { id: 'organizations', name: 'Organizations', icon: BuildingOfficeIcon },
-  { id: 'settings', name: 'System Settings', icon: Cog6ToothIcon }
-];
-
-// Computed properties
-const filteredSubscriptions = computed(() => {
-  if (!subscriptionSearch.value) return adminStore.activeSubscriptions;
-  
-  const search = subscriptionSearch.value.toLowerCase();
-  return adminStore.activeSubscriptions.filter(sub => 
-    sub.userName.toLowerCase().includes(search) || 
-    sub.userEmail.toLowerCase().includes(search)
-  );
-});
+const selectedOrg = ref<Organization | null>(null);
+const selectedSubscription = ref<Subscription | null>(null);
+const orgUsers = ref<OrganizationUser[]>([]);
+const featuresText = ref('');
 
 const filteredUsers = computed(() => {
   let filtered = adminStore.users;
   
-  if (userSearch.value) {
-    const search = userSearch.value.toLowerCase();
+  if (userFilters.role) {
+    filtered = filtered.filter(user => user.role === userFilters.role);
+  }
+  
+  if (userFilters.search) {
+    const search = userFilters.search.toLowerCase();
     filtered = filtered.filter(user => 
       user.name.toLowerCase().includes(search) || 
       user.email.toLowerCase().includes(search)
     );
   }
   
-  if (userRoleFilter.value) {
-    filtered = filtered.filter(user => user.role === userRoleFilter.value);
+  return filtered;
+});
+
+const filteredLogs = computed(() => {
+  let filtered = adminStore.systemLogs;
+  
+  if (logFilters.level) {
+    filtered = filtered.filter(log => log.level === logFilters.level);
+  }
+  
+  if (logFilters.search) {
+    const search = logFilters.search.toLowerCase();
+    filtered = filtered.filter(log => 
+      log.message.toLowerCase().includes(search)
+    );
   }
   
   return filtered;
 });
 
-// Methods
+const refreshData = async () => {
+  await Promise.all([
+    adminStore.fetchSubscriptionPlans(),
+    adminStore.fetchActiveSubscriptions(),
+    adminStore.fetchUsers(),
+    adminStore.fetchOrganizations(),
+    adminStore.fetchAnalytics(),
+    adminStore.fetchSystemSettings(),
+    adminStore.fetchSystemLogs()
+  ]);
+};
+
 const formatDate = (dateString: string) => {
   return format(new Date(dateString), 'MMM dd, yyyy');
 };
 
-const getStatusClass = (status: string) => {
+const formatTime = (dateString: string) => {
+  return format(new Date(dateString), 'MMM dd, yyyy HH:mm:ss');
+};
+
+const formatRole = (role: string) => {
+  if (role === 'organization_admin') return 'Org Admin';
+  return role.charAt(0).toUpperCase() + role.slice(1);
+};
+
+const getRoleClass = (role: string) => {
+  const classes = {
+    'admin': 'bg-red-100 text-red-800',
+    'organization_admin': 'bg-purple-100 text-purple-800',
+    'manager': 'bg-blue-100 text-blue-800',
+    'supervisor': 'bg-indigo-100 text-indigo-800',
+    'lead': 'bg-green-100 text-green-800',
+    'operator': 'bg-gray-100 text-gray-800'
+  };
+  return classes[role as keyof typeof classes] || classes.operator;
+};
+
+const getSubscriptionStatusClass = (status: string) => {
   const classes = {
     'active': 'bg-green-100 text-green-800',
     'trialing': 'bg-blue-100 text-blue-800',
@@ -1269,16 +1527,41 @@ const getStatusClass = (status: string) => {
     'canceled': 'bg-red-100 text-red-800',
     'incomplete': 'bg-orange-100 text-orange-800',
     'incomplete_expired': 'bg-gray-100 text-gray-800',
-    'unpaid': 'bg-red-100 text-red-800',
-    'paused': 'bg-purple-100 text-purple-800'
+    'unpaid': 'bg-red-100 text-red-800'
   };
   return classes[status as keyof typeof classes] || 'bg-gray-100 text-gray-800';
 };
 
+const getLogLevelClass = (level: string) => {
+  const classes = {
+    'INFO': 'bg-blue-100 text-blue-600',
+    'WARN': 'bg-yellow-100 text-yellow-600',
+    'ERROR': 'bg-red-100 text-red-600',
+    'DEBUG': 'bg-gray-100 text-gray-600'
+  };
+  return classes[level as keyof typeof classes] || classes.INFO;
+};
+
+const getLogLevelIcon = (level: string) => {
+  const icons = {
+    'INFO': InformationCircleIcon,
+    'WARN': ExclamationTriangleIcon,
+    'ERROR': ExclamationCircleIcon,
+    'DEBUG': DocumentTextIcon
+  };
+  return icons[level as keyof typeof icons] || InformationCircleIcon;
+};
+
+const getUserOrganization = (user: User) => {
+  if (!user.organization_id) return 'Platform Admin';
+  const org = adminStore.organizations.find(o => o.id === user.organization_id);
+  return org ? org.name : 'Unknown';
+};
+
 const editPlan = (plan: SubscriptionPlan) => {
-  editingPlan.value = plan;
-  planForm.value = { ...plan };
-  planFeaturesText.value = plan.features.join('\n');
+  Object.assign(editingPlan, plan);
+  editingPlan.displayPrice = plan.price / 100;
+  featuresText.value = plan.features.join('\n');
   showPlanModal.value = true;
 };
 
@@ -1292,25 +1575,158 @@ const togglePlanStatus = async (plan: SubscriptionPlan) => {
 };
 
 const savePlan = async () => {
+  savingPlan.value = true;
   try {
     // Convert display price to cents
-    planForm.value.price = Math.round(parseFloat(planForm.value.displayPrice as unknown as string) * 100);
+    editingPlan.price = Math.round((editingPlan.displayPrice || 0) * 100);
     
-    // Convert features from text to array
-    planForm.value.features = planFeaturesText.value
+    // Parse features from text
+    editingPlan.features = featuresText.value
       .split('\n')
       .map(line => line.trim())
       .filter(line => line.length > 0);
     
-    await adminStore.saveSubscriptionPlan(planForm.value);
+    await adminStore.saveSubscriptionPlan(editingPlan);
     showPlanModal.value = false;
+    
+    // Reset form
+    Object.assign(editingPlan, {
+      id: '',
+      name: '',
+      description: '',
+      price: 0,
+      displayPrice: 0,
+      interval: 'monthly',
+      stripePriceId: '',
+      active: true,
+      features: []
+    });
+    featuresText.value = '';
   } catch (error) {
     console.error('Error saving plan:', error);
+  } finally {
+    savingPlan.value = false;
+  }
+};
+
+const editOrganization = (org: Organization) => {
+  Object.assign(editingOrg, org);
+  showOrgModal.value = true;
+};
+
+const saveOrganization = async () => {
+  savingOrg.value = true;
+  try {
+    await adminStore.saveOrganization(editingOrg);
+    showOrgModal.value = false;
+    
+    // Reset form
+    Object.assign(editingOrg, {
+      id: '',
+      name: '',
+      industry: '',
+      address: '',
+      phone: '',
+      website: '',
+      logoUrl: '',
+      primaryContactName: '',
+      primaryContactEmail: '',
+      subscriptionId: '',
+      subscriptionStatus: '',
+      planId: '',
+      planName: '',
+      maxUsers: 10,
+      currentUserCount: 0,
+      isActive: true,
+      createdAt: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('Error saving organization:', error);
+  } finally {
+    savingOrg.value = false;
+  }
+};
+
+const viewOrganizationUsers = (org: Organization) => {
+  selectedOrg.value = org;
+  // In a real app, you would fetch the users for this organization
+  orgUsers.value = [
+    {
+      id: 'ou-1',
+      organizationId: org.id,
+      userId: 'user-1',
+      userName: 'John Smith',
+      userEmail: 'john@example.com',
+      role: 'manager',
+      isAdmin: true,
+      isPrimary: true,
+      joinedAt: '2024-01-01T00:00:00Z'
+    },
+    {
+      id: 'ou-2',
+      organizationId: org.id,
+      userId: 'user-2',
+      userName: 'Sarah Johnson',
+      userEmail: 'sarah@example.com',
+      role: 'operator',
+      isAdmin: false,
+      isPrimary: false,
+      joinedAt: '2024-01-05T00:00:00Z'
+    }
+  ];
+  showOrgUsersModal.value = true;
+};
+
+const editOrgUser = (user: OrganizationUser) => {
+  // In a real app, you would implement this
+  console.log('Edit organization user:', user);
+};
+
+const removeOrgUser = (user: OrganizationUser) => {
+  // In a real app, you would implement this
+  console.log('Remove organization user:', user);
+  orgUsers.value = orgUsers.value.filter(u => u.id !== user.id);
+};
+
+const addOrgUser = async () => {
+  addingOrgUser.value = true;
+  try {
+    // In a real app, you would implement this
+    console.log('Add organization user:', newOrgUser);
+    
+    // Simulate adding a user
+    if (selectedOrg.value) {
+      const newUser: OrganizationUser = {
+        id: `ou-${Date.now()}`,
+        organizationId: selectedOrg.value.id,
+        userId: `user-${Date.now()}`,
+        userName: newOrgUser.email.split('@')[0],
+        userEmail: newOrgUser.email,
+        role: newOrgUser.role,
+        isAdmin: newOrgUser.isAdmin,
+        isPrimary: false,
+        joinedAt: new Date().toISOString()
+      };
+      orgUsers.value.push(newUser);
+    }
+    
+    showAddOrgUserModal.value = false;
+    
+    // Reset form
+    Object.assign(newOrgUser, {
+      email: '',
+      role: 'operator',
+      isAdmin: false
+    });
+  } catch (error) {
+    console.error('Error adding organization user:', error);
+  } finally {
+    addingOrgUser.value = false;
   }
 };
 
 const editUser = (user: User) => {
-  userForm.value = { ...user };
+  Object.assign(editingUser, user);
   showUserModal.value = true;
 };
 
@@ -1324,235 +1740,62 @@ const toggleUserStatus = async (user: User) => {
 };
 
 const saveUser = async () => {
+  savingUser.value = true;
   try {
-    await adminStore.updateUser(userForm.value);
+    await adminStore.updateUser(editingUser);
     showUserModal.value = false;
   } catch (error) {
     console.error('Error saving user:', error);
+  } finally {
+    savingUser.value = false;
   }
 };
 
-const viewSubscription = (subscription: Subscription) => {
+const viewSubscriptionDetails = (subscription: Subscription) => {
   selectedSubscription.value = subscription;
-  showSubscriptionModal.value = true;
+  showSubscriptionDetailsModal.value = true;
 };
 
-const confirmCancelSubscription = (subscription: Subscription) => {
-  confirmTitle.value = 'Cancel Subscription';
-  confirmMessage.value = `Are you sure you want to cancel the subscription for ${subscription.userName}? This will stop billing at the end of the current period.`;
-  confirmCallback.value = () => cancelSubscription(subscription.subscriptionId);
-  showConfirmModal.value = true;
-};
-
-const cancelSubscription = async (subscriptionId: string) => {
-  try {
-    await adminStore.cancelSubscription(subscriptionId);
-    showConfirmModal.value = false;
-    
-    // If we're in the subscription modal, update the selected subscription
-    if (showSubscriptionModal.value && selectedSubscription.value) {
-      selectedSubscription.value.status = 'canceled';
-      selectedSubscription.value.cancelAtPeriodEnd = true;
+const cancelSubscription = async (subscription: Subscription) => {
+  if (confirm(`Are you sure you want to cancel the subscription for ${subscription.userName}?`)) {
+    try {
+      await adminStore.cancelSubscription(subscription.subscriptionId);
+    } catch (error) {
+      console.error('Error cancelling subscription:', error);
     }
-  } catch (error) {
-    console.error('Error cancelling subscription:', error);
   }
-};
-
-const confirmAction = () => {
-  confirmCallback.value();
-  showConfirmModal.value = false;
 };
 
 const saveSettings = async () => {
+  savingSettings.value = true;
   try {
-    await adminStore.saveSystemSettings(settings.value);
+    await adminStore.saveSystemSettings(settings);
     alert('Settings saved successfully');
   } catch (error) {
     console.error('Error saving settings:', error);
+    alert('Error saving settings');
+  } finally {
+    savingSettings.value = false;
   }
 };
 
 const triggerBackup = async () => {
+  backupInProgress.value = true;
   try {
     await adminStore.triggerManualBackup();
-    alert('Backup triggered successfully');
+    alert('Backup completed successfully');
   } catch (error) {
     console.error('Error triggering backup:', error);
+    alert('Error triggering backup');
+  } finally {
+    backupInProgress.value = false;
   }
 };
 
-const refreshData = async () => {
-  await Promise.all([
-    adminStore.fetchAnalytics(),
-    adminStore.fetchSubscriptionPlans(),
-    adminStore.fetchActiveSubscriptions(),
-    adminStore.fetchUsers()
-  ]);
-  initCharts();
-};
-
-const viewOrganization = (org: any) => {
-  console.log('View organization:', org);
-  // Would implement organization details view
-};
-
-const toggleOrgStatus = (org: any) => {
-  org.isActive = !org.isActive;
-  console.log('Toggle organization status:', org);
-  // Would implement organization status toggle
-};
-
-// Initialize charts
-const initCharts = () => {
-  // Revenue chart
-  if (revenueChart.value) {
-    const ctx = revenueChart.value.getContext('2d');
-    if (ctx) {
-      new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-          datasets: [{
-            label: 'Monthly Revenue ($)',
-            data: adminStore.analytics.monthlyRevenue.map(rev => rev / 100),
-            borderColor: '#2563eb',
-            backgroundColor: 'rgba(37, 99, 235, 0.1)',
-            fill: true,
-            tension: 0.4
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              display: false
-            }
-          },
-          scales: {
-            y: {
-              beginAtZero: true,
-              ticks: {
-                callback: function(value) {
-                  return '$' + value;
-                }
-              }
-            }
-          }
-        }
-      });
-    }
-  }
-
-  // User chart
-  if (userChart.value) {
-    const ctx = userChart.value.getContext('2d');
-    if (ctx) {
-      new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-          datasets: [{
-            label: 'Active Users',
-            data: adminStore.analytics.monthlyUsers,
-            borderColor: '#10b981',
-            backgroundColor: 'rgba(16, 185, 129, 0.1)',
-            fill: true,
-            tension: 0.4
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              display: false
-            }
-          },
-          scales: {
-            y: {
-              beginAtZero: true
-            }
-          }
-        }
-      });
-    }
-  }
-
-  // Plan distribution chart
-  if (planDistributionChart.value) {
-    const ctx = planDistributionChart.value.getContext('2d');
-    if (ctx) {
-      const planNames = Object.keys(adminStore.analytics.planDistribution);
-      const planCounts = Object.values(adminStore.analytics.planDistribution);
-      
-      new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-          labels: planNames,
-          datasets: [{
-            data: planCounts,
-            backgroundColor: [
-              '#3b82f6',
-              '#10b981',
-              '#f59e0b',
-              '#ef4444',
-              '#8b5cf6'
-            ],
-            borderWidth: 1
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              position: 'bottom'
-            }
-          }
-        }
-      });
-    }
-  }
-};
-
-// Watch for plan form changes
-watch(() => editingPlan.value, (newPlan) => {
-  if (newPlan) {
-    planForm.value = { ...newPlan };
-    planForm.value.displayPrice = (newPlan.price / 100).toFixed(2) as unknown as number;
-    planFeaturesText.value = newPlan.features.join('\n');
-  } else {
-    planForm.value = {
-      id: '',
-      name: '',
-      description: '',
-      price: 0,
-      displayPrice: 0,
-      interval: 'monthly',
-      stripePriceId: '',
-      active: true,
-      features: []
-    };
-    planFeaturesText.value = '';
-  }
-});
-
-// Initialize data
 onMounted(async () => {
-  await Promise.all([
-    adminStore.fetchAnalytics(),
-    adminStore.fetchSubscriptionPlans(),
-    adminStore.fetchActiveSubscriptions(),
-    adminStore.fetchUsers(),
-    adminStore.fetchSystemSettings()
-  ]);
+  await refreshData();
   
-  settings.value = { ...adminStore.systemSettings };
-  
-  // Initialize charts after data is loaded
-  setTimeout(initCharts, 100);
+  // Initialize settings form with current values
+  Object.assign(settings, adminStore.systemSettings);
 });
 </script>
-```
