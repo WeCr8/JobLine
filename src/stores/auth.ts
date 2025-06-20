@@ -46,13 +46,13 @@ export const useAuthStore = defineStore('auth', () => {
           console.error('Error checking for invites:', inviteError);
         }
 
-        let role = 'operator';
+        let role: User['role'] = 'operator';
         let organization_id = null;
         let department = null;
 
         // If there's an invite, use its role and organization
         if (inviteData) {
-          role = inviteData.role;
+          role = inviteData.role as User['role'];
           organization_id = inviteData.organization_id;
           department = inviteData.department;
         }

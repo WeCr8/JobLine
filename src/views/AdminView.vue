@@ -593,15 +593,15 @@
                     <div class="text-sm text-gray-900">{{ log.message }}</div>
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap">
-                    <div class="text-sm text-gray-900">{{ getUserName(log.user_id) || 'System' }}</div>
+                    <div class="text-sm text-gray-900">{{ getUserName(log.userId) || 'System' }}</div>
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap">
-                    <div class="text-sm text-gray-900">{{ log.ip_address || '-' }}</div>
+                    <div class="text-sm text-gray-900">{{ log.ipAddress || '-' }}</div>
                   </td>
                 </tr>
               </tbody>
             </table>
-          </div>
+          </div> 
         </div>
       </div>
     </div>
@@ -838,6 +838,11 @@ const tabs = [
   { id: 'dashboard', name: 'Dashboard', icon: ArrowTrendingUpIcon },
   { id: 'organizations', name: 'Organizations', icon: BuildingOfficeIcon },
   { id: 'users', name: 'Users', icon: UserGroupIcon },
+  { id: 'jobs', name: 'Jobs', icon: BriefcaseIcon },
+  { id: 'analytics', name: 'Analytics', icon: CurrencyDollarIcon },
+  { id: 'subscriptions', name: 'Subscriptions', icon: ArrowTrendingDownIcon },
+  { id: 'ai', name: 'AI Configuration', icon: CurrencyDollarIcon },
+  { id: 'backups', name: 'Backups', icon: CurrencyDollarIcon },
   { id: 'plans', name: 'Subscription Plans', icon: CreditCardIcon },
   { id: 'settings', name: 'System Settings', icon: Cog6ToothIcon },
   { id: 'logs', name: 'System Logs', icon: DocumentTextIcon }

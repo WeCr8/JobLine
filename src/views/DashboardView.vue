@@ -291,6 +291,13 @@ const kpis = computed<(KPI & { icon: any; bgColor: string; iconColor: string; ch
     bgColor: 'bg-red-100',
     iconColor: 'text-red-600',
     change: -15
+  },
+  {
+    name: 'Settings',
+    value: '',
+    icon: CogIcon,
+    bgColor: 'bg-gray-100',
+    iconColor: 'text-gray-600'
   }
 ]);
 
