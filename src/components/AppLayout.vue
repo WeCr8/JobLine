@@ -92,6 +92,22 @@
                 >
                   Subscription
                 </router-link>
+                <router-link
+                  v-if="isPlatformAdmin"
+                  to="/admin/dashboard"
+                  @click="showUserMenu = false"
+                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200"
+                >
+                  Admin Panel
+                </router-link>
+                <router-link
+                  v-if="isOrgAdmin"
+                  to="/org/dashboard"
+                  @click="showUserMenu = false"
+                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200"
+                >
+                  Organization Admin
+                </router-link>
                 <button
                   @click="handleLogout"
                   class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200"
@@ -130,7 +146,8 @@ import {
   CircleStackIcon,
   LightBulbIcon,
   TrophyIcon,
-  CheckCircleIcon
+  CheckCircleIcon,
+  Cog6ToothIcon
 } from '@heroicons/vue/24/outline';
 
 const router = useRouter();
@@ -140,19 +157,28 @@ const subscriptionStore = useSubscriptionStore();
 const showUserMenu = ref(false);
 
 const navigation = [
-  { name: 'Dashboard', href: '/dashboard', icon: HomeIcon, roles: ['operator', 'lead', 'supervisor', 'manager', 'admin'] },
-  { name: 'Jobs', href: '/jobs', icon: BriefcaseIcon, roles: ['operator', 'lead', 'supervisor', 'manager', 'admin'] },
-  { name: 'Chat', href: '/chat', icon: ChatBubbleLeftRightIcon, roles: ['operator', 'lead', 'supervisor', 'manager', 'admin'] },
-  { name: 'Machines', href: '/machines', icon: CogIcon, roles: ['operator', 'lead', 'supervisor', 'manager', 'admin'] },
-  { name: 'Passdown', href: '/passdown', icon: DocumentTextIcon, roles: ['operator', 'lead', 'supervisor', 'manager', 'admin'] },
-  { name: 'Performance', href: '/performance', icon: TrophyIcon, roles: ['operator', 'lead', 'supervisor', 'manager', 'admin'] },
-  { name: 'Optimization', href: '/optimization', icon: LightBulbIcon, roles: ['lead', 'supervisor', 'manager', 'admin'] },
-  { name: 'Integration', href: '/integration', icon: CircleStackIcon, roles: ['manager', 'admin'] },
+  { name: 'Dashboard', href: '/dashboard', icon: HomeIcon, roles: ['operator', 'lead', 'supervisor', 'manager', 'admin', 'organization_admin'] },
+  { name: 'Jobs', href: '/jobs', icon: BriefcaseIcon, roles: ['operator', 'lead', 'supervisor', 'manager', 'admin', 'organization_admin'] },
+  { name: 'Chat', href: '/chat', icon: ChatBubbleLeftRightIcon, roles: ['operator', 'lead', 'supervisor', 'manager', 'admin', 'organization_admin'] },
+  { name: 'Machines', href: '/machines', icon: CogIcon, roles: ['operator', 'lead', 'supervisor', 'manager', 'admin', 'organization_admin'] },
+  { name: 'Passdown', href: '/passdown', icon: DocumentTextIcon, roles: ['operator', 'lead', 'supervisor', 'manager', 'admin', 'organization_admin'] },
+  { name: 'Performance', href: '/performance', icon: TrophyIcon, roles: ['operator', 'lead', 'supervisor', 'manager', 'admin', 'organization_admin'] },
+  { name: 'Optimization', href: '/optimization', icon: LightBulbIcon, roles: ['lead', 'supervisor', 'manager', 'admin', 'organization_admin'] },
+  { name: 'Integration', href: '/integration', icon: CircleStackIcon, roles: ['manager', 'admin', 'organization_admin'] },
+  { name: 'Admin', href: '/admin/dashboard', icon: Cog6ToothIcon, roles: ['admin'] },
 ];
 
 const visibleNavigation = computed(() => {
   if (!authStore.user) return [];
   return navigation.filter(item => item.roles.includes(authStore.user!.role));
+});
+
+const isPlatformAdmin = computed(() => {
+  return authStore.isPlatformAdmin;
+});
+
+const isOrgAdmin = computed(() => {
+  return authStore.isOrgAdmin;
 });
 
 const handleLogout = async () => {

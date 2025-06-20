@@ -65,19 +65,127 @@ const router = createRouter({
       path: '/integration',
       name: 'Integration',
       component: () => import('../views/IntegrationView.vue'),
-      meta: { requiresAuth: true, requiresRole: ['admin', 'manager'] }
+      meta: { requiresAuth: true, requiresRole: ['admin', 'manager', 'organization_admin'] }
     },
     {
       path: '/optimization',
       name: 'Optimization',
       component: () => import('../views/OptimizationView.vue'),
-      meta: { requiresAuth: true, requiresRole: ['lead', 'supervisor', 'manager', 'admin'] }
+      meta: { requiresAuth: true, requiresRole: ['lead', 'supervisor', 'manager', 'admin', 'organization_admin'] }
     },
     {
       path: '/performance',
       name: 'Performance',
       component: () => import('../views/PerformanceView.vue'),
       meta: { requiresAuth: true }
+    },
+    {
+      path: '/admin',
+      name: 'Admin',
+      component: () => import('../admin/index.vue'),
+      meta: { requiresAuth: true, requiresRole: ['admin'], requiresPlatformAdmin: true },
+      children: [
+        {
+          path: 'dashboard',
+          component: () => import('../admin/dashboard.vue')
+        },
+        {
+          path: 'organizations',
+          component: () => import('../admin/organizations.vue')
+        },
+        {
+          path: 'users',
+          component: () => import('../admin/users.vue')
+        },
+        {
+          path: 'subscriptions',
+          component: () => import('../admin/subscriptions.vue')
+        },
+        {
+          path: 'plans',
+          component: () => import('../admin/plans.vue')
+        },
+        {
+          path: 'settings',
+          component: () => import('../admin/settings.vue')
+        },
+        {
+          path: 'logs',
+          component: () => import('../admin/logs.vue')
+        },
+        {
+          path: '',
+          redirect: '/admin/dashboard'
+        }
+      ]
+    },
+    {
+      path: '/org',
+      name: 'OrganizationAdmin',
+      component: () => import('../org/index.vue'),
+      meta: { requiresAuth: true, requiresRole: ['organization_admin', 'admin'] },
+      children: [
+        {
+          path: 'dashboard',
+          component: () => import('../org/dashboard.vue')
+        },
+        {
+          path: 'users',
+          component: () => import('../org/users.vue')
+        },
+        {
+          path: 'departments',
+          component: () => import('../org/departments.vue')
+        },
+        {
+          path: 'integrations',
+          component: () => import('../org/integrations.vue')
+        },
+        {
+          path: 'settings',
+          component: () => import('../org/settings.vue')
+        },
+        {
+          path: '',
+          redirect: '/org/dashboard'
+        }
+      ]
+    },
+    {
+      path: '/team',
+      name: 'TeamMember',
+      component: () => import('../team/index.vue'),
+      meta: { requiresAuth: true },
+      children: [
+        {
+          path: 'dashboard',
+          component: () => import('../team/dashboard.vue')
+        },
+        {
+          path: 'jobs',
+          component: () => import('../views/JobsView.vue')
+        },
+        {
+          path: 'chat',
+          component: () => import('../views/ChatView.vue')
+        },
+        {
+          path: 'machines',
+          component: () => import('../views/MachinesView.vue')
+        },
+        {
+          path: 'passdown',
+          component: () => import('../views/PassdownView.vue')
+        },
+        {
+          path: 'performance',
+          component: () => import('../views/PerformanceView.vue')
+        },
+        {
+          path: '',
+          redirect: '/team/dashboard'
+        }
+      ]
     }
   ]
 });
@@ -91,8 +199,12 @@ router.beforeEach((to, from, next) => {
     next('/dashboard');
   } else if (to.meta.requiresRole && authStore.user) {
     const requiredRoles = to.meta.requiresRole as string[];
-    if (!requiredRoles.includes(authStore.user.role)) {
-      next('/dashboard'); // Redirect to dashboard if user doesn't have required role
+    
+    // Check if route requires platform admin (no organization)
+    if (to.meta.requiresPlatformAdmin && authStore.user.organization_id) {
+      next('/dashboard'); // Redirect if user is not a platform admin
+    } else if (!requiredRoles.includes(authStore.user.role)) {
+      next('/dashboard'); // Redirect if user doesn't have required role
     } else {
       next();
     }

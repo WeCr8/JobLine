@@ -96,17 +96,24 @@
             </div>
           </div>
 
-          <div class="mt-6 grid grid-cols-2 gap-3">
+          <div class="mt-6 grid grid-cols-3 gap-3">
             <button
               type="button"
-              @click="loginAsDemo('admin@jobline.ai')"
+              @click="loginAsDemo('admin@wecr8.info')"
               class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 transition-colors duration-200"
             >
-              Admin
+              Platform Admin
             </button>
             <button
               type="button"
-              @click="loginAsDemo('operator@jobline.ai')"
+              @click="loginAsDemo('org-admin@example.com')"
+              class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 transition-colors duration-200"
+            >
+              Org Admin
+            </button>
+            <button
+              type="button"
+              @click="loginAsDemo('operator@example.com')"
               class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 transition-colors duration-200"
             >
               Operator
@@ -133,7 +140,14 @@ const password = ref('');
 const handleLogin = async () => {
   const { error } = await authStore.signIn(email.value, password.value);
   if (!error) {
-    router.push('/dashboard');
+    // Redirect based on user role
+    if (authStore.isPlatformAdmin) {
+      router.push('/admin/dashboard');
+    } else if (authStore.isOrgAdmin) {
+      router.push('/org/dashboard');
+    } else {
+      router.push('/dashboard');
+    }
   }
 };
 

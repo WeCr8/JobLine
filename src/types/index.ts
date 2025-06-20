@@ -166,10 +166,13 @@ export interface User {
   name: string;
   role: UserRole;
   department?: string;
-  createdAt: string;
+  organization_id?: string;
+  is_active: boolean;
+  last_login?: string;
+  created_at: string;
 }
 
-export type UserRole = 'operator' | 'lead' | 'supervisor' | 'manager' | 'admin' | 'customer';
+export type UserRole = 'operator' | 'lead' | 'supervisor' | 'manager' | 'admin' | 'customer' | 'organization_admin';
 
 export interface ChatMessage {
   id: string;
@@ -240,4 +243,49 @@ export interface ChartData {
     borderColor?: string | string[];
     borderWidth?: number;
   }[];
+}
+
+export interface Organization {
+  id: string;
+  name: string;
+  industry?: string;
+  address?: string;
+  phone?: string;
+  website?: string;
+  logoUrl?: string;
+  primaryContactName?: string;
+  primaryContactEmail?: string;
+  primaryContactPhone?: string;
+  subscriptionId?: string;
+  subscriptionStatus?: string;
+  planId?: string;
+  planName?: string;
+  maxUsers: number;
+  currentUserCount: number;
+  settings?: Record<string, any>;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export interface OrganizationUser {
+  id: string;
+  organizationId: string;
+  userId: string;
+  role: string;
+  isAdmin: boolean;
+  isPrimary: boolean;
+  joinedAt: string;
+}
+
+export interface Invite {
+  id: string;
+  organizationId: string;
+  email: string;
+  role: string;
+  department?: string;
+  status: 'pending' | 'accepted' | 'expired';
+  createdBy: string;
+  createdAt: string;
+  expiresAt: string;
 }

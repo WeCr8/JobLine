@@ -13,6 +13,8 @@ export const useAuthStore = defineStore('auth', () => {
   const loading = ref(false);
   const error = ref<string | null>(null);
   const isAuthenticated = computed(() => !!user.value);
+  const isPlatformAdmin = computed(() => user.value?.role === 'admin' && !user.value?.organization_id);
+  const isOrgAdmin = computed(() => user.value?.role === 'organization_admin' || (user.value?.role === 'admin' && !!user.value?.organization_id));
 
   const signUp = async (email: string, password: string, name: string) => {
     loading.value = true;
@@ -32,6 +34,29 @@ export const useAuthStore = defineStore('auth', () => {
       if (signUpError) throw signUpError;
 
       if (data.user) {
+        // Check if there's a pending invite for this email
+        const { data: inviteData, error: inviteError } = await supabase
+          .from('invites')
+          .select('*')
+          .eq('email', email)
+          .eq('status', 'pending')
+          .single();
+
+        if (inviteError && inviteError.code !== 'PGRST116') {
+          console.error('Error checking for invites:', inviteError);
+        }
+
+        let role = 'operator';
+        let organization_id = null;
+        let department = null;
+
+        // If there's an invite, use its role and organization
+        if (inviteData) {
+          role = inviteData.role;
+          organization_id = inviteData.organization_id;
+          department = inviteData.department;
+        }
+
         // Create user profile
         const { error: profileError } = await supabase
           .from('users')
@@ -39,20 +64,52 @@ export const useAuthStore = defineStore('auth', () => {
             id: data.user.id,
             email: data.user.email!,
             name,
-            role: 'operator'
+            role,
+            organization_id,
+            department
           });
 
         if (profileError) {
           console.error('Error creating user profile:', profileError);
         }
 
+        // If there was an invite, update it to accepted
+        if (inviteData) {
+          const { error: updateInviteError } = await supabase
+            .from('invites')
+            .update({ status: 'accepted' })
+            .eq('id', inviteData.id);
+
+          if (updateInviteError) {
+            console.error('Error updating invite status:', updateInviteError);
+          }
+
+          // Add user to organization_users if there's an organization
+          if (organization_id) {
+            const { error: orgUserError } = await supabase
+              .from('organization_users')
+              .insert({
+                organization_id,
+                user_id: data.user.id,
+                role,
+                is_admin: role === 'organization_admin'
+              });
+
+            if (orgUserError) {
+              console.error('Error adding user to organization:', orgUserError);
+            }
+          }
+        }
+
         user.value = {
           id: data.user.id,
           email: data.user.email!,
           name,
-          role: 'operator',
-          department: 'Manufacturing',
-          createdAt: new Date().toISOString()
+          role,
+          department,
+          organization_id,
+          is_active: true,
+          created_at: new Date().toISOString()
         };
       }
 
@@ -85,14 +142,25 @@ export const useAuthStore = defineStore('auth', () => {
           .eq('id', data.user.id)
           .single();
 
-        user.value = profile || {
-          id: data.user.id,
-          email: data.user.email!,
-          name: data.user.user_metadata?.name || 'User',
-          role: 'operator',
-          department: 'Manufacturing',
-          createdAt: new Date().toISOString()
-        };
+        if (profile) {
+          user.value = profile;
+          
+          // Update last login
+          await supabase
+            .from('users')
+            .update({ last_login: new Date().toISOString() })
+            .eq('id', data.user.id);
+        } else {
+          user.value = {
+            id: data.user.id,
+            email: data.user.email!,
+            name: data.user.user_metadata?.name || 'User',
+            role: 'operator',
+            department: 'Manufacturing',
+            is_active: true,
+            created_at: new Date().toISOString()
+          };
+        }
       }
 
       return { data, error: null };
@@ -136,14 +204,19 @@ export const useAuthStore = defineStore('auth', () => {
           .eq('id', session.user.id)
           .single();
 
-        user.value = profile || {
-          id: session.user.id,
-          email: session.user.email!,
-          name: session.user.user_metadata?.name || 'User',
-          role: 'operator',
-          department: 'Manufacturing',
-          createdAt: new Date().toISOString()
-        };
+        if (profile) {
+          user.value = profile;
+        } else {
+          user.value = {
+            id: session.user.id,
+            email: session.user.email!,
+            name: session.user.user_metadata?.name || 'User',
+            role: 'operator',
+            department: 'Manufacturing',
+            is_active: true,
+            created_at: new Date().toISOString()
+          };
+        }
       }
     } catch (err: any) {
       console.error('Error initializing auth:', err);
@@ -161,14 +234,19 @@ export const useAuthStore = defineStore('auth', () => {
           .eq('id', session.user.id)
           .single();
 
-        user.value = profile || {
-          id: session.user.id,
-          email: session.user.email!,
-          name: session.user.user_metadata?.name || 'User',
-          role: 'operator',
-          department: 'Manufacturing',
-          createdAt: new Date().toISOString()
-        };
+        if (profile) {
+          user.value = profile;
+        } else {
+          user.value = {
+            id: session.user.id,
+            email: session.user.email!,
+            name: session.user.user_metadata?.name || 'User',
+            role: 'operator',
+            department: 'Manufacturing',
+            is_active: true,
+            created_at: new Date().toISOString()
+          };
+        }
       } else if (event === 'SIGNED_OUT') {
         user.value = null;
       }
@@ -189,6 +267,8 @@ export const useAuthStore = defineStore('auth', () => {
     loading,
     error,
     isAuthenticated,
+    isPlatformAdmin,
+    isOrgAdmin,
     signUp,
     signIn,
     signOut,
