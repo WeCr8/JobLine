@@ -92,10 +92,10 @@
                   <div class="text-sm text-gray-900">{{ log.message }}</div>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-900">{{ getUserName(log.user_id) || 'System' }}</div>
+                  <div class="text-sm text-gray-900">{{ getUserName(log.userId) || 'System' }}</div>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-900">{{ log.ip_address || '-' }}</div>
+                  <div class="text-sm text-gray-900">{{ log.ipAddress || '-' }}</div>
                 </td>
               </tr>
             </tbody>
@@ -172,7 +172,7 @@ const filteredLogs = computed(() => {
     const query = searchQuery.value.toLowerCase();
     filtered = filtered.filter(log => 
       log.message.toLowerCase().includes(query) || 
-      (log.user_id && getUserName(log.user_id)?.toLowerCase().includes(query))
+      (log.userId && getUserName(log.userId)?.toLowerCase().includes(query))
     );
   }
   
