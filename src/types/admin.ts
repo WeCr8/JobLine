@@ -3,6 +3,7 @@ export interface SubscriptionPlan {
   name: string;
   description: string;
   price: number; // in cents
+  displayPrice?: number; // for UI display
   interval: 'monthly' | 'yearly';
   stripePriceId: string;
   active: boolean;
@@ -40,7 +41,7 @@ export interface Invoice {
   status: string;
 }
 
-export interface AdminUser {
+export interface User {
   id: string;
   name: string;
   email: string;
@@ -49,9 +50,43 @@ export interface AdminUser {
   is_active: boolean;
   last_login?: string;
   created_at: string;
+  organization_id?: string;
 }
 
-export interface AdminAnalytics {
+export interface Organization {
+  id: string;
+  name: string;
+  industry?: string;
+  address?: string;
+  phone?: string;
+  website?: string;
+  logoUrl?: string;
+  primaryContactName?: string;
+  primaryContactEmail?: string;
+  subscriptionId?: string;
+  subscriptionStatus?: string;
+  planId?: string;
+  planName?: string;
+  maxUsers: number;
+  currentUserCount: number;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export interface OrganizationUser {
+  id: string;
+  organizationId: string;
+  userId: string;
+  userName: string;
+  userEmail: string;
+  role: string;
+  isAdmin: boolean;
+  isPrimary: boolean;
+  joinedAt: string;
+}
+
+export interface Analytics {
   totalRevenue: number;
   revenueGrowth: number;
   activeUsers: number;
@@ -82,39 +117,12 @@ export interface SystemSettings {
   };
 }
 
-export interface AppSettings {
-  appName: string;
-  supportEmail: string;
-  defaultRole: string;
-  defaultDepartment: string;
-  features: {
-    enableVoice: boolean;
-    enableImageRecognition: boolean;
-    enablePerformanceModule: boolean;
-    enableOptimizationModule: boolean;
-  };
-  email: {
-    smtpHost: string;
-    smtpPort: number;
-    smtpUsername: string;
-    smtpPassword: string;
-  };
-}
-
-export interface SystemInfo {
-  version: string;
-  environment: string;
-  lastUpdated: string;
-  database: {
-    status: string;
-    size: string;
-    lastBackup: string;
-  };
-  logs: SystemLog[];
-}
-
 export interface SystemLog {
+  id: string;
   level: 'INFO' | 'WARN' | 'ERROR' | 'DEBUG';
-  timestamp: string;
   message: string;
+  context?: any;
+  userId?: string;
+  ipAddress?: string;
+  timestamp: string;
 }

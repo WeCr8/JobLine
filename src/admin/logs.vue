@@ -110,6 +110,8 @@
 import { ref, computed, onMounted } from 'vue';
 import { format, subDays } from 'date-fns';
 import { useAdminStore } from '../stores/admin';
+import { adminService } from '../services/admin.service';
+import { getDateRangeStart } from '../utils/date.utils';
 import { ArrowPathIcon } from '@heroicons/vue/24/outline';
 
 const adminStore = useAdminStore();
@@ -137,22 +139,6 @@ const getUserName = (userId: string | undefined) => {
   return user ? user.name : null;
 };
 
-const getDateRangeStart = () => {
-  const now = new Date();
-  switch (dateRange.value) {
-    case 'today':
-      return new Date(now.setHours(0, 0, 0, 0));
-    case 'yesterday':
-      return subDays(new Date(now.setHours(0, 0, 0, 0)), 1);
-    case 'week':
-      return subDays(now, 7);
-    case 'month':
-      return subDays(now, 30);
-    default:
-      return new Date(0); // beginning of time
-  }
-};
-
 const filteredLogs = computed(() => {
   let filtered = adminStore.systemLogs;
   
@@ -163,7 +149,7 @@ const filteredLogs = computed(() => {
   
   // Apply date range filter
   if (dateRange.value !== 'all') {
-    const startDate = getDateRangeStart();
+    const startDate = getDateRangeStart(dateRange.value);
     filtered = filtered.filter(log => new Date(log.timestamp) >= startDate);
   }
   

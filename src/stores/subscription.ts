@@ -1,13 +1,8 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import { createClient } from '@supabase/supabase-js';
+import { subscriptionService } from '../services/subscription.service';
 import { products } from '../stripe-config';
 import type { Product } from '../stripe-config';
-
-const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_ANON_KEY
-);
 
 interface Subscription {
   customer_id: string;
@@ -54,13 +49,7 @@ export const useSubscriptionStore = defineStore('subscription', () => {
     error.value = null;
 
     try {
-      const { data, error: fetchError } = await supabase
-        .from('stripe_user_subscriptions')
-        .select('*')
-        .maybeSingle();
-
-      if (fetchError) throw fetchError;
-
+      const data = await subscriptionService.fetchSubscription();
       subscription.value = data;
     } catch (err: any) {
       error.value = err.message;
@@ -75,14 +64,8 @@ export const useSubscriptionStore = defineStore('subscription', () => {
     error.value = null;
 
     try {
-      const { data, error: fetchError } = await supabase
-        .from('stripe_user_orders')
-        .select('*')
-        .order('order_date', { ascending: false });
-
-      if (fetchError) throw fetchError;
-
-      orders.value = data || [];
+      const data = await subscriptionService.fetchOrders();
+      orders.value = data;
     } catch (err: any) {
       error.value = err.message;
       console.error('Error fetching orders:', err);
@@ -96,38 +79,7 @@ export const useSubscriptionStore = defineStore('subscription', () => {
     error.value = null;
 
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!session?.access_token) {
-        throw new Error('No authentication token found');
-      }
-
-      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/stripe-checkout`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.access_token}`,
-        },
-        body: JSON.stringify({
-          price_id: product.priceId,
-          mode: product.mode,
-          success_url: `${window.location.origin}/success?session_id={CHECKOUT_SESSION_ID}`,
-          cancel_url: `${window.location.origin}/pricing`,
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to create checkout session');
-      }
-
-      const { url } = await response.json();
-      
-      if (url) {
-        window.location.href = url;
-      } else {
-        throw new Error('No checkout URL received');
-      }
+      await subscriptionService.createCheckoutSession(product);
     } catch (err: any) {
       error.value = err.message;
       console.error('Error creating checkout session:', err);
@@ -138,9 +90,18 @@ export const useSubscriptionStore = defineStore('subscription', () => {
   };
 
   const cancelSubscription = async () => {
-    // This would typically be handled by a separate edge function
-    // For now, we'll just show an error message
-    error.value = 'Please contact support to cancel your subscription';
+    loading.value = true;
+    error.value = null;
+    
+    try {
+      await subscriptionService.cancelSubscription();
+    } catch (err: any) {
+      error.value = err.message;
+      console.error('Error cancelling subscription:', err);
+      throw err;
+    } finally {
+      loading.value = false;
+    }
   };
 
   return {
