@@ -37,8 +37,7 @@ const demoAccounts = {
 
 // Check if demo mode is enabled
 const isDemoMode = () => {
-  return process.env.NEXT_PUBLIC_AUTH_DISABLED === 'true' || 
-         import.meta.env.VITE_DEMO_MODE === 'true';
+  return import.meta.env.VITE_DEMO_MODE === 'true';
 };
 
 export const authService = {
