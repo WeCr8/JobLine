@@ -132,12 +132,16 @@ const password = ref('');
 const signupSuccess = ref(false);
 
 const handleSignup = async () => {
-  const { error } = await authStore.signUp(email.value, password.value, name.value);
-  if (!error) {
-    signupSuccess.value = true;
-    setTimeout(() => {
-      router.push('/login');
-    }, 2000);
+  try {
+    const { error } = await authStore.signUp(email.value, password.value, name.value);
+    if (!error) {
+      signupSuccess.value = true;
+      setTimeout(() => {
+        router.push('/login');
+      }, 2000);
+    }
+  } catch (err) {
+    console.error('Signup error:', err);
   }
 };
 </script>

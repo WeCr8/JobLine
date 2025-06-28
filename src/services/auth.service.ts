@@ -79,7 +79,7 @@ export const authService = {
         .eq('status', 'pending')
         .maybeSingle();
 
-      if (inviteError) {
+      if (inviteError && inviteError.code !== 'PGRST116') {
         console.error('Error checking for invites:', inviteError);
       }
 
@@ -96,47 +96,53 @@ export const authService = {
 
       // Create user profile
       if (data.user) {
-        const { error: profileError } = await supabase
-          .from('users')
-          .insert({
-            id: data.user.id,
-            email: data.user.email!,
-            name,
-            role,
-            organization_id,
-            department
-          });
+        try {
+          const { error: profileError } = await supabase
+            .from('users')
+            .insert({
+              id: data.user.id,
+              email: data.user.email!,
+              name,
+              role,
+              organization_id,
+              department
+            });
 
-        if (profileError) {
-          console.error('Error creating user profile:', profileError);
-        }
-
-        // If there was an invite, update it to accepted
-        if (inviteData) {
-          const { error: updateInviteError } = await supabase
-            .from('invites')
-            .update({ status: 'accepted' })
-            .eq('id', inviteData.id);
-
-          if (updateInviteError) {
-            console.error('Error updating invite status:', updateInviteError);
+          if (profileError) {
+            console.error('Error creating user profile:', profileError);
+            // Don't throw here, continue with the process
           }
 
-          // Add user to organization_users if there's an organization
-          if (organization_id) {
-            const { error: orgUserError } = await supabase
-              .from('organization_users')
-              .insert({
-                organization_id,
-                user_id: data.user.id,
-                role,
-                is_admin: role === 'organization_admin'
-              });
+          // If there was an invite, update it to accepted
+          if (inviteData) {
+            const { error: updateInviteError } = await supabase
+              .from('invites')
+              .update({ status: 'accepted' })
+              .eq('id', inviteData.id);
 
-            if (orgUserError) {
-              console.error('Error adding user to organization:', orgUserError);
+            if (updateInviteError) {
+              console.error('Error updating invite status:', updateInviteError);
+            }
+
+            // Add user to organization_users if there's an organization
+            if (organization_id) {
+              const { error: orgUserError } = await supabase
+                .from('organization_users')
+                .insert({
+                  organization_id,
+                  user_id: data.user.id,
+                  role,
+                  is_admin: role === 'organization_admin'
+                });
+
+              if (orgUserError) {
+                console.error('Error adding user to organization:', orgUserError);
+              }
             }
           }
+        } catch (err) {
+          console.error('Error in post-signup process:', err);
+          // Continue with the signup process even if there are errors in the post-signup steps
         }
       }
 
@@ -155,6 +161,7 @@ export const authService = {
       // Check for demo accounts
       if (isDemoMode() && email in demoAccounts) {
         console.log(`Using demo account for ${email}`);
+        localStorage.setItem('demoUserEmail', email);
         return { 
           data: { 
             user: { 
@@ -210,6 +217,7 @@ export const authService = {
     try {
       // In demo mode, just return success
       if (isDemoMode()) {
+        localStorage.removeItem('demoUserEmail');
         return { error: null };
       }
 
@@ -229,11 +237,18 @@ export const authService = {
     try {
       // In demo mode, return a fake session
       if (isDemoMode()) {
-        return {
-          access_token: 'demo-token',
-          refresh_token: 'demo-refresh-token',
-          user: { id: 'demo-user-id' }
-        };
+        const demoEmail = localStorage.getItem('demoUserEmail');
+        if (demoEmail && demoEmail in demoAccounts) {
+          return {
+            access_token: 'demo-token',
+            refresh_token: 'demo-refresh-token',
+            user: { 
+              id: demoAccounts[demoEmail as keyof typeof demoAccounts].id,
+              email: demoEmail
+            }
+          };
+        }
+        return null;
       }
 
       const { data, error } = await supabase.auth.getSession();
