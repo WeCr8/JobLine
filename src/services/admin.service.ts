@@ -3,7 +3,8 @@ import type {
   SubscriptionPlan, 
   Organization, 
   User, 
-  SystemSettings 
+  SystemSettings,
+  SystemLog
 } from '../types/admin';
 
 export const adminService = {
@@ -98,7 +99,7 @@ export const adminService = {
   /**
    * Fetch system logs
    */
-  async fetchSystemLogs(limit: number = 100): Promise<any[]> {
+  async fetchSystemLogs(limit: number = 100): Promise<SystemLog[]> {
     try {
       const { data, error } = await supabase
         .from('system_logs')
@@ -108,7 +109,15 @@ export const adminService = {
 
       if (error) throw error;
       
-      return data || [];
+      return (data || []).map(log => ({
+        id: log.id,
+        level: log.level,
+        message: log.message,
+        context: log.context,
+        userId: log.user_id,
+        ipAddress: log.ip_address,
+        timestamp: log.timestamp
+      }));
     } catch (err) {
       console.error('Error fetching system logs:', err);
       return [];
