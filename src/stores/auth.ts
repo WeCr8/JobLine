@@ -60,6 +60,12 @@ export const useAuthStore = defineStore('auth', () => {
       }
       
       if (result.data.user) {
+        // Store demo user email for persistence
+        if (process.env.NEXT_PUBLIC_AUTH_DISABLED === 'true' || 
+            import.meta.env.VITE_DEMO_MODE === 'true') {
+          localStorage.setItem('demoUserEmail', email);
+        }
+        
         // Set user from profile data
         const profile = await authService.getCurrentUser();
         if (profile) {
@@ -96,6 +102,12 @@ export const useAuthStore = defineStore('auth', () => {
       if (result.error) {
         error.value = result.error;
         return { error: result.error };
+      }
+      
+      // Clear demo user email
+      if (process.env.NEXT_PUBLIC_AUTH_DISABLED === 'true' || 
+          import.meta.env.VITE_DEMO_MODE === 'true') {
+        localStorage.removeItem('demoUserEmail');
       }
       
       user.value = null;

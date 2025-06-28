@@ -1,12 +1,66 @@
 import { supabase, handleApiError } from './api.service';
 import type { User } from '../types';
 
+// Demo accounts for testing
+const demoAccounts = {
+  'admin@wecr8.info': {
+    id: 'demo-admin-id',
+    email: 'admin@wecr8.info',
+    name: 'Admin User',
+    role: 'admin',
+    department: null,
+    organization_id: null,
+    is_active: true,
+    created_at: '2024-01-01T00:00:00Z'
+  },
+  'org-admin@example.com': {
+    id: 'demo-org-admin-id',
+    email: 'org-admin@example.com',
+    name: 'Organization Admin',
+    role: 'organization_admin',
+    department: 'Administration',
+    organization_id: 'org-1',
+    is_active: true,
+    created_at: '2024-01-01T00:00:00Z'
+  },
+  'operator@example.com': {
+    id: 'demo-operator-id',
+    email: 'operator@example.com',
+    name: 'John Operator',
+    role: 'operator',
+    department: 'cnc-machining',
+    organization_id: 'org-1',
+    is_active: true,
+    created_at: '2024-01-01T00:00:00Z'
+  }
+};
+
+// Check if demo mode is enabled
+const isDemoMode = () => {
+  return process.env.NEXT_PUBLIC_AUTH_DISABLED === 'true' || 
+         import.meta.env.VITE_DEMO_MODE === 'true';
+};
+
 export const authService = {
   /**
    * Sign up a new user
    */
   async signUp(email: string, password: string, name: string): Promise<{ data: any; error: null } | { data: null; error: string }> {
     try {
+      // Check for demo mode
+      if (isDemoMode()) {
+        return { 
+          data: { 
+            user: { 
+              id: 'demo-signup-id',
+              email,
+              user_metadata: { name }
+            } 
+          }, 
+          error: null 
+        };
+      }
+
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -98,6 +152,24 @@ export const authService = {
    */
   async signIn(email: string, password: string): Promise<{ data: any; error: null } | { data: null; error: string }> {
     try {
+      // Check for demo accounts
+      if (isDemoMode() && email in demoAccounts) {
+        console.log(`Using demo account for ${email}`);
+        return { 
+          data: { 
+            user: { 
+              id: demoAccounts[email as keyof typeof demoAccounts].id,
+              email: demoAccounts[email as keyof typeof demoAccounts].email
+            },
+            session: { 
+              access_token: 'demo-token',
+              refresh_token: 'demo-refresh-token'
+            }
+          }, 
+          error: null 
+        };
+      }
+
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password
@@ -136,6 +208,11 @@ export const authService = {
    */
   async signOut(): Promise<{ error: null } | { error: string }> {
     try {
+      // In demo mode, just return success
+      if (isDemoMode()) {
+        return { error: null };
+      }
+
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
       return { error: null };
@@ -150,6 +227,15 @@ export const authService = {
    */
   async getSession() {
     try {
+      // In demo mode, return a fake session
+      if (isDemoMode()) {
+        return {
+          access_token: 'demo-token',
+          refresh_token: 'demo-refresh-token',
+          user: { id: 'demo-user-id' }
+        };
+      }
+
       const { data, error } = await supabase.auth.getSession();
       if (error) throw error;
       return data.session;
@@ -164,6 +250,17 @@ export const authService = {
    */
   async getCurrentUser(): Promise<User | null> {
     try {
+      // Check for demo mode with active session
+      if (isDemoMode()) {
+        // Get the email from localStorage if available
+        const email = localStorage.getItem('demoUserEmail');
+        if (email && email in demoAccounts) {
+          return demoAccounts[email as keyof typeof demoAccounts];
+        }
+        // Default to admin if no email stored
+        return demoAccounts['admin@wecr8.info'];
+      }
+
       const { data: { user } } = await supabase.auth.getUser();
       
       if (!user) return null;
@@ -187,6 +284,10 @@ export const authService = {
    * Set up auth state change listener
    */
   onAuthStateChange(callback: (event: string, session: any) => void) {
+    // In demo mode, don't set up real listeners
+    if (isDemoMode()) {
+      return { data: { subscription: { unsubscribe: () => {} } } };
+    }
     return supabase.auth.onAuthStateChange(callback);
   }
 };
