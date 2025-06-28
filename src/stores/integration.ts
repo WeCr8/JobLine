@@ -184,6 +184,24 @@ export const useIntegrationStore = defineStore('integration', () => {
     }
   };
 
+  const scheduleAutomaticSync = async (connectionId: string) => {
+    try {
+      return await integrationService.scheduleAutomaticSync(connectionId);
+    } catch (err: any) {
+      console.error('Error scheduling automatic sync:', err);
+      return false;
+    }
+  };
+
+  const optimizeJobSchedule = async (departmentId?: string) => {
+    try {
+      return await integrationService.optimizeJobSchedule(departmentId);
+    } catch (err: any) {
+      console.error('Error optimizing job schedule:', err);
+      return false;
+    }
+  };
+
   // Computed properties
   const activeConnections = computed(() => 
     connections.value.filter(c => c.status === 'active')
@@ -236,6 +254,8 @@ export const useIntegrationStore = defineStore('integration', () => {
     deleteConnection,
     testConnection,
     runImport,
-    checkCompliance
+    checkCompliance,
+    scheduleAutomaticSync,
+    optimizeJobSchedule
   };
 });

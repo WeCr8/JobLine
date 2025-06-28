@@ -64,7 +64,7 @@ const router = createRouter({
     {
       path: '/integration',
       name: 'Integration',
-      component: () => import('../views/IntegrationView.vue'),
+      component: () => import('../views/IntegrationDashboardView.vue'),
       meta: { requiresAuth: true, requiresRole: ['admin', 'manager', 'organization_admin'] }
     },
     {
@@ -72,6 +72,12 @@ const router = createRouter({
       name: 'IntegrationSettings',
       component: () => import('../views/IntegrationSettingsView.vue'),
       meta: { requiresAuth: true, requiresRole: ['admin', 'manager', 'organization_admin'] }
+    },
+    {
+      path: '/integration/scheduler',
+      name: 'IntegrationScheduler',
+      component: () => import('../views/IntegrationSchedulerView.vue'),
+      meta: { requiresAuth: true, requiresRole: ['admin', 'manager', 'organization_admin', 'supervisor'] }
     },
     {
       path: '/optimization',
@@ -129,6 +135,10 @@ const router = createRouter({
         {
           path: 'logs',
           component: () => import('../admin/logs.vue')
+        },
+        {
+          path: 'integrations',
+          component: () => import('../admin/integrations.vue')
         },
         {
           path: '',
@@ -203,6 +213,13 @@ const router = createRouter({
           redirect: '/team/dashboard'
         }
       ]
+    },
+    // Share target route for PWA
+    {
+      path: '/share-target',
+      name: 'ShareTarget',
+      component: () => import('../views/ShareTargetView.vue'),
+      meta: { requiresAuth: true }
     },
     // Catch-all route for 404
     {

@@ -1,16 +1,13 @@
-export interface ConnectionConfig {
-  id: string;
-  name: string;
-  type: ConnectionType;
-  status: 'active' | 'inactive' | 'error' | 'testing';
-  config: ConnectionSettings;
-  complianceLevel: ComplianceLevel;
-  lastSync?: string;
-  errorCount: number;
-  mapping: ImportMapping[];
-  createdAt: string;
-  updatedAt: string;
-}
+import { supabase, handleApiError } from './api.service';
+import type { 
+  ConnectionConfig, 
+  ImportJob, 
+  ComplianceCheck, 
+  ExportControlFlag,
+  ConnectionType,
+  ImportType,
+  ImportMapping
+} from '../types/integration';
 
 export type ConnectionType = 
   | 'google-sheets'
@@ -81,6 +78,35 @@ export interface ImportMapping {
   complianceFlag?: boolean;
 }
 
+export interface ConnectionConfig {
+  id: string;
+  name: string;
+  type: ConnectionType;
+  status: 'active' | 'inactive' | 'error' | 'testing';
+  config: ConnectionSettings;
+  complianceLevel: ComplianceLevel;
+  lastSync?: string;
+  errorCount: number;
+  mapping: ImportMapping[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type ImportType = 
+  | 'job-data'
+  | 'operator-workcenter'
+  | 'routing-operations'
+  | 'cost-tracking'
+  | 'customer-association';
+
+export interface ImportError {
+  row: number;
+  field?: string;
+  value?: any;
+  error: string;
+  severity: 'warning' | 'error' | 'critical';
+}
+
 export interface ImportJob {
   id: string;
   connectionId: string;
@@ -93,31 +119,6 @@ export interface ImportJob {
   errors: ImportError[];
   startedAt?: string;
   completedAt?: string | null;
-}
-
-export type ImportType = 
-  | 'job-data'
-  | 'operator-workcenter'
-  | 'routing-operations'
-  | 'cost-tracking'
-  | 'customer-association';
-
-export interface ImportError {
-  row: number;
-  field: string;
-  value: any;
-  error: string;
-  severity: 'warning' | 'error' | 'critical';
-}
-
-export interface ComplianceRule {
-  id: string;
-  name: string;
-  type: ComplianceType;
-  condition: string;
-  action: ComplianceAction;
-  message: string;
-  enabled: boolean;
 }
 
 export type ComplianceType = 'itar' | 'ear' | 'dfars' | 'cmmc' | 'custom';
@@ -142,4 +143,21 @@ export interface ExportControlFlag {
   authorizedPersonnel: string[];
   expirationDate?: string;
   notes?: string;
+}
+
+export interface AIRecommendation {
+  machine?: string;
+  operator?: string;
+  confidence?: number;
+  reason?: string;
+}
+
+export interface ScheduleResult {
+  jobId: string;
+  jobNumber: string;
+  success: boolean;
+  machine?: string;
+  operator?: string;
+  status?: string;
+  error?: string;
 }
