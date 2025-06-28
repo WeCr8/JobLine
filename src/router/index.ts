@@ -92,6 +92,11 @@ const router = createRouter({
       meta: { requiresAuth: true }
     },
     {
+      path: '/components',
+      name: 'ComponentLibrary',
+      component: () => import('../views/ComponentLibrary.vue')
+    },
+    {
       path: '/admin',
       name: 'Admin',
       component: () => import('../admin/index.vue'),
@@ -198,6 +203,12 @@ const router = createRouter({
           redirect: '/team/dashboard'
         }
       ]
+    },
+    // Catch-all route for 404
+    {
+      path: '/:pathMatch(.*)*',
+      name: 'NotFound',
+      component: () => import('../views/NotFoundView.vue')
     }
   ]
 });
