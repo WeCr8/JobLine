@@ -6,7 +6,7 @@
     aria-live="assertive"
   >
     <div class="flex items-center justify-center space-x-2 py-1">
-      <WifiOffIcon class="w-4 h-4" />
+      <WifiIcon class="w-4 h-4" />
       <span>You're offline. Some features may be unavailable.</span>
     </div>
   </div>
@@ -14,7 +14,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue';
-import { WifiOffIcon } from '@heroicons/vue/24/outline';
+import { WifiIcon } from '@heroicons/vue/24/outline';
 import { addConnectivityListeners } from '../utils/offline';
 
 const isOnline = ref(navigator.onLine);
