@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
+import { integrationService } from '../services/integration.service';
 import type { 
   ConnectionConfig, 
   ImportJob, 
@@ -15,213 +16,172 @@ export const useIntegrationStore = defineStore('integration', () => {
   const complianceChecks = ref<ComplianceCheck[]>([]);
   const exportFlags = ref<ExportControlFlag[]>([]);
   const loading = ref(false);
-
-  // Mock data for demonstration
-  const mockConnections: ConnectionConfig[] = [
-    {
-      id: '1',
-      name: 'ProShop ERP Connection',
-      type: 'rest-api',
-      status: 'active',
-      config: {
-        baseUrl: 'https://api.proshop.com/v1',
-        apiKey: '***hidden***',
-        authType: 'bearer',
-        pollInterval: 300000, // 5 minutes
-        batchSize: 100
-      },
-      complianceLevel: 'itar',
-      lastSync: '2024-01-12T14:30:00Z',
-      errorCount: 0,
-      createdAt: '2024-01-01T08:00:00Z',
-      updatedAt: '2024-01-12T14:30:00Z'
-    },
-    {
-      id: '2',
-      name: 'SAP Production Orders',
-      type: 'sap-bapi',
-      status: 'active',
-      config: {
-        sapHost: 'sap-prod.company.com',
-        sapClient: '100',
-        sapSystem: 'PRD',
-        pollInterval: 900000, // 15 minutes
-        batchSize: 50
-      },
-      complianceLevel: 'cmmc-2',
-      lastSync: '2024-01-12T14:15:00Z',
-      errorCount: 0,
-      createdAt: '2024-01-05T10:00:00Z',
-      updatedAt: '2024-01-12T14:15:00Z'
-    },
-    {
-      id: '3',
-      name: 'Job Data Spreadsheet',
-      type: 'google-sheets',
-      status: 'active',
-      config: {
-        spreadsheetId: '1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms',
-        sheetName: 'Jobs',
-        range: 'A1:Z1000',
-        pollInterval: 60000 // 1 minute
-      },
-      complianceLevel: 'basic',
-      lastSync: '2024-01-12T14:45:00Z',
-      errorCount: 0,
-      createdAt: '2024-01-10T12:00:00Z',
-      updatedAt: '2024-01-12T14:45:00Z'
-    }
-  ];
-
-  const mockImportJobs: ImportJob[] = [
-    {
-      id: '1',
-      connectionId: '1',
-      type: 'job-data',
-      status: 'completed',
-      mapping: [
-        { sourceField: 'job_number', targetField: 'jobNumber', required: true },
-        { sourceField: 'part_name', targetField: 'partName', required: true },
-        { sourceField: 'itar_flag', targetField: 'exportFlag', required: true, complianceFlag: true }
-      ],
-      recordsProcessed: 150,
-      recordsSuccess: 148,
-      recordsError: 2,
-      errors: [
-        {
-          row: 45,
-          field: 'itar_flag',
-          value: null,
-          error: 'ITAR flag is required for all jobs',
-          severity: 'critical'
-        }
-      ],
-      startedAt: '2024-01-12T14:30:00Z',
-      completedAt: '2024-01-12T14:32:15Z'
-    }
-  ];
-
-  const mockExportFlags: ExportControlFlag[] = [
-    {
-      jobId: '4',
-      classification: 'itar',
-      category: 'Category VIII',
-      restrictions: ['US Persons Only', 'No Export', 'Facility Access Required'],
-      authorizedPersonnel: ['john.smith@company.com', 'sarah.johnson@company.com'],
-      notes: 'Defense article - requires ITAR compliance'
-    }
-  ];
+  const error = ref<string | null>(null);
 
   const fetchConnections = async () => {
     loading.value = true;
-    await new Promise(resolve => setTimeout(resolve, 800));
-    connections.value = mockConnections;
-    loading.value = false;
+    error.value = null;
+    
+    try {
+      const fetchedConnections = await integrationService.fetchConnections();
+      connections.value = fetchedConnections;
+    } catch (err: any) {
+      error.value = err.message;
+      console.error('Error fetching connections:', err);
+    } finally {
+      loading.value = false;
+    }
   };
 
   const fetchImportJobs = async () => {
     loading.value = true;
-    await new Promise(resolve => setTimeout(resolve, 600));
-    importJobs.value = mockImportJobs;
-    loading.value = false;
+    error.value = null;
+    
+    try {
+      const fetchedJobs = await integrationService.fetchImportJobs();
+      importJobs.value = fetchedJobs;
+    } catch (err: any) {
+      error.value = err.message;
+      console.error('Error fetching import jobs:', err);
+    } finally {
+      loading.value = false;
+    }
   };
 
   const fetchExportFlags = async () => {
     loading.value = true;
-    await new Promise(resolve => setTimeout(resolve, 400));
-    exportFlags.value = mockExportFlags;
-    loading.value = false;
+    error.value = null;
+    
+    try {
+      const fetchedFlags = await integrationService.fetchExportFlags();
+      exportFlags.value = fetchedFlags;
+    } catch (err: any) {
+      error.value = err.message;
+      console.error('Error fetching export flags:', err);
+    } finally {
+      loading.value = false;
+    }
   };
 
   const createConnection = async (connection: Omit<ConnectionConfig, 'id' | 'createdAt' | 'updatedAt'>) => {
-    const newConnection: ConnectionConfig = {
-      ...connection,
-      id: Date.now().toString(),
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    };
-    connections.value.push(newConnection);
+    loading.value = true;
+    error.value = null;
+    
+    try {
+      const newConnection = await integrationService.createConnection(connection);
+      connections.value.unshift(newConnection);
+      return newConnection;
+    } catch (err: any) {
+      error.value = err.message;
+      console.error('Error creating connection:', err);
+      throw err;
+    } finally {
+      loading.value = false;
+    }
   };
 
-  const testConnection = async (connectionId: string): Promise<boolean> => {
-    const connection = connections.value.find(c => c.id === connectionId);
-    if (!connection) return false;
-
-    // Simulate connection test
-    await new Promise(resolve => setTimeout(resolve, 2000));
+  const updateConnection = async (connection: ConnectionConfig) => {
+    loading.value = true;
+    error.value = null;
     
-    // Mock success/failure based on connection type
-    const success = Math.random() > 0.2; // 80% success rate
-    
-    if (success) {
-      connection.status = 'active';
-      connection.errorCount = 0;
-    } else {
-      connection.status = 'error';
-      connection.errorCount++;
+    try {
+      const success = await integrationService.updateConnection(connection);
+      
+      if (success) {
+        const index = connections.value.findIndex(c => c.id === connection.id);
+        if (index !== -1) {
+          connections.value[index] = { ...connection };
+        }
+      }
+      
+      return success;
+    } catch (err: any) {
+      error.value = err.message;
+      console.error('Error updating connection:', err);
+      throw err;
+    } finally {
+      loading.value = false;
     }
+  };
+
+  const deleteConnection = async (connectionId: string) => {
+    loading.value = true;
+    error.value = null;
     
-    connection.updatedAt = new Date().toISOString();
-    return success;
+    try {
+      const success = await integrationService.deleteConnection(connectionId);
+      
+      if (success) {
+        connections.value = connections.value.filter(c => c.id !== connectionId);
+      }
+      
+      return success;
+    } catch (err: any) {
+      error.value = err.message;
+      console.error('Error deleting connection:', err);
+      throw err;
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  const testConnection = async (connectionId: string) => {
+    loading.value = true;
+    error.value = null;
+    
+    try {
+      const success = await integrationService.testConnection(connectionId);
+      
+      if (success) {
+        const index = connections.value.findIndex(c => c.id === connectionId);
+        if (index !== -1) {
+          connections.value[index].status = 'active';
+          connections.value[index].lastSync = new Date().toISOString();
+        }
+      }
+      
+      return success;
+    } catch (err: any) {
+      error.value = err.message;
+      console.error('Error testing connection:', err);
+      throw err;
+    } finally {
+      loading.value = false;
+    }
   };
 
   const runImport = async (connectionId: string, importType: ImportType) => {
-    const connection = connections.value.find(c => c.id === connectionId);
-    if (!connection) throw new Error('Connection not found');
-
-    const importJob: ImportJob = {
-      id: Date.now().toString(),
-      connectionId,
-      type: importType,
-      status: 'running',
-      mapping: [], // Would be configured based on import type
-      recordsProcessed: 0,
-      recordsSuccess: 0,
-      recordsError: 0,
-      errors: [],
-      startedAt: new Date().toISOString()
-    };
-
-    importJobs.value.unshift(importJob);
-
-    // Simulate import process
-    await new Promise(resolve => setTimeout(resolve, 3000));
-
-    // Mock completion
-    importJob.status = 'completed';
-    importJob.recordsProcessed = 100;
-    importJob.recordsSuccess = 98;
-    importJob.recordsError = 2;
-    importJob.completedAt = new Date().toISOString();
-
-    connection.lastSync = new Date().toISOString();
+    loading.value = true;
+    error.value = null;
+    
+    try {
+      const importJob = await integrationService.runImport(connectionId, importType);
+      importJobs.value.unshift(importJob);
+      return importJob;
+    } catch (err: any) {
+      error.value = err.message;
+      console.error('Error running import:', err);
+      throw err;
+    } finally {
+      loading.value = false;
+    }
   };
 
-  const checkCompliance = async (jobId: string, userId: string, action: string): Promise<ComplianceCheck> => {
-    const exportFlag = exportFlags.value.find(f => f.jobId === jobId);
+  const checkCompliance = async (jobId: string, userId: string, action: string) => {
+    loading.value = true;
+    error.value = null;
     
-    const check: ComplianceCheck = {
-      jobId,
-      userId,
-      action,
-      result: 'allowed',
-      rules: [],
-      timestamp: new Date().toISOString()
-    };
-
-    if (exportFlag) {
-      // Check if user is authorized for ITAR-controlled job
-      if (exportFlag.classification === 'itar') {
-        const isAuthorized = exportFlag.authorizedPersonnel.includes(userId);
-        if (!isAuthorized) {
-          check.result = 'denied';
-          check.rules.push('ITAR-controlled job requires authorized personnel');
-        }
-      }
+    try {
+      const check = await integrationService.checkCompliance(jobId, userId, action);
+      complianceChecks.value.unshift(check);
+      return check;
+    } catch (err: any) {
+      error.value = err.message;
+      console.error('Error checking compliance:', err);
+      throw err;
+    } finally {
+      loading.value = false;
     }
-
-    complianceChecks.value.unshift(check);
-    return check;
   };
 
   // Computed properties
@@ -263,6 +223,7 @@ export const useIntegrationStore = defineStore('integration', () => {
     complianceChecks,
     exportFlags,
     loading,
+    error,
     activeConnections,
     connectionsByType,
     recentImports,
@@ -271,6 +232,8 @@ export const useIntegrationStore = defineStore('integration', () => {
     fetchImportJobs,
     fetchExportFlags,
     createConnection,
+    updateConnection,
+    deleteConnection,
     testConnection,
     runImport,
     checkCompliance

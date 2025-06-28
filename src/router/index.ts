@@ -68,6 +68,12 @@ const router = createRouter({
       meta: { requiresAuth: true, requiresRole: ['admin', 'manager', 'organization_admin'] }
     },
     {
+      path: '/integration/settings',
+      name: 'IntegrationSettings',
+      component: () => import('../views/IntegrationSettingsView.vue'),
+      meta: { requiresAuth: true, requiresRole: ['admin', 'manager', 'organization_admin'] }
+    },
+    {
       path: '/optimization',
       name: 'Optimization',
       component: () => import('../views/OptimizationView.vue'),

@@ -7,6 +7,7 @@ export interface ConnectionConfig {
   complianceLevel: ComplianceLevel;
   lastSync?: string;
   errorCount: number;
+  mapping: ImportMapping[];
   createdAt: string;
   updatedAt: string;
 }
@@ -36,7 +37,7 @@ export interface ConnectionSettings {
   
   // SQL/ODBC
   connectionString?: string;
-  database?: string;
+  databaseName?: string;
   table?: string;
   query?: string;
   
@@ -44,12 +45,14 @@ export interface ConnectionSettings {
   sapHost?: string;
   sapClient?: string;
   sapUser?: string;
+  sapPassword?: string;
   sapSystem?: string;
   
   // SFTP
   host?: string;
   port?: number;
   username?: string;
+  password?: string;
   privateKey?: string;
   remotePath?: string;
   
@@ -57,8 +60,14 @@ export interface ConnectionSettings {
   endpoint?: string;
   secret?: string;
   
+  // CSV Upload
+  fileFormat?: 'csv' | 'tsv' | 'excel';
+  delimiter?: string;
+  hasHeaderRow?: boolean;
+  
   // Common settings
   pollInterval?: number;
+  pollIntervalMinutes?: number;
   batchSize?: number;
   retryAttempts?: number;
   timeout?: number;
@@ -83,7 +92,7 @@ export interface ImportJob {
   recordsError: number;
   errors: ImportError[];
   startedAt?: string;
-  completedAt?: string;
+  completedAt?: string | null;
 }
 
 export type ImportType = 
