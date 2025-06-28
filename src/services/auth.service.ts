@@ -17,15 +17,15 @@ export const authService = {
 
       if (error) throw error;
 
-      // Check for pending invites
+      // Check for pending invites - use maybeSingle() to avoid errors when no invite exists
       const { data: inviteData, error: inviteError } = await supabase
         .from('invites')
         .select('*')
         .eq('email', email)
         .eq('status', 'pending')
-        .single();
+        .maybeSingle();
 
-      if (inviteError && inviteError.code !== 'PGRST116') {
+      if (inviteError) {
         console.error('Error checking for invites:', inviteError);
       }
 
