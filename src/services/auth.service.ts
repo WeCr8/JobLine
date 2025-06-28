@@ -48,10 +48,25 @@ export const authService = {
     try {
       // Check for demo mode
       if (isDemoMode()) {
+        // Create a demo user
+        const demoUser = {
+          id: `demo-${Date.now()}`,
+          email,
+          name,
+          role: 'operator',
+          department: 'cnc-machining',
+          organization_id: 'org-1',
+          is_active: true,
+          created_at: new Date().toISOString()
+        };
+        
+        // Store in localStorage for persistence
+        localStorage.setItem('demoUserEmail', email);
+        
         return { 
           data: { 
             user: { 
-              id: 'demo-signup-id',
+              id: demoUser.id,
               email,
               user_metadata: { name }
             } 

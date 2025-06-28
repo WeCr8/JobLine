@@ -25,8 +25,7 @@ export const useAuthStore = defineStore('auth', () => {
       
       if (result.data.user) {
         // Store demo user email for persistence
-        if (process.env.NEXT_PUBLIC_AUTH_DISABLED === 'true' || 
-            import.meta.env.VITE_DEMO_MODE === 'true') {
+        if (import.meta.env.VITE_DEMO_MODE === 'true') {
           localStorage.setItem('demoUserEmail', email);
         }
         
@@ -105,8 +104,7 @@ export const useAuthStore = defineStore('auth', () => {
       }
       
       // Clear demo user email
-      if (process.env.NEXT_PUBLIC_AUTH_DISABLED === 'true' || 
-          import.meta.env.VITE_DEMO_MODE === 'true') {
+      if (import.meta.env.VITE_DEMO_MODE === 'true') {
         localStorage.removeItem('demoUserEmail');
       }
       

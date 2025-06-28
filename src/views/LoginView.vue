@@ -138,16 +138,20 @@ const email = ref('');
 const password = ref('');
 
 const handleLogin = async () => {
-  const { error } = await authStore.signIn(email.value, password.value);
-  if (!error) {
-    // Redirect based on user role
-    if (authStore.isPlatformAdmin) {
-      router.push('/admin/dashboard');
-    } else if (authStore.isOrgAdmin) {
-      router.push('/org/dashboard');
-    } else {
-      router.push('/dashboard');
+  try {
+    const { error } = await authStore.signIn(email.value, password.value);
+    if (!error) {
+      // Redirect based on user role
+      if (authStore.isPlatformAdmin) {
+        router.push('/admin/dashboard');
+      } else if (authStore.isOrgAdmin) {
+        router.push('/org/dashboard');
+      } else {
+        router.push('/dashboard');
+      }
     }
+  } catch (err) {
+    console.error('Login error:', err);
   }
 };
 
