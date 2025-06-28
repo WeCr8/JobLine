@@ -78,3 +78,117 @@ body {
 .status-setup {
   @apply bg-purple-100 text-purple-800 border-purple-200;
 }
+
+/* Safe area handling for notched devices */
+.has-safe-areas .safe-area-top {
+  padding-top: env(safe-area-inset-top);
+}
+
+.has-safe-areas .safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.has-safe-areas .safe-area-left {
+  padding-left: env(safe-area-inset-left);
+}
+
+.has-safe-areas .safe-area-right {
+  padding-right: env(safe-area-inset-right);
+}
+
+/* Platform-specific styles */
+.ios-device input,
+.ios-device textarea,
+.ios-device select {
+  font-size: 16px !important; /* Prevent zoom on iOS */
+}
+
+.ios-device .fixed-bottom {
+  bottom: env(safe-area-inset-bottom, 0);
+}
+
+.android-device .fixed-bottom {
+  bottom: 0;
+}
+
+/* Prevent pull-to-refresh */
+body {
+  overscroll-behavior-y: contain;
+}
+
+/* Accessibility - Screen reader only */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: more) {
+  :root {
+    --color-primary-600: #0000FF;
+    --color-primary-700: #0000CC;
+  }
+  
+  .bg-primary-600 {
+    background-color: var(--color-primary-600) !important;
+  }
+  
+  .bg-primary-700 {
+    background-color: var(--color-primary-700) !important;
+  }
+  
+  .text-gray-600 {
+    color: #000000 !important;
+  }
+  
+  .border {
+    border-width: 2px !important;
+  }
+}
+
+/* Offline indicator */
+.offline-indicator {
+  @apply fixed top-0 left-0 right-0 bg-yellow-500 text-white text-center py-1 z-50;
+}
+
+/* Tap highlight for mobile */
+.tap-highlight {
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
+/* Fix for iOS 100vh issue */
+.ios-device .full-height {
+  height: -webkit-fill-available;
+}
+
+/* Fix for iOS input padding */
+.ios-device input,
+.ios-device textarea {
+  padding-left: 3px;
+  padding-right: 3px;
+}
+
+/* Fix for Android overflow issues */
+.android-device .overflow-fix {
+  -webkit-backface-visibility: hidden;
+  -moz-backface-visibility: hidden;
+  -webkit-transform: translate3d(0, 0, 0);
+  -moz-transform: translate3d(0, 0, 0);
+}

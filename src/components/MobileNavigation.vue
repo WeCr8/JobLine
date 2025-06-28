@@ -6,10 +6,11 @@
         v-for="item in mobileNavigation"
         :key="item.name"
         :to="item.href"
-        class="flex flex-col items-center justify-center space-y-1 text-xs transition-colors duration-200"
-        :class="$route.name === item.name 
+        class="flex flex-col items-center justify-center space-y-1 text-xs transition-colors duration-200 tap-highlight"
+        :class="$route.path.startsWith(item.href) 
           ? 'text-primary-600 bg-primary-50' 
           : 'text-gray-500 hover:text-gray-700'"
+        active-class="text-primary-600 bg-primary-50"
       >
         <component :is="item.icon" class="w-5 h-5" />
         <span class="font-medium">{{ item.name }}</span>
@@ -41,13 +42,17 @@
           v-if="chatStore.voiceEnabled"
           @click="toggleVoiceMode"
           :class="voiceMode ? 'bg-red-100 text-red-600' : 'bg-gray-100 text-gray-600'"
-          class="p-2 rounded-full transition-colors duration-200"
+          class="p-2 rounded-full transition-colors duration-200 tap-highlight"
+          aria-label="Toggle voice mode"
         >
           <MicrophoneIcon class="w-5 h-5" />
         </button>
         
         <!-- Notifications -->
-        <button class="p-2 text-gray-400 hover:text-gray-500 transition-colors duration-200 relative">
+        <button 
+          class="p-2 text-gray-400 hover:text-gray-500 transition-colors duration-200 relative tap-highlight"
+          aria-label="Notifications"
+        >
           <BellIcon class="w-5 h-5" />
           <span v-if="notificationCount > 0" class="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
             {{ notificationCount }}
@@ -57,7 +62,10 @@
         <!-- User Menu -->
         <button 
           @click="showUserMenu = !showUserMenu"
-          class="flex items-center space-x-2 text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+          class="flex items-center space-x-2 text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 tap-highlight"
+          aria-label="User menu"
+          aria-expanded="showUserMenu"
+          aria-controls="user-menu"
         >
           <div class="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
             <span class="text-primary-600 font-medium text-sm">
@@ -71,7 +79,9 @@
     <!-- User Dropdown -->
     <div 
       v-if="showUserMenu"
+      id="user-menu"
       class="absolute right-4 top-16 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200"
+      ref="userMenuRef"
     >
       <div class="px-4 py-2 text-sm text-gray-500 border-b border-gray-100">
         {{ authStore.user?.email }}
@@ -107,30 +117,6 @@
       </button>
     </div>
   </div>
-
-  <!-- Install App Banner -->
-  <div v-if="showInstallBanner" class="md:hidden fixed top-4 left-4 right-4 bg-primary-600 text-white p-3 rounded-lg z-40 safe-area-top">
-    <div class="flex items-center justify-between">
-      <div>
-        <p class="text-sm font-medium">Install JobLine.ai</p>
-        <p class="text-xs opacity-90">Add to home screen for better experience</p>
-      </div>
-      <div class="flex space-x-2">
-        <button
-          @click="installApp"
-          class="bg-white bg-opacity-20 hover:bg-opacity-30 px-3 py-1 rounded text-xs transition-colors duration-200"
-        >
-          Install
-        </button>
-        <button
-          @click="dismissInstallBanner"
-          class="bg-white bg-opacity-20 hover:bg-opacity-30 px-2 py-1 rounded text-xs transition-colors duration-200"
-        >
-          ×
-        </button>
-      </div>
-    </div>
-  </div>
 </template>
 
 <script setup lang="ts">
@@ -139,6 +125,8 @@ import { useRouter } from 'vue-router';
 import { useAuthStore } from '../stores/auth';
 import { useChatStore } from '../stores/chat';
 import { usePerformanceStore } from '../stores/performance';
+import { createAccessibleFocusTrap } from '../utils/accessibility';
+import { addTapGesture } from '../utils/gesture';
 import {
   HomeIcon,
   BriefcaseIcon,
@@ -157,17 +145,18 @@ const performanceStore = usePerformanceStore();
 
 const showUserMenu = ref(false);
 const voiceMode = ref(false);
-const showInstallBanner = ref(false);
 const notificationCount = ref(3);
+const userMenuRef = ref<HTMLElement | null>(null);
 
-let deferredPrompt: any = null;
+// Focus trap for accessibility
+let focusTrap: { activate: () => void; deactivate: () => void } | null = null;
 
 const mobileNavigation = computed(() => {
   const baseNav = [
     { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
     { name: 'Jobs', href: '/jobs', icon: BriefcaseIcon },
     { name: 'Chat', href: '/chat', icon: ChatBubbleLeftRightIcon },
-    { name: 'Performance', href: '/performance', icon: TrophyIcon },
+    { name: 'Passdown', href: '/passdown', icon: DocumentTextIcon },
     { name: 'Machines', href: '/machines', icon: CogIcon }
   ];
 
@@ -176,7 +165,7 @@ const mobileNavigation = computed(() => {
   
   return baseNav.filter(item => {
     // All users can access these
-    const publicRoutes = ['Dashboard', 'Jobs', 'Chat', 'Performance', 'Machines'];
+    const publicRoutes = ['Dashboard', 'Jobs', 'Chat', 'Passdown', 'Machines'];
     return publicRoutes.includes(item.name);
   });
 });
@@ -196,52 +185,30 @@ const handleLogout = () => {
   showUserMenu.value = false;
 };
 
-const installApp = () => {
-  if (deferredPrompt) {
-    deferredPrompt.prompt();
-    deferredPrompt.userChoice.then((choiceResult: any) => {
-      if (choiceResult.outcome === 'accepted') {
-        console.log('User accepted the install prompt');
-        showInstallBanner.value = false;
-      }
-      deferredPrompt = null;
-    });
-  }
-};
-
-const dismissInstallBanner = () => {
-  showInstallBanner.value = false;
-  localStorage.setItem('installBannerDismissed', 'true');
-};
-
 const handleClickOutside = (event: Event) => {
   const target = event.target as Element;
-  if (!target.closest('.relative')) {
+  if (userMenuRef.value && !userMenuRef.value.contains(target) && !target.closest('button')) {
     showUserMenu.value = false;
-  }
-};
-
-const handleBeforeInstallPrompt = (e: Event) => {
-  e.preventDefault();
-  deferredPrompt = e;
-  
-  // Show install banner if not dismissed
-  const dismissed = localStorage.getItem('installBannerDismissed');
-  if (!dismissed) {
-    showInstallBanner.value = true;
   }
 };
 
 onMounted(() => {
   document.addEventListener('click', handleClickOutside);
-  window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
   
-  // Check if app is already installed
-  if (window.matchMedia('(display-mode: standalone)').matches) {
-    showInstallBanner.value = false;
+  // Set up focus trap for user menu
+  if (userMenuRef.value) {
+    focusTrap = createAccessibleFocusTrap(userMenuRef.value);
   }
-
-  // Load performance data
+  
+  // Add tap gestures for better mobile experience
+  const navLinks = document.querySelectorAll('.grid-cols-5 > a');
+  navLinks.forEach(link => {
+    addTapGesture(link as HTMLElement, () => {
+      // The router-link will handle navigation
+    });
+  });
+  
+  // Load user performance data
   if (authStore.user) {
     performanceStore.fetchUserMetrics(authStore.user.id);
   }
@@ -249,6 +216,33 @@ onMounted(() => {
 
 onUnmounted(() => {
   document.removeEventListener('click', handleClickOutside);
-  window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+  
+  // Clean up focus trap
+  if (focusTrap) {
+    focusTrap.deactivate();
+  }
 });
 </script>
+
+<style scoped>
+/* Fix for iOS safe areas */
+:global(.ios-device) .safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+:global(.ios-device) .safe-area-top {
+  padding-top: env(safe-area-inset-top, 0);
+}
+
+/* Active tab indicator with animation */
+.router-link-active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 25%;
+  width: 50%;
+  height: 2px;
+  background-color: currentColor;
+  transition: all 0.3s ease;
+}
+</style>

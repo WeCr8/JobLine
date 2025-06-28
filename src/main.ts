@@ -3,6 +3,8 @@ import { createPinia } from 'pinia';
 import router from './router';
 import App from './App.vue';
 import './style.css';
+import { isIOS, isAndroid, getPlatformClass } from './utils/platform';
+import { addConnectivityListeners } from './utils/offline';
 
 const app = createApp(App);
 const pinia = createPinia();
@@ -10,12 +12,24 @@ const pinia = createPinia();
 app.use(pinia);
 app.use(router);
 
+// Add platform-specific class to body
+document.body.classList.add(getPlatformClass());
+
+// Add platform detection to window for debugging
+window.isPlatform = {
+  ios: isIOS(),
+  android: isAndroid()
+};
+
 // PWA Installation handling
 let deferredPrompt: any;
 
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
   deferredPrompt = e;
+  
+  // Dispatch custom event that components can listen for
+  window.dispatchEvent(new CustomEvent('pwaInstallable'));
 });
 
 // Register service worker
@@ -34,7 +48,22 @@ if ('serviceWorker' in navigator) {
 // Handle app installation
 window.addEventListener('appinstalled', (evt) => {
   console.log('App was installed');
+  window.dispatchEvent(new CustomEvent('pwaInstalled'));
 });
+
+// Set up online/offline listeners
+addConnectivityListeners(
+  () => {
+    // Online event
+    window.dispatchEvent(new CustomEvent('appOnline'));
+    console.log('App is online');
+  },
+  () => {
+    // Offline event
+    window.dispatchEvent(new CustomEvent('appOffline'));
+    console.log('App is offline');
+  }
+);
 
 // Prevent zoom on input focus (iOS Safari)
 document.addEventListener('touchstart', (e) => {
@@ -64,5 +93,34 @@ document.addEventListener('touchmove', (e) => {
     e.preventDefault();
   }
 }, { passive: false });
+
+// Add safe area support for notched devices
+if (CSS.supports('padding-top: env(safe-area-inset-top)')) {
+  document.body.classList.add('has-safe-areas');
+}
+
+// Expose installPWA method for components to use
+window.installPWA = () => {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then((choiceResult: any) => {
+      if (choiceResult.outcome === 'accepted') {
+        console.log('User accepted the install prompt');
+      }
+      deferredPrompt = null;
+    });
+  }
+};
+
+// Add global type definitions
+declare global {
+  interface Window {
+    isPlatform: {
+      ios: boolean;
+      android: boolean;
+    };
+    installPWA: () => void;
+  }
+}
 
 app.mount('#app');
