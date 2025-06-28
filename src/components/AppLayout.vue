@@ -79,6 +79,13 @@
                   {{ authStore.user?.email }}
                 </div>
                 <router-link
+                  to="/settings"
+                  @click="showUserMenu = false"
+                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200"
+                >
+                  Settings
+                </router-link>
+                <router-link
                   to="/performance"
                   @click="showUserMenu = false"
                   class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200"
@@ -147,7 +154,8 @@ import {
   LightBulbIcon,
   TrophyIcon,
   CheckCircleIcon,
-  Cog6ToothIcon
+  Cog6ToothIcon,
+  UserIcon
 } from '@heroicons/vue/24/outline';
 
 const router = useRouter();
@@ -165,6 +173,7 @@ const navigation = [
   { name: 'Performance', href: '/performance', icon: TrophyIcon, roles: ['operator', 'lead', 'supervisor', 'manager', 'admin', 'organization_admin'] },
   { name: 'Optimization', href: '/optimization', icon: LightBulbIcon, roles: ['lead', 'supervisor', 'manager', 'admin', 'organization_admin'] },
   { name: 'Integration', href: '/integration', icon: CircleStackIcon, roles: ['manager', 'admin', 'organization_admin'] },
+  { name: 'Settings', href: '/settings', icon: UserIcon, roles: ['operator', 'lead', 'supervisor', 'manager', 'admin', 'organization_admin'] },
   { name: 'Admin', href: '/admin/dashboard', icon: Cog6ToothIcon, roles: ['admin'] },
 ];
 
