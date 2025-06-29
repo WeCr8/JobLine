@@ -156,44 +156,14 @@
 
       <SettingsCard title="Notification Events">
         <div class="space-y-4">
-          <div v-for="event in notificationEvents" :key="event.id" class="flex items-center justify-between">
-            <div>
-              <h4 class="text-sm font-medium text-gray-900">{{ event.name }}</h4>
-              <p class="text-sm text-gray-500">{{ event.description }}</p>
-            </div>
-            <div class="flex items-center space-x-4">
-              <div class="flex items-center space-x-2">
-                <input
-                  :id="`email-${event.id}`"
-                  v-model="event.email"
-                  type="checkbox"
-                  class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
-                  :disabled="!notificationSettings.emailEnabled"
-                />
-                <label :for="`email-${event.id}`" class="text-xs text-gray-700">Email</label>
-              </div>
-              <div class="flex items-center space-x-2">
-                <input
-                  :id="`push-${event.id}`"
-                  v-model="event.push"
-                  type="checkbox"
-                  class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
-                  :disabled="!notificationSettings.pushEnabled"
-                />
-                <label :for="`push-${event.id}`" class="text-xs text-gray-700">Push</label>
-              </div>
-              <div class="flex items-center space-x-2">
-                <input
-                  :id="`sms-${event.id}`"
-                  v-model="event.sms"
-                  type="checkbox"
-                  class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
-                  :disabled="!notificationSettings.smsEnabled"
-                />
-                <label :for="`sms-${event.id}`" class="text-xs text-gray-700">SMS</label>
-              </div>
-            </div>
-          </div>
+          <NotificationEventSetting
+            v-for="event in notificationEvents"
+            :key="event.id"
+            :event="event"
+            :email-enabled="notificationSettings.emailEnabled"
+            :push-enabled="notificationSettings.pushEnabled"
+            :sms-enabled="notificationSettings.smsEnabled"
+          />
         </div>
       </SettingsCard>
     </div>
@@ -273,27 +243,12 @@
     <div v-if="activeTab === 'integrations'" class="space-y-6">
       <SettingsCard title="Connected Services">
         <div class="space-y-4">
-          <div v-for="service in connectedServices" :key="service.id" class="flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-              <div 
-                class="w-10 h-10 rounded-lg flex items-center justify-center"
-                :class="service.bgColor"
-              >
-                <component :is="service.icon" class="w-5 h-5" />
-              </div>
-              <div>
-                <h4 class="text-sm font-medium text-gray-900">{{ service.name }}</h4>
-                <p class="text-xs text-gray-500">{{ service.status === 'connected' ? 'Connected' : 'Not connected' }}</p>
-              </div>
-            </div>
-            <button
-              @click="toggleServiceConnection(service)"
-              :class="service.status === 'connected' ? 'bg-red-100 text-red-700' : 'bg-primary-600 text-white'"
-              class="px-3 py-1 rounded text-sm font-medium transition-colors duration-200"
-            >
-              {{ service.status === 'connected' ? 'Disconnect' : 'Connect' }}
-            </button>
-          </div>
+          <ConnectedServiceCard
+            v-for="service in connectedServices"
+            :key="service.id"
+            :service="service"
+            @toggle="toggleServiceConnection"
+          />
         </div>
       </SettingsCard>
 
@@ -402,6 +357,8 @@ import SecuritySettingsCard from '../components/SecuritySettingsCard.vue';
 import PrivacySettingsCard from '../components/PrivacySettingsCard.vue';
 import DataManagementCard from '../components/DataManagementCard.vue';
 import DeleteAccountModal from '../components/DeleteAccountModal.vue';
+import NotificationEventSetting from '../components/NotificationEventSetting.vue';
+import ConnectedServiceCard from '../components/ConnectedServiceCard.vue';
 import { settingsService } from '../services/settings.service';
 import {
   UserIcon,
@@ -680,6 +637,14 @@ const toggleServiceConnection = async (service: any) => {
       await settingsService.disconnectService(service.id);
       service.status = 'disconnected';
     } else {
+      // In demo mode, simulate a successful connection
+      if (import.meta.env.VITE_DEMO_MODE === 'true') {
+        // Simulate a delay
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        service.status = 'connected';
+        return;
+      }
+      
       await settingsService.connectService(service.id);
       service.status = 'connected';
     }
@@ -787,6 +752,22 @@ onMounted(async () => {
       // Update privacy settings
       if (settings.privacy) {
         Object.assign(privacySettings, settings.privacy);
+      }
+      
+      // Update integration settings
+      if (settings.integrations) {
+        integrationSettings.apiKey = settings.integrations.apiKey || integrationSettings.apiKey;
+        integrationSettings.webhookSecret = settings.integrations.webhookSecret || integrationSettings.webhookSecret;
+        
+        // Update connected services
+        if (settings.integrations.connectedServices) {
+          settings.integrations.connectedServices.forEach((serviceId: string) => {
+            const service = connectedServices.find(s => s.id === serviceId);
+            if (service) {
+              service.status = 'connected';
+            }
+          });
+        }
       }
     }
   } catch (error) {

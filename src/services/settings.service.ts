@@ -7,6 +7,64 @@ export const settingsService = {
    */
   async fetchUserSettings(): Promise<UserSettings | null> {
     try {
+      // Check for demo mode
+      if (import.meta.env.VITE_DEMO_MODE === 'true') {
+        // Return mock settings for demo mode
+        return {
+          profile: {
+            name: 'Demo User',
+            department: 'cnc-machining',
+            phone: '555-123-4567'
+          },
+          notifications: {
+            emailEnabled: true,
+            pushEnabled: true,
+            smsEnabled: false,
+            events: [
+              {
+                id: 'job-status',
+                name: 'Job Status Changes',
+                description: 'Notify when job status changes',
+                email: true,
+                push: true,
+                sms: false
+              },
+              {
+                id: 'machine-status',
+                name: 'Machine Status Changes',
+                description: 'Notify when machine status changes',
+                email: true,
+                push: true,
+                sms: false
+              }
+            ]
+          },
+          appearance: {
+            theme: 'light',
+            density: 'comfortable',
+            defaultView: 'dashboard',
+            dashboardWidgets: [
+              { id: 'job-status', visible: true },
+              { id: 'machine-status', visible: true }
+            ]
+          },
+          security: {
+            twoFactorEnabled: false,
+            sessionTimeout: 60
+          },
+          privacy: {
+            analyticsEnabled: true,
+            errorReportingEnabled: true,
+            marketingEnabled: false
+          },
+          integrations: {
+            apiKey: 'jl_api_' + Math.random().toString(36).substring(2, 15),
+            webhookSecret: Math.random().toString(36).substring(2, 15),
+            connectedServices: ['google-sheets', 'slack']
+          }
+        };
+      }
+
       // Get the current user
       const { data: { user } } = await supabase.auth.getUser();
       
@@ -114,6 +172,13 @@ export const settingsService = {
    */
   async updateUserProfile(profile: Partial<UserSettings['profile']>): Promise<boolean> {
     try {
+      // Check for demo mode
+      if (import.meta.env.VITE_DEMO_MODE === 'true') {
+        // Simulate success in demo mode
+        await new Promise(resolve => setTimeout(resolve, 500));
+        return true;
+      }
+
       // Get the current user
       const { data: { user } } = await supabase.auth.getUser();
       
@@ -143,6 +208,13 @@ export const settingsService = {
    */
   async updateNotificationSettings(settings: Partial<UserSettings['notifications']>): Promise<boolean> {
     try {
+      // Check for demo mode
+      if (import.meta.env.VITE_DEMO_MODE === 'true') {
+        // Simulate success in demo mode
+        await new Promise(resolve => setTimeout(resolve, 500));
+        return true;
+      }
+
       // Get the current user
       const { data: { user } } = await supabase.auth.getUser();
       
@@ -205,6 +277,13 @@ export const settingsService = {
    */
   async updateAppearanceSettings(settings: Partial<UserSettings['appearance']>): Promise<boolean> {
     try {
+      // Check for demo mode
+      if (import.meta.env.VITE_DEMO_MODE === 'true') {
+        // Simulate success in demo mode
+        await new Promise(resolve => setTimeout(resolve, 500));
+        return true;
+      }
+
       // Get the current user
       const { data: { user } } = await supabase.auth.getUser();
       
@@ -267,6 +346,13 @@ export const settingsService = {
    */
   async updateSecuritySettings(settings: Partial<UserSettings['security']>): Promise<boolean> {
     try {
+      // Check for demo mode
+      if (import.meta.env.VITE_DEMO_MODE === 'true') {
+        // Simulate success in demo mode
+        await new Promise(resolve => setTimeout(resolve, 500));
+        return true;
+      }
+
       // Get the current user
       const { data: { user } } = await supabase.auth.getUser();
       
@@ -329,6 +415,13 @@ export const settingsService = {
    */
   async updatePrivacySettings(settings: Partial<UserSettings['privacy']>): Promise<boolean> {
     try {
+      // Check for demo mode
+      if (import.meta.env.VITE_DEMO_MODE === 'true') {
+        // Simulate success in demo mode
+        await new Promise(resolve => setTimeout(resolve, 500));
+        return true;
+      }
+
       // Get the current user
       const { data: { user } } = await supabase.auth.getUser();
       
@@ -391,6 +484,13 @@ export const settingsService = {
    */
   async updatePassword(currentPassword: string, newPassword: string): Promise<boolean> {
     try {
+      // Check for demo mode
+      if (import.meta.env.VITE_DEMO_MODE === 'true') {
+        // Simulate success in demo mode
+        await new Promise(resolve => setTimeout(resolve, 500));
+        return true;
+      }
+
       const { error } = await supabase.auth.updateUser({
         password: newPassword
       });
@@ -409,6 +509,14 @@ export const settingsService = {
    */
   async regenerateApiKey(): Promise<string | null> {
     try {
+      // Check for demo mode
+      if (import.meta.env.VITE_DEMO_MODE === 'true') {
+        // Generate a new API key for demo mode
+        const newApiKey = 'jl_api_' + Math.random().toString(36).substring(2, 15);
+        await new Promise(resolve => setTimeout(resolve, 500));
+        return newApiKey;
+      }
+
       // Get the current user
       const { data: { user } } = await supabase.auth.getUser();
       
@@ -478,6 +586,13 @@ export const settingsService = {
    */
   async connectService(serviceId: string): Promise<boolean> {
     try {
+      // Check for demo mode
+      if (import.meta.env.VITE_DEMO_MODE === 'true') {
+        // Simulate success in demo mode
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        return true;
+      }
+
       // Get the current user
       const { data: { user } } = await supabase.auth.getUser();
       
@@ -550,6 +665,13 @@ export const settingsService = {
    */
   async disconnectService(serviceId: string): Promise<boolean> {
     try {
+      // Check for demo mode
+      if (import.meta.env.VITE_DEMO_MODE === 'true') {
+        // Simulate success in demo mode
+        await new Promise(resolve => setTimeout(resolve, 500));
+        return true;
+      }
+
       // Get the current user
       const { data: { user } } = await supabase.auth.getUser();
       
@@ -597,6 +719,14 @@ export const settingsService = {
    */
   async verifyTwoFactor(code: string): Promise<boolean> {
     try {
+      // Check for demo mode
+      if (import.meta.env.VITE_DEMO_MODE === 'true') {
+        // In demo mode, accept any 6-digit code
+        const isValid = /^\d{6}$/.test(code);
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        return isValid;
+      }
+
       // In a real app, this would verify the code with an authenticator service
       // For now, we'll just simulate success
       if (code.length === 6 && /^\d+$/.test(code)) {
@@ -668,6 +798,13 @@ export const settingsService = {
    */
   async exportUserData(): Promise<boolean> {
     try {
+      // Check for demo mode
+      if (import.meta.env.VITE_DEMO_MODE === 'true') {
+        // Simulate success in demo mode
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        return true;
+      }
+
       // In a real app, this would trigger a data export process
       // For now, we'll just simulate success
       return true;
@@ -682,6 +819,13 @@ export const settingsService = {
    */
   async deleteAccount(): Promise<boolean> {
     try {
+      // Check for demo mode
+      if (import.meta.env.VITE_DEMO_MODE === 'true') {
+        // Simulate success in demo mode
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        return true;
+      }
+
       // Get the current user
       const { data: { user } } = await supabase.auth.getUser();
       
