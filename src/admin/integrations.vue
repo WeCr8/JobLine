@@ -288,11 +288,9 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { format } from 'date-fns';
-import { useAdminStore } from '../stores/admin';
 import ToggleSwitch from '../components/ToggleSwitch.vue';
 import { ArrowPathIcon } from '@heroicons/vue/24/outline';
 
-const adminStore = useAdminStore();
 const logLevel = ref('all');
 const savingGlobalSettings = ref(false);
 

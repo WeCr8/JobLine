@@ -209,7 +209,7 @@ export const authService = {
 
       if (data.user) {
         // Fetch user profile
-        const { data: profile, error: profileError } = await supabase
+        const { error: profileError } = await supabase
           .from('users')
           .select('*')
           .eq('id', data.user.id)

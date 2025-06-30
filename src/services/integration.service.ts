@@ -528,7 +528,7 @@ export const integrationService = {
       
       // Update local cache
       const importJobs = await getOfflineData<ImportJob[]>('integration', 'importJobs') || [];
-      const updatedJob = {
+      const updatedJob: ImportJob = {
         ...importJob,
         status: 'completed',
         recordsProcessed: processed,
