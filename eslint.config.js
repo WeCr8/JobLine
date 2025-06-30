@@ -2,9 +2,8 @@ import js from '@eslint/js';
 import { FlatCompat } from '@eslint/eslintrc';
 import tseslint from '@typescript-eslint/eslint-plugin';
 import tsParser from '@typescript-eslint/parser';
-import reactPlugin from 'eslint-plugin-react';
-import reactHooksPlugin from 'eslint-plugin-react-hooks';
 import importPlugin from 'eslint-plugin-import';
+import vuePlugin from 'eslint-plugin-vue';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -84,28 +83,6 @@ export default [
     },
   },
   
-  // React specific configuration
-  {
-    files: ['**/*.jsx', '**/*.tsx'],
-    plugins: {
-      'react': reactPlugin,
-      'react-hooks': reactHooksPlugin,
-    },
-    settings: {
-      react: {
-        version: 'detect',
-      },
-    },
-    rules: {
-      ...reactPlugin.configs.recommended.rules,
-      ...reactHooksPlugin.configs.recommended.rules,
-      'react/prop-types': 'off',
-      'react/react-in-jsx-scope': 'off',
-      'react-hooks/rules-of-hooks': 'error',
-      'react-hooks/exhaustive-deps': 'warn',
-    },
-  },
-  
   // Import plugin configuration
   {
     plugins: {
@@ -131,7 +108,7 @@ export default [
   {
     files: ['src/**/*.ts', 'src/**/*.vue'],
     rules: {
-      // Add any project-specific rules here
+      // Code style and formatting
       'no-console': ['warn', { allow: ['warn', 'error', 'info'] }],
       'no-debugger': 'warn',
       'prefer-const': 'error',
@@ -145,6 +122,27 @@ export default [
         'ignoreTemplateLiterals': true,
         'ignoreRegExpLiterals': true 
       }],
+      
+      // Error prevention
+      'no-unused-expressions': 'warn',
+      'no-undef': 'error',
+      'no-use-before-define': 'error',
+      'no-duplicate-imports': 'error',
+      
+      // Best practices
+      'array-callback-return': 'error',
+      'consistent-return': 'warn',
+      'default-case': 'warn',
+      'dot-notation': 'warn',
+      'no-alert': 'warn',
+      'no-else-return': 'warn',
+      'no-empty-function': 'warn',
+      'no-eval': 'error',
+      'no-implied-eval': 'error',
+      'no-return-await': 'warn',
+      'no-throw-literal': 'error',
+      'prefer-promise-reject-errors': 'warn',
+      'require-await': 'warn',
     },
   },
   
