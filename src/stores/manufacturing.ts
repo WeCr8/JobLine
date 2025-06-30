@@ -15,6 +15,8 @@ import type {
   ShippingReceiving,
   ProgrammingTask
 } from '../types/manufacturing';
+import { demoService } from '../services/demo.service';
+import { useAuthStore } from './auth';
 
 export const useManufacturingStore = defineStore('manufacturing', () => {
   const departments = ref<ManufacturingDepartment[]>([]);
@@ -29,36 +31,44 @@ export const useManufacturingStore = defineStore('manufacturing', () => {
   const shippingReceiving = ref<ShippingReceiving[]>([]);
   const programmingTasks = ref<ProgrammingTask[]>([]);
   const loading = ref(false);
+  const authStore = useAuthStore();
 
   const fetchDepartments = async () => {
     loading.value = true;
     try {
-      const { data, error } = await supabase
-        .from('departments')
-        .select('*');
-      
-      if (error) throw error;
-      
-      // Map database fields to our ManufacturingDepartment type
-      departments.value = (data || []).map(dept => ({
-        id: dept.id,
-        name: dept.name,
-        description: dept.description || '',
-        supervisor: dept.supervisor || 'Unassigned',
-        shift: dept.shift || 'day',
-        capabilities: dept.capabilities || [],
-        qualityStandards: dept.quality_standards || [],
-        machines: dept.machines || [],
-        operators: [], // Would need to fetch from users table
-        activeJobs: dept.active_jobs || 0,
-        efficiency: dept.efficiency || 0,
-        utilizationRate: dept.utilization_rate || 0,
-        kpis: [
-          { name: 'Efficiency', value: dept.efficiency || 0, target: 85, unit: '%', trend: 'up' },
-          { name: 'Utilization', value: dept.utilization_rate || 0, target: 80, unit: '%', trend: 'stable' }
-        ],
-        integrations: dept.integrations || []
-      }));
+      // Check if we're in demo mode
+      if (import.meta.env.VITE_DEMO_MODE === 'true' && authStore.user?.email?.includes('demo')) {
+        // Use hardcoded demo data
+        departments.value = demoService.getDemoData('departments') as ManufacturingDepartment[];
+      } else {
+        // Use real data from API
+        const { data, error } = await supabase
+          .from('departments')
+          .select('*');
+        
+        if (error) throw error;
+        
+        // Map database fields to our ManufacturingDepartment type
+        departments.value = (data || []).map(dept => ({
+          id: dept.id,
+          name: dept.name,
+          description: dept.description || '',
+          supervisor: dept.supervisor || 'Unassigned',
+          shift: dept.shift || 'day',
+          capabilities: dept.capabilities || [],
+          qualityStandards: dept.quality_standards || [],
+          machines: dept.machines || [],
+          operators: [], // Would need to fetch from users table
+          activeJobs: dept.active_jobs || 0,
+          efficiency: dept.efficiency || 0,
+          utilizationRate: dept.utilization_rate || 0,
+          kpis: [
+            { name: 'Efficiency', value: dept.efficiency || 0, target: 85, unit: '%', trend: 'up' },
+            { name: 'Utilization', value: dept.utilization_rate || 0, target: 80, unit: '%', trend: 'stable' }
+          ],
+          integrations: dept.integrations || []
+        }));
+      }
     } catch (error) {
       console.error('Error fetching departments:', error);
       // Fallback to empty array
@@ -71,34 +81,41 @@ export const useManufacturingStore = defineStore('manufacturing', () => {
   const fetchMachines = async () => {
     loading.value = true;
     try {
-      const { data, error } = await supabase
-        .from('machines')
-        .select('*');
-      
-      if (error) throw error;
-      
-      // Map database fields to our Machine type
-      machines.value = (data || []).map(machine => ({
-        id: machine.id,
-        name: machine.name,
-        type: machine.type,
-        department: machine.department_id || '',
-        status: machine.status || 'idle',
-        capabilities: machine.capabilities || [],
-        specifications: machine.specifications || {},
-        currentJob: machine.current_job_id,
-        operator: machine.operator_id,
-        condition: machine.condition || 'idle',
-        lastMaintenance: machine.last_maintenance,
-        nextMaintenance: machine.next_maintenance,
-        utilizationRate: machine.utilization_rate || 0,
-        efficiency: machine.efficiency || 0,
-        location: machine.location || '',
-        serialNumber: machine.serial_number,
-        manufacturer: machine.manufacturer,
-        model: machine.model,
-        yearInstalled: machine.year_installed
-      }));
+      // Check if we're in demo mode
+      if (import.meta.env.VITE_DEMO_MODE === 'true' && authStore.user?.email?.includes('demo')) {
+        // Use hardcoded demo data
+        machines.value = demoService.getDemoData('machines') as Machine[];
+      } else {
+        // Use real data from API
+        const { data, error } = await supabase
+          .from('machines')
+          .select('*');
+        
+        if (error) throw error;
+        
+        // Map database fields to our Machine type
+        machines.value = (data || []).map(machine => ({
+          id: machine.id,
+          name: machine.name,
+          type: machine.type,
+          department: machine.department_id || '',
+          status: machine.status || 'idle',
+          capabilities: machine.capabilities || [],
+          specifications: machine.specifications || {},
+          currentJob: machine.current_job_id,
+          operator: machine.operator_id,
+          condition: machine.condition || 'idle',
+          lastMaintenance: machine.last_maintenance,
+          nextMaintenance: machine.next_maintenance,
+          utilizationRate: machine.utilization_rate || 0,
+          efficiency: machine.efficiency || 0,
+          location: machine.location || '',
+          serialNumber: machine.serial_number,
+          manufacturer: machine.manufacturer,
+          model: machine.model,
+          yearInstalled: machine.year_installed
+        }));
+      }
     } catch (error) {
       console.error('Error fetching machines:', error);
       // Fallback to empty array
@@ -111,27 +128,34 @@ export const useManufacturingStore = defineStore('manufacturing', () => {
   const fetchWorkCenters = async () => {
     loading.value = true;
     try {
-      const { data, error } = await supabase
-        .from('work_centers')
-        .select('*');
-      
-      if (error) throw error;
-      
-      // Map database fields to our WorkCenter type
-      workCenters.value = (data || []).map(wc => ({
-        id: wc.id,
-        name: wc.name,
-        department: wc.department_id || '',
-        machines: wc.machines || [],
-        capabilities: wc.capabilities || [],
-        capacity: wc.capacity || 24,
-        currentLoad: wc.current_load || 0,
-        efficiency: wc.efficiency || 0,
-        setupTime: wc.setup_time || 0,
-        cycleTime: wc.cycle_time || 0,
-        location: wc.location || '',
-        supervisor: wc.supervisor_id || ''
-      }));
+      // Check if we're in demo mode
+      if (import.meta.env.VITE_DEMO_MODE === 'true' && authStore.user?.email?.includes('demo')) {
+        // Use hardcoded demo data - would need to implement this in demoService
+        workCenters.value = [];
+      } else {
+        // Use real data from API
+        const { data, error } = await supabase
+          .from('work_centers')
+          .select('*');
+        
+        if (error) throw error;
+        
+        // Map database fields to our WorkCenter type
+        workCenters.value = (data || []).map(wc => ({
+          id: wc.id,
+          name: wc.name,
+          department: wc.department_id || '',
+          machines: wc.machines || [],
+          capabilities: wc.capabilities || [],
+          capacity: wc.capacity || 24,
+          currentLoad: wc.current_load || 0,
+          efficiency: wc.efficiency || 0,
+          setupTime: wc.setup_time || 0,
+          cycleTime: wc.cycle_time || 0,
+          location: wc.location || '',
+          supervisor: wc.supervisor_id || ''
+        }));
+      }
     } catch (error) {
       console.error('Error fetching work centers:', error);
       // Fallback to empty array
