@@ -209,11 +209,11 @@ const triggerFileInput = () => {
   }
 };
 
-const handleDragOver = (event: DragEvent) => {
+const handleDragOver = () => {
   isDragging.value = true;
 };
 
-const handleDragLeave = (event: DragEvent) => {
+const handleDragLeave = () => {
   isDragging.value = false;
 };
 

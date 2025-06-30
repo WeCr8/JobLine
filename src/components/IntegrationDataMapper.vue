@@ -172,7 +172,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
 import type { ImportMapping } from '../types/integration';
 import {
   ChevronDownIcon,
@@ -387,7 +387,7 @@ if (mappings.value.length === 0) {
 }
 
 // Close dropdowns when clicking outside
-const handleClickOutside = (event: MouseEvent) => {
+const handleClickOutside = () => {
   if (activeSourceDropdown.value !== null || activeTargetDropdown.value !== null) {
     activeSourceDropdown.value = null;
     activeTargetDropdown.value = null;
@@ -402,8 +402,6 @@ onMounted(() => {
 onUnmounted(() => {
   document.removeEventListener('click', handleClickOutside);
 });
-
-import { onUnmounted } from 'vue';
 </script>
 
 <style scoped>

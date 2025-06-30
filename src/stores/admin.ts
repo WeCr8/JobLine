@@ -11,6 +11,8 @@ import type {
   SystemSettings 
 } from '../types/admin';
 
+export type { User, Organization, SubscriptionPlan, Subscription, SystemLog, Analytics, SystemSettings };
+
 export const useAdminStore = defineStore('admin', () => {
   const subscriptionPlans = ref<SubscriptionPlan[]>([]);
   const activeSubscriptions = ref<Subscription[]>([]);
