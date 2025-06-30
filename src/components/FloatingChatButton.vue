@@ -1,6 +1,6 @@
 <template>
   <div 
-    class="fixed bottom-20 right-4 md:bottom-8 md:right-8 z-50"
+    class="fixed bottom-20 right-4 md:bottom-8 md:right-8 z-50 safe-area-right safe-area-bottom"
     :class="{ 'chat-open': isOpen }"
   >
     <!-- Chat Button -->
