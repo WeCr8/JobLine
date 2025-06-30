@@ -290,7 +290,7 @@
 import { ref, reactive, computed, onMounted } from 'vue';
 import { format } from 'date-fns';
 import { useAdminStore } from '../stores/admin';
-import type { User } from '../stores/admin';
+import type { User } from '../types/admin';
 import { ArrowPathIcon } from '@heroicons/vue/24/outline';
 
 const adminStore = useAdminStore();
@@ -440,4 +440,3 @@ onMounted(async () => {
   await refreshData();
 });
 </script>
-```

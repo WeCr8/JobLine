@@ -4,14 +4,14 @@ import { adminService } from '../services/admin.service';
 import type { 
   SubscriptionPlan, 
   Subscription, 
-  User, 
   Organization, 
   SystemLog, 
   Analytics, 
   SystemSettings 
 } from '../types/admin';
 
-export type { User, Organization, SubscriptionPlan, Subscription, SystemLog, Analytics, SystemSettings };
+export type { Organization, SubscriptionPlan, SystemSettings, SystemLog, Analytics };
+export type { User, Subscription, Invoice } from '../types/admin';
 
 export const useAdminStore = defineStore('admin', () => {
   const subscriptionPlans = ref<SubscriptionPlan[]>([]);
