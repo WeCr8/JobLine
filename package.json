@@ -30,7 +30,6 @@
     "workbox-window": "^7.0.0"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3.4.0",
     "@eslint/js": "^9.4.0",
     "@types/body-scroll-lock": "^4.0.0",
     "@types/hammerjs": "^2.0.51",
@@ -41,9 +40,6 @@
     "autoprefixer": "^10.4.17",
     "eslint": "^9.4.0",
     "eslint-plugin-import": "^2.29.1",
-    "eslint-plugin-react": "^7.34.1",
-    "eslint-plugin-react-hooks": "^4.6.0",
-    "eslint-plugin-react-native": "^5.1.0",
     "eslint-plugin-vue": "^9.23.1",
     "postcss": "^8.4.35",
     "prettier": "^3.3.2",
