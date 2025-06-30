@@ -1,3 +1,5 @@
+import type { AIRecommendation } from './integration';
+
 export interface Job {
   id: string;
   jobNumber: string;
@@ -23,6 +25,7 @@ export interface Job {
   tooling: ToolingRequirement[];
   materials: MaterialRequirement[];
   drawings: Drawing[];
+  aiRecommendation?: AIRecommendation;
   createdAt: string;
   updatedAt: string;
 }
