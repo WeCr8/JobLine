@@ -115,13 +115,6 @@
                 >
                   Organization Admin
                 </router-link>
-                <router-link
-                  to="/demo"
-                  @click="showUserMenu = false"
-                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200"
-                >
-                  Demo Controls
-                </router-link>
                 <button
                   @click="handleLogout"
                   class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200"
@@ -182,7 +175,6 @@ const navigation = [
   { name: 'Integration', href: '/integration', icon: CircleStackIcon, roles: ['manager', 'admin', 'organization_admin'] },
   { name: 'Settings', href: '/settings', icon: UserIcon, roles: ['operator', 'lead', 'supervisor', 'manager', 'admin', 'organization_admin'] },
   { name: 'Admin', href: '/admin/dashboard', icon: Cog6ToothIcon, roles: ['admin'] },
-  { name: 'Demo', href: '/demo', icon: Cog6ToothIcon, roles: ['operator', 'lead', 'supervisor', 'manager', 'admin', 'organization_admin'] },
 ];
 
 const visibleNavigation = computed(() => {

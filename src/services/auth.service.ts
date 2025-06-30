@@ -1,5 +1,6 @@
 import { supabase, handleApiError } from './api.service';
 import type { User } from '../types';
+import { demoService } from './demo.service';
 
 // Demo accounts for testing
 const demoAccounts = {
@@ -175,6 +176,24 @@ export const authService = {
       // Check for demo accounts
       if (isDemoMode() && email in demoAccounts) {
         console.log(`Using demo account for ${email}`);
+        
+        // Check if demo data has been seeded
+        const demoDataSeeded = localStorage.getItem('demoDataSeeded');
+        
+        if (!demoDataSeeded) {
+          // Seed demo data
+          console.log('Seeding demo data...');
+          const seedResult = await demoService.seedDemoData();
+          
+          if (seedResult.success) {
+            // Mark demo data as seeded
+            localStorage.setItem('demoDataSeeded', 'true');
+            console.log('Demo data seeded successfully');
+          } else {
+            console.error('Failed to seed demo data:', seedResult.error);
+          }
+        }
+        
         localStorage.setItem('demoUserEmail', email);
         return { 
           data: { 

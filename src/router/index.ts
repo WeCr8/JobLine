@@ -103,12 +103,6 @@ const router = createRouter({
       component: () => import('../views/ComponentLibrary.vue')
     },
     {
-      path: '/demo',
-      name: 'DemoControls',
-      component: () => import('../views/DemoControlsView.vue'),
-      meta: { requiresAuth: true }
-    },
-    {
       path: '/admin',
       name: 'Admin',
       component: () => import('../admin/index.vue'),
