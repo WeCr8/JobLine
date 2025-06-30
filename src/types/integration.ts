@@ -1,14 +1,3 @@
-import { supabase, handleApiError } from './api.service';
-import type { 
-  ConnectionConfig, 
-  ImportJob, 
-  ComplianceCheck, 
-  ExportControlFlag,
-  ConnectionType,
-  ImportType,
-  ImportMapping
-} from '../types/integration';
-
 export type ConnectionType = 
   | 'google-sheets'
   | 'csv-upload'

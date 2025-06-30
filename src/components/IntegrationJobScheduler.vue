@@ -449,7 +449,7 @@ const optimizeJobs = async () => {
     optimizationResults.value = results;
     emit('schedule-jobs', selectedJobs.value);
     emit('optimization-complete', results);
-  } catch (err) {
+  } catch (err: any) {
     console.error('Error optimizing jobs:', err);
     
     // Add error results
@@ -505,7 +505,7 @@ const autoScheduleAll = async () => {
       optimizationResults.value = results;
       emit('optimization-complete', results);
     }
-  } catch (err) {
+  } catch (err: any) {
     console.error('Error auto-scheduling jobs:', err);
     
     // Add error results
