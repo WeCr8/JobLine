@@ -11,7 +11,7 @@ const demoAccounts = {
     role: 'admin',
     department: null,
     organization_id: null,
-    is_active: true,
+    is_active: false,
     created_at: '2024-01-01T00:00:00Z'
   },
   'org-admin@example.com': {
