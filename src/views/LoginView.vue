@@ -106,14 +106,14 @@
             </button>
             <button
               type="button"
-              @click="loginAsDemo('org-admin@example.com')"
+              @click="loginAsDemo('demo-org-admin@wecr8.info')"
               class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 transition-colors duration-200"
             >
               Org Admin
             </button>
             <button
               type="button"
-              @click="loginAsDemo('operator@example.com')"
+              @click="loginAsDemo('demo-operator@wecr8.info')"
               class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 transition-colors duration-200"
             >
               Operator
