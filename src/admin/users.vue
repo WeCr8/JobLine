@@ -324,7 +324,7 @@ const filteredUsers = computed(() => {
   // Apply search filter
   if (searchQuery.value) {
     const query = searchQuery.value.toLowerCase();
-    filtered = filtered.filter(user => 
+    filtered = filtered.filter((user: User) => 
       user.name.toLowerCase().includes(query) || 
       user.email.toLowerCase().includes(query)
     );
@@ -332,12 +332,12 @@ const filteredUsers = computed(() => {
   
   // Apply role filter
   if (roleFilter.value !== 'all') {
-    filtered = filtered.filter(user => user.role === roleFilter.value);
+    filtered = filtered.filter((user: User) => user.role === roleFilter.value);
   }
   
   // Apply status filter
   if (statusFilter.value !== 'all') {
-    filtered = filtered.filter(user => 
+    filtered = filtered.filter((user: User) => 
       (statusFilter.value === 'active' && user.is_active) || 
       (statusFilter.value === 'inactive' && !user.is_active)
     );
