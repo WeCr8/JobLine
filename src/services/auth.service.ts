@@ -14,20 +14,20 @@ const demoAccounts = {
     is_active: false,
     created_at: '2024-01-01T00:00:00Z'
   },
-  'org-admin@example.com': {
+  'demo-org-admin@wecr8.info': {
     id: 'demo-org-admin-id',
-    email: 'org-admin@example.com',
-    name: 'Organization Admin',
+    email: 'demo-org-admin@wecr8.info',
+    name: 'Demo Organization Admin',
     role: 'organization_admin',
     department: 'Administration',
     organization_id: 'org-1',
     is_active: true,
     created_at: '2024-01-01T00:00:00Z'
   },
-  'operator@example.com': {
+  'demo-operator@wecr8.info': {
     id: 'demo-operator-id',
-    email: 'operator@example.com',
-    name: 'John Operator',
+    email: 'demo-operator@wecr8.info',
+    name: 'Demo Operator',
     role: 'operator',
     department: 'cnc-machining',
     organization_id: 'org-1',
