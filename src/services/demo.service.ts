@@ -1,4 +1,4 @@
-import { supabase } from './api.service';
+import { supabase, handleApiError } from './api.service';
 
 export const demoService = {
   /**

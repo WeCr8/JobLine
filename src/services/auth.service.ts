@@ -4,20 +4,10 @@ import { demoService } from './demo.service';
 
 // Demo accounts for testing
 const demoAccounts = {
-  'admin@wecr8.info': {
-    id: 'demo-admin-id',
-    email: 'admin@wecr8.info',
-    name: 'Admin User',
-    role: 'admin',
-    department: null,
-    organization_id: null,
-    is_active: true,
-    created_at: '2024-01-01T00:00:00Z'
-  },
   'demo-org-admin@wecr8.info': {
-    id: 'demo-org-admin-id',
+    id: 'demo-admin-id',
     email: 'demo-org-admin@wecr8.info',
-    name: 'Demo Organization Admin',
+    name: 'Organization Admin',
     role: 'organization_admin',
     department: 'Administration',
     organization_id: 'org-1',
@@ -27,7 +17,7 @@ const demoAccounts = {
   'demo-operator@wecr8.info': {
     id: 'demo-operator-id',
     email: 'demo-operator@wecr8.info',
-    name: 'Demo Operator',
+    name: 'John Operator',
     role: 'operator',
     department: 'cnc-machining',
     organization_id: 'org-1',
@@ -305,8 +295,7 @@ export const authService = {
         if (email && email in demoAccounts) {
           return demoAccounts[email as keyof typeof demoAccounts];
         }
-        // Default to admin if no email stored
-        return demoAccounts['admin@wecr8.info'];
+        return null;
       }
 
       const { data: { user } } = await supabase.auth.getUser();
@@ -337,42 +326,5 @@ export const authService = {
       return { data: { subscription: { unsubscribe: () => {} } } };
     }
     return supabase.auth.onAuthStateChange(callback);
-  },
-
-  /**
-   * Ensure a user exists (create if not)
-   */
-  async ensureUser(email: string, password: string): Promise<boolean> {
-    try {
-      // In demo mode, just return success
-      if (isDemoMode()) {
-        return true;
-      }
-
-      // Check if user exists
-      const { data: { users }, error: listError } = await supabase.auth.admin.listUsers({ 
-        filter: { email }
-      });
-
-      if (listError) throw listError;
-
-      const exists = users?.some(user => user.email === email);
-
-      if (!exists) {
-        // Create the user if they don't exist
-        const { error: createError } = await supabase.auth.admin.createUser({
-          email,
-          password,
-          email_confirm: true,
-        });
-
-        if (createError) throw createError;
-      }
-
-      return true;
-    } catch (err) {
-      console.error('Error ensuring user exists:', err);
-      return false;
-    }
   }
 };
