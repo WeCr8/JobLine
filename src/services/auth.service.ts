@@ -337,5 +337,42 @@ export const authService = {
       return { data: { subscription: { unsubscribe: () => {} } } };
     }
     return supabase.auth.onAuthStateChange(callback);
+  },
+
+  /**
+   * Ensure a user exists (create if not)
+   */
+  async ensureUser(email: string, password: string): Promise<boolean> {
+    try {
+      // In demo mode, just return success
+      if (isDemoMode()) {
+        return true;
+      }
+
+      // Check if user exists
+      const { data: { users }, error: listError } = await supabase.auth.admin.listUsers({ 
+        filter: { email }
+      });
+
+      if (listError) throw listError;
+
+      const exists = users?.some(user => user.email === email);
+
+      if (!exists) {
+        // Create the user if they don't exist
+        const { error: createError } = await supabase.auth.admin.createUser({
+          email,
+          password,
+          email_confirm: true,
+        });
+
+        if (createError) throw createError;
+      }
+
+      return true;
+    } catch (err) {
+      console.error('Error ensuring user exists:', err);
+      return false;
+    }
   }
 };
