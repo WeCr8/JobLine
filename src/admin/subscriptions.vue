@@ -36,7 +36,7 @@
             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
           >
             <option value="all">All Plans</option>
-            <option v-for="plan in adminStore.subscriptionPlans" :key="plan.id" :value="plan.priceId">
+            <option v-for="plan in adminStore.subscriptionPlans" :key="plan.id" :value="plan.stripePriceId">
               {{ plan.name }}
             </option>
           </select>
@@ -229,7 +229,7 @@
 import { ref, computed, onMounted } from 'vue';
 import { format } from 'date-fns';
 import { useAdminStore } from '../stores/admin';
-import type { Subscription, Invoice } from '../stores/admin';
+import type { Subscription, Invoice } from '../types/admin';
 import { ArrowPathIcon, XMarkIcon, ExclamationTriangleIcon } from '@heroicons/vue/24/outline';
 
 const adminStore = useAdminStore();
@@ -336,4 +336,3 @@ onMounted(async () => {
   await refreshData();
 });
 </script>
-```
