@@ -1,35 +1,13 @@
-"use strict";
-var __assign = (this && this.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
-var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
-    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
-        if (ar || !(i in from)) {
-            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
-            ar[i] = from[i];
-        }
-    }
-    return to.concat(ar || Array.prototype.slice.call(from));
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-var vue_1 = require("vue");
-var performance_1 = require("../stores/performance");
-var auth_1 = require("../stores/auth");
-var outline_1 = require("@heroicons/vue/24/outline");
-var performanceStore = (0, performance_1.usePerformanceStore)();
-var authStore = (0, auth_1.useAuthStore)();
-var __VLS_emit = defineEmits();
-var selectedPeriod = (0, vue_1.ref)('monthly');
-var selectedDepartment = (0, vue_1.ref)('');
-var getRankClass = function (rank) {
+import { ref, onMounted } from 'vue';
+import { usePerformanceStore } from '../stores/performance';
+import { useAuthStore } from '../stores/auth';
+import { TrophyIcon, StarIcon, FireIcon, ChevronUpIcon, ChevronDownIcon, MinusIcon } from '@heroicons/vue/24/outline';
+const performanceStore = usePerformanceStore();
+const authStore = useAuthStore();
+const __VLS_emit = defineEmits();
+const selectedPeriod = ref('monthly');
+const selectedDepartment = ref('');
+const getRankClass = (rank) => {
     if (rank === 1)
         return 'bg-gradient-to-r from-yellow-400 to-yellow-600';
     if (rank === 2)
@@ -38,51 +16,64 @@ var getRankClass = function (rank) {
         return 'bg-gradient-to-r from-amber-600 to-amber-800';
     return 'bg-gray-500';
 };
-var getRankIcon = function (rank) {
-    var icons = ['🥇', '🥈', '🥉'];
+const getRankIcon = (rank) => {
+    const icons = ['🥇', '🥈', '🥉'];
     return icons[rank - 1] || rank.toString();
 };
-var getUserRowClass = function (userId, index) {
-    var _a;
-    var isCurrentUser = userId === ((_a = authStore.user) === null || _a === void 0 ? void 0 : _a.id);
-    var baseClass = index < 3 ? 'bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200' : 'hover:bg-gray-50';
+const getUserRowClass = (userId, index) => {
+    const isCurrentUser = userId === authStore.user?.id;
+    const baseClass = index < 3 ? 'bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200' : 'hover:bg-gray-50';
     if (isCurrentUser) {
-        return "".concat(baseClass, " ring-2 ring-primary-500 bg-primary-50");
+        return `${baseClass} ring-2 ring-primary-500 bg-primary-50`;
     }
     return baseClass;
 };
-var getTrendIcon = function (trend) {
-    var icons = {
-        'up': outline_1.ChevronUpIcon,
-        'down': outline_1.ChevronDownIcon,
-        'stable': outline_1.MinusIcon
+const getTrendIcon = (trend) => {
+    const icons = {
+        'up': ChevronUpIcon,
+        'down': ChevronDownIcon,
+        'stable': MinusIcon
     };
-    return icons[trend] || outline_1.MinusIcon;
+    return icons[trend] || MinusIcon;
 };
-var getTrendColor = function (trend) {
-    var colors = {
+const getTrendColor = (trend) => {
+    const colors = {
         'up': 'text-green-500',
         'down': 'text-red-500',
         'stable': 'text-gray-500'
     };
     return colors[trend] || colors.stable;
 };
-var updateLeaderboard = function () {
-    performanceStore.fetchLeaderboard(selectedPeriod.value, selectedDepartment.value);
+const updateLeaderboard = () => {
+    performanceStore.fetchLeaderboard();
 };
-(0, vue_1.onMounted)(function () {
-    performanceStore.fetchLeaderboard(selectedPeriod.value, selectedDepartment.value);
+onMounted(() => {
+    performanceStore.fetchLeaderboard();
 });
 debugger; /* PartiallyEnd: #3632/scriptSetup.vue */
-var __VLS_ctx = {};
-var __VLS_components;
-var __VLS_directives;
-__VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)(__assign({ class: "bg-white rounded-lg shadow-sm border border-gray-200" }));
-__VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)(__assign({ class: "p-6 border-b border-gray-200" }));
-__VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)(__assign({ class: "flex items-center justify-between" }));
-__VLS_asFunctionalElement(__VLS_intrinsicElements.h3, __VLS_intrinsicElements.h3)(__assign({ class: "text-lg font-semibold text-gray-900" }));
-__VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)(__assign({ class: "flex space-x-2" }));
-__VLS_asFunctionalElement(__VLS_intrinsicElements.select, __VLS_intrinsicElements.select)(__assign(__assign({ onChange: (__VLS_ctx.updateLeaderboard) }, { value: (__VLS_ctx.selectedPeriod) }), { class: "text-sm border border-gray-300 rounded-md px-2 py-1 focus:ring-primary-500 focus:border-primary-500" }));
+const __VLS_ctx = {};
+let __VLS_components;
+let __VLS_directives;
+__VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({
+    ...{ class: "bg-white rounded-lg shadow-sm border border-gray-200" },
+});
+__VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({
+    ...{ class: "p-6 border-b border-gray-200" },
+});
+__VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({
+    ...{ class: "flex items-center justify-between" },
+});
+__VLS_asFunctionalElement(__VLS_intrinsicElements.h3, __VLS_intrinsicElements.h3)({
+    ...{ class: "text-lg font-semibold text-gray-900" },
+});
+__VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({
+    ...{ class: "flex space-x-2" },
+});
+__VLS_asFunctionalElement(__VLS_intrinsicElements.select, __VLS_intrinsicElements.select)({
+    ...{ onChange: (__VLS_ctx.updateLeaderboard) },
+    value: (__VLS_ctx.selectedPeriod),
+    ...{ class: "text-sm border border-gray-300 rounded-md px-2 py-1 focus:ring-primary-500 focus:border-primary-500" },
+});
 __VLS_asFunctionalElement(__VLS_intrinsicElements.option, __VLS_intrinsicElements.option)({
     value: "daily",
 });
@@ -95,7 +86,11 @@ __VLS_asFunctionalElement(__VLS_intrinsicElements.option, __VLS_intrinsicElement
 __VLS_asFunctionalElement(__VLS_intrinsicElements.option, __VLS_intrinsicElements.option)({
     value: "quarterly",
 });
-__VLS_asFunctionalElement(__VLS_intrinsicElements.select, __VLS_intrinsicElements.select)(__assign(__assign({ onChange: (__VLS_ctx.updateLeaderboard) }, { value: (__VLS_ctx.selectedDepartment) }), { class: "text-sm border border-gray-300 rounded-md px-2 py-1 focus:ring-primary-500 focus:border-primary-500" }));
+__VLS_asFunctionalElement(__VLS_intrinsicElements.select, __VLS_intrinsicElements.select)({
+    ...{ onChange: (__VLS_ctx.updateLeaderboard) },
+    value: (__VLS_ctx.selectedDepartment),
+    ...{ class: "text-sm border border-gray-300 rounded-md px-2 py-1 focus:ring-primary-500 focus:border-primary-500" },
+});
 __VLS_asFunctionalElement(__VLS_intrinsicElements.option, __VLS_intrinsicElements.option)({
     value: "",
 });
@@ -111,89 +106,165 @@ __VLS_asFunctionalElement(__VLS_intrinsicElements.option, __VLS_intrinsicElement
 __VLS_asFunctionalElement(__VLS_intrinsicElements.option, __VLS_intrinsicElements.option)({
     value: "assembly",
 });
-__VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)(__assign({ class: "p-6" }));
+__VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({
+    ...{ class: "p-6" },
+});
 if (__VLS_ctx.performanceStore.loading) {
-    __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)(__assign({ class: "space-y-3" }));
-    for (var _i = 0, _a = __VLS_getVForSourceType((5)); _i < _a.length; _i++) {
-        var i = _a[_i][0];
-        __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)(__assign({ key: (i) }, { class: "animate-pulse" }));
-        __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)(__assign({ class: "h-4 bg-gray-200 rounded w-3/4 mb-2" }));
-        __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)(__assign({ class: "h-3 bg-gray-200 rounded w-1/2" }));
+    __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({
+        ...{ class: "space-y-3" },
+    });
+    for (const [i] of __VLS_getVForSourceType((5))) {
+        __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({
+            key: (i),
+            ...{ class: "animate-pulse" },
+        });
+        __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({
+            ...{ class: "h-4 bg-gray-200 rounded w-3/4 mb-2" },
+        });
+        __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({
+            ...{ class: "h-3 bg-gray-200 rounded w-1/2" },
+        });
     }
 }
 else if (__VLS_ctx.performanceStore.leaderboard.length === 0) {
-    __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)(__assign({ class: "text-center py-8" }));
-    var __VLS_0 = {}.TrophyIcon;
+    __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({
+        ...{ class: "text-center py-8" },
+    });
+    const __VLS_0 = {}.TrophyIcon;
     /** @type {[typeof __VLS_components.TrophyIcon, ]} */ ;
     // @ts-ignore
-    var __VLS_1 = __VLS_asFunctionalComponent(__VLS_0, new __VLS_0(__assign({ class: "w-12 h-12 text-gray-400 mx-auto mb-4" })));
-    var __VLS_2 = __VLS_1.apply(void 0, __spreadArray([__assign({ class: "w-12 h-12 text-gray-400 mx-auto mb-4" })], __VLS_functionalComponentArgsRest(__VLS_1), false));
-    __VLS_asFunctionalElement(__VLS_intrinsicElements.p, __VLS_intrinsicElements.p)(__assign({ class: "text-gray-500" }));
+    const __VLS_1 = __VLS_asFunctionalComponent(__VLS_0, new __VLS_0({
+        ...{ class: "w-12 h-12 text-gray-400 mx-auto mb-4" },
+    }));
+    const __VLS_2 = __VLS_1({
+        ...{ class: "w-12 h-12 text-gray-400 mx-auto mb-4" },
+    }, ...__VLS_functionalComponentArgsRest(__VLS_1));
+    __VLS_asFunctionalElement(__VLS_intrinsicElements.p, __VLS_intrinsicElements.p)({
+        ...{ class: "text-gray-500" },
+    });
 }
 else {
-    __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)(__assign({ class: "space-y-3" }));
-    for (var _b = 0, _c = __VLS_getVForSourceType((__VLS_ctx.performanceStore.leaderboard)); _b < _c.length; _b++) {
-        var _d = _c[_b], entry = _d[0], index = _d[1];
-        __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)(__assign(__assign({ key: (entry.userId) }, { class: "flex items-center space-x-4 p-4 rounded-lg transition-colors duration-200" }), { class: (__VLS_ctx.getUserRowClass(entry.userId, index)) }));
-        __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)(__assign({ class: "flex-shrink-0" }));
-        __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)(__assign({ class: "w-10 h-10 rounded-full flex items-center justify-center font-bold text-white" }, { class: (__VLS_ctx.getRankClass(entry.rank)) }));
+    __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({
+        ...{ class: "space-y-3" },
+    });
+    for (const [entry, index] of __VLS_getVForSourceType((__VLS_ctx.performanceStore.leaderboard))) {
+        __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({
+            key: (entry.userId),
+            ...{ class: "flex items-center space-x-4 p-4 rounded-lg transition-colors duration-200" },
+            ...{ class: (__VLS_ctx.getUserRowClass(entry.userId, index)) },
+        });
+        __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({
+            ...{ class: "flex-shrink-0" },
+        });
+        __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({
+            ...{ class: "w-10 h-10 rounded-full flex items-center justify-center font-bold text-white" },
+            ...{ class: (__VLS_ctx.getRankClass(entry.rank)) },
+        });
         (entry.rank <= 3 ? __VLS_ctx.getRankIcon(entry.rank) : entry.rank);
-        __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)(__assign({ class: "flex-1" }));
-        __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)(__assign({ class: "flex items-center space-x-2" }));
-        __VLS_asFunctionalElement(__VLS_intrinsicElements.h4, __VLS_intrinsicElements.h4)(__assign({ class: "font-medium text-gray-900" }));
+        __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({
+            ...{ class: "flex-1" },
+        });
+        __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({
+            ...{ class: "flex items-center space-x-2" },
+        });
+        __VLS_asFunctionalElement(__VLS_intrinsicElements.h4, __VLS_intrinsicElements.h4)({
+            ...{ class: "font-medium text-gray-900" },
+        });
         (entry.userName);
-        __VLS_asFunctionalElement(__VLS_intrinsicElements.span, __VLS_intrinsicElements.span)(__assign({ class: "text-xs text-gray-500" }));
+        __VLS_asFunctionalElement(__VLS_intrinsicElements.span, __VLS_intrinsicElements.span)({
+            ...{ class: "text-xs text-gray-500" },
+        });
         (entry.level);
-        __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)(__assign({ class: "flex items-center space-x-1" }));
-        var __VLS_4 = ((__VLS_ctx.getTrendIcon(entry.trend)));
+        __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({
+            ...{ class: "flex items-center space-x-1" },
+        });
+        const __VLS_4 = ((__VLS_ctx.getTrendIcon(entry.trend)));
         // @ts-ignore
-        var __VLS_5 = __VLS_asFunctionalComponent(__VLS_4, new __VLS_4(__assign({ class: "w-3 h-3" }, { class: (__VLS_ctx.getTrendColor(entry.trend)) })));
-        var __VLS_6 = __VLS_5.apply(void 0, __spreadArray([__assign({ class: "w-3 h-3" }, { class: (__VLS_ctx.getTrendColor(entry.trend)) })], __VLS_functionalComponentArgsRest(__VLS_5), false));
-        __VLS_asFunctionalElement(__VLS_intrinsicElements.span, __VLS_intrinsicElements.span)(__assign({ class: "text-xs text-gray-500" }));
+        const __VLS_5 = __VLS_asFunctionalComponent(__VLS_4, new __VLS_4({
+            ...{ class: "w-3 h-3" },
+            ...{ class: (__VLS_ctx.getTrendColor(entry.trend)) },
+        }));
+        const __VLS_6 = __VLS_5({
+            ...{ class: "w-3 h-3" },
+            ...{ class: (__VLS_ctx.getTrendColor(entry.trend)) },
+        }, ...__VLS_functionalComponentArgsRest(__VLS_5));
+        __VLS_asFunctionalElement(__VLS_intrinsicElements.span, __VLS_intrinsicElements.span)({
+            ...{ class: "text-xs text-gray-500" },
+        });
         (entry.previousRank ? Math.abs(entry.rank - entry.previousRank) : 0);
-        __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)(__assign({ class: "flex items-center space-x-4 text-sm text-gray-600" }));
+        __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({
+            ...{ class: "flex items-center space-x-4 text-sm text-gray-600" },
+        });
         __VLS_asFunctionalElement(__VLS_intrinsicElements.span, __VLS_intrinsicElements.span)({});
         (entry.department);
         __VLS_asFunctionalElement(__VLS_intrinsicElements.span, __VLS_intrinsicElements.span)({});
         (entry.role);
-        __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)(__assign({ class: "text-right" }));
-        __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)(__assign({ class: "text-lg font-bold text-gray-900" }));
+        __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({
+            ...{ class: "text-right" },
+        });
+        __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({
+            ...{ class: "text-lg font-bold text-gray-900" },
+        });
         (entry.score);
-        __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)(__assign({ class: "text-sm text-gray-600" }));
-        __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)(__assign({ class: "text-right" }));
-        __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)(__assign({ class: "flex items-center space-x-2" }));
-        __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)(__assign({ class: "flex items-center space-x-1" }));
-        var __VLS_8 = {}.StarIcon;
+        __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({
+            ...{ class: "text-sm text-gray-600" },
+        });
+        __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({
+            ...{ class: "text-right" },
+        });
+        __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({
+            ...{ class: "flex items-center space-x-2" },
+        });
+        __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({
+            ...{ class: "flex items-center space-x-1" },
+        });
+        const __VLS_8 = {}.StarIcon;
         /** @type {[typeof __VLS_components.StarIcon, ]} */ ;
         // @ts-ignore
-        var __VLS_9 = __VLS_asFunctionalComponent(__VLS_8, new __VLS_8(__assign({ class: "w-4 h-4 text-yellow-500" })));
-        var __VLS_10 = __VLS_9.apply(void 0, __spreadArray([__assign({ class: "w-4 h-4 text-yellow-500" })], __VLS_functionalComponentArgsRest(__VLS_9), false));
-        __VLS_asFunctionalElement(__VLS_intrinsicElements.span, __VLS_intrinsicElements.span)(__assign({ class: "text-sm font-medium text-gray-900" }));
+        const __VLS_9 = __VLS_asFunctionalComponent(__VLS_8, new __VLS_8({
+            ...{ class: "w-4 h-4 text-yellow-500" },
+        }));
+        const __VLS_10 = __VLS_9({
+            ...{ class: "w-4 h-4 text-yellow-500" },
+        }, ...__VLS_functionalComponentArgsRest(__VLS_9));
+        __VLS_asFunctionalElement(__VLS_intrinsicElements.span, __VLS_intrinsicElements.span)({
+            ...{ class: "text-sm font-medium text-gray-900" },
+        });
         (entry.achievements);
-        __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)(__assign({ class: "flex items-center space-x-1" }));
-        var __VLS_12 = {}.FireIcon;
+        __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({
+            ...{ class: "flex items-center space-x-1" },
+        });
+        const __VLS_12 = {}.FireIcon;
         /** @type {[typeof __VLS_components.FireIcon, ]} */ ;
         // @ts-ignore
-        var __VLS_13 = __VLS_asFunctionalComponent(__VLS_12, new __VLS_12(__assign({ class: "w-4 h-4 text-orange-500" })));
-        var __VLS_14 = __VLS_13.apply(void 0, __spreadArray([__assign({ class: "w-4 h-4 text-orange-500" })], __VLS_functionalComponentArgsRest(__VLS_13), false));
-        __VLS_asFunctionalElement(__VLS_intrinsicElements.span, __VLS_intrinsicElements.span)(__assign({ class: "text-sm font-medium text-gray-900" }));
+        const __VLS_13 = __VLS_asFunctionalComponent(__VLS_12, new __VLS_12({
+            ...{ class: "w-4 h-4 text-orange-500" },
+        }));
+        const __VLS_14 = __VLS_13({
+            ...{ class: "w-4 h-4 text-orange-500" },
+        }, ...__VLS_functionalComponentArgsRest(__VLS_13));
+        __VLS_asFunctionalElement(__VLS_intrinsicElements.span, __VLS_intrinsicElements.span)({
+            ...{ class: "text-sm font-medium text-gray-900" },
+        });
         (entry.streaks);
-        __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)(__assign({ class: "text-sm text-green-600 font-medium" }));
+        __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({
+            ...{ class: "text-sm text-green-600 font-medium" },
+        });
         (entry.bonusEarned.toLocaleString());
     }
 }
 if (__VLS_ctx.performanceStore.leaderboard.length > 0) {
-    __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)(__assign({ class: "mt-6 text-center" }));
-    __VLS_asFunctionalElement(__VLS_intrinsicElements.button, __VLS_intrinsicElements.button)(__assign({ onClick: function () {
-            var _a = [];
-            for (var _i = 0; _i < arguments.length; _i++) {
-                _a[_i] = arguments[_i];
-            }
-            var $event = _a[0];
-            if (!(__VLS_ctx.performanceStore.leaderboard.length > 0))
-                return;
-            __VLS_ctx.$emit('view-full-leaderboard');
-        } }, { class: "text-primary-600 hover:text-primary-700 text-sm font-medium" }));
+    __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({
+        ...{ class: "mt-6 text-center" },
+    });
+    __VLS_asFunctionalElement(__VLS_intrinsicElements.button, __VLS_intrinsicElements.button)({
+        ...{ onClick: (...[$event]) => {
+                if (!(__VLS_ctx.performanceStore.leaderboard.length > 0))
+                    return;
+                __VLS_ctx.$emit('view-full-leaderboard');
+            } },
+        ...{ class: "text-primary-600 hover:text-primary-700 text-sm font-medium" },
+    });
 }
 /** @type {__VLS_StyleScopedClasses['bg-white']} */ ;
 /** @type {__VLS_StyleScopedClasses['rounded-lg']} */ ;
@@ -322,12 +393,12 @@ if (__VLS_ctx.performanceStore.leaderboard.length > 0) {
 /** @type {__VLS_StyleScopedClasses['text-sm']} */ ;
 /** @type {__VLS_StyleScopedClasses['font-medium']} */ ;
 var __VLS_dollars;
-var __VLS_self = (await Promise.resolve().then(function () { return require('vue'); })).defineComponent({
-    setup: function () {
+const __VLS_self = (await import('vue')).defineComponent({
+    setup() {
         return {
-            TrophyIcon: outline_1.TrophyIcon,
-            StarIcon: outline_1.StarIcon,
-            FireIcon: outline_1.FireIcon,
+            TrophyIcon: TrophyIcon,
+            StarIcon: StarIcon,
+            FireIcon: FireIcon,
             performanceStore: performanceStore,
             selectedPeriod: selectedPeriod,
             selectedDepartment: selectedDepartment,
@@ -341,8 +412,8 @@ var __VLS_self = (await Promise.resolve().then(function () { return require('vue
     },
     __typeEmits: {},
 });
-exports.default = (await Promise.resolve().then(function () { return require('vue'); })).defineComponent({
-    setup: function () {
+export default (await import('vue')).defineComponent({
+    setup() {
         return {};
     },
     __typeEmits: {},

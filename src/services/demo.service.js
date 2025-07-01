@@ -1,127 +1,68 @@
-"use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g = Object.create((typeof Iterator === "function" ? Iterator : Object).prototype);
-    return g.next = verb(0), g["throw"] = verb(1), g["return"] = verb(2), typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (g && (g = 0, op[0] && (_ = 0)), _) try {
-            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [op[0] & 2, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.demoService = void 0;
-exports.demoService = {
+export const demoService = {
     /**
      * Seed demo data for the application
      */
-    seedDemoData: function () {
-        return __awaiter(this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                try {
-                    // In hardcoded demo mode, we'll just return success
-                    // No need to actually call the Supabase function
-                    console.log('Seeding demo data in hardcoded mode');
-                    return [2 /*return*/, { success: true, message: 'Demo data initialized successfully' }];
-                }
-                catch (err) {
-                    console.error('Error seeding demo data:', err);
-                    return [2 /*return*/, { success: false, error: err.message }];
-                }
-                return [2 /*return*/];
-            });
-        });
+    async seedDemoData() {
+        try {
+            // In hardcoded demo mode, we'll just return success
+            // No need to actually call the Supabase function
+            console.log('Seeding demo data in hardcoded mode');
+            return { success: true, message: 'Demo data initialized successfully' };
+        }
+        catch (err) {
+            console.error('Error seeding demo data:', err);
+            return { success: false, error: err.message };
+        }
     },
     /**
      * Shuffle job priorities to simulate changing conditions
      */
-    shuffleJobPriorities: function () {
-        return __awaiter(this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                try {
-                    console.log('Shuffling job priorities in hardcoded mode');
-                    return [2 /*return*/, {
-                            success: true,
-                            message: 'Successfully shuffled priorities for demo jobs'
-                        }];
-                }
-                catch (err) {
-                    console.error('Error shuffling job priorities:', err);
-                    return [2 /*return*/, { success: false, error: err.message }];
-                }
-                return [2 /*return*/];
-            });
-        });
+    async shuffleJobPriorities() {
+        try {
+            console.log('Shuffling job priorities in hardcoded mode');
+            return {
+                success: true,
+                message: 'Successfully shuffled priorities for demo jobs'
+            };
+        }
+        catch (err) {
+            console.error('Error shuffling job priorities:', err);
+            return { success: false, error: err.message };
+        }
     },
     /**
      * Reorder job statuses to simulate production progress
      */
-    advanceJobStatuses: function () {
-        return __awaiter(this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                try {
-                    console.log('Advancing job statuses in hardcoded mode');
-                    return [2 /*return*/, {
-                            success: true,
-                            message: 'Successfully advanced statuses for demo jobs'
-                        }];
-                }
-                catch (err) {
-                    console.error('Error advancing job statuses:', err);
-                    return [2 /*return*/, { success: false, error: err.message }];
-                }
-                return [2 /*return*/];
-            });
-        });
+    async advanceJobStatuses() {
+        try {
+            console.log('Advancing job statuses in hardcoded mode');
+            return {
+                success: true,
+                message: 'Successfully advanced statuses for demo jobs'
+            };
+        }
+        catch (err) {
+            console.error('Error advancing job statuses:', err);
+            return { success: false, error: err.message };
+        }
     },
     /**
      * Reset demo data to initial state
      */
-    resetDemoData: function () {
-        return __awaiter(this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                try {
-                    console.log('Resetting demo data in hardcoded mode');
-                    return [2 /*return*/, { success: true, message: 'Demo data reset successfully' }];
-                }
-                catch (err) {
-                    console.error('Error resetting demo data:', err);
-                    return [2 /*return*/, { success: false, error: err.message }];
-                }
-                return [2 /*return*/];
-            });
-        });
+    async resetDemoData() {
+        try {
+            console.log('Resetting demo data in hardcoded mode');
+            return { success: true, message: 'Demo data reset successfully' };
+        }
+        catch (err) {
+            console.error('Error resetting demo data:', err);
+            return { success: false, error: err.message };
+        }
     },
     /**
      * Get hardcoded demo data for various entities
      */
-    getDemoData: function (entity) {
+    getDemoData(entity) {
         switch (entity) {
             case 'jobs':
                 return this.getDemoJobs();
@@ -142,7 +83,7 @@ exports.demoService = {
     /**
      * Get hardcoded demo jobs
      */
-    getDemoJobs: function () {
+    getDemoJobs() {
         return [
             {
                 id: 'job-1',
@@ -162,7 +103,7 @@ exports.demoService = {
                 machine: 'CNC-001',
                 operation: 'Manufacture Hydraulic Cylinder Housing',
                 notes: 'Critical customer order, needs quality check at 25 units',
-                operations: this.getDemoOperations().filter(function (op) { return op.jobId === 'job-1'; }),
+                operations: this.getDemoOperations().filter(op => op.jobId === 'job-1'),
                 dncPrograms: [
                     {
                         id: 'prog-1',
@@ -296,7 +237,7 @@ exports.demoService = {
                 machine: 'CNC-002',
                 operation: 'Manufacture Gear Assembly',
                 notes: 'New customer, first article inspection required',
-                operations: this.getDemoOperations().filter(function (op) { return op.jobId === 'job-2'; }),
+                operations: this.getDemoOperations().filter(op => op.jobId === 'job-2'),
                 dncPrograms: [],
                 history: [
                     {
@@ -343,7 +284,7 @@ exports.demoService = {
                 machine: null,
                 operation: 'Manufacture Valve Body',
                 notes: 'On hold due to material quality issues',
-                operations: this.getDemoOperations().filter(function (op) { return op.jobId === 'job-3'; }),
+                operations: this.getDemoOperations().filter(op => op.jobId === 'job-3'),
                 dncPrograms: [],
                 history: [
                     {
@@ -391,7 +332,7 @@ exports.demoService = {
                 machine: 'CNC-003',
                 operation: 'Manufacture Mounting Bracket',
                 notes: 'Completed ahead of schedule',
-                operations: this.getDemoOperations().filter(function (op) { return op.jobId === 'job-4'; }),
+                operations: this.getDemoOperations().filter(op => op.jobId === 'job-4'),
                 dncPrograms: [],
                 history: [
                     {
@@ -458,7 +399,7 @@ exports.demoService = {
                 machine: null,
                 operation: 'Manufacture Control Arm',
                 notes: 'Waiting for material delivery',
-                operations: this.getDemoOperations().filter(function (op) { return op.jobId === 'job-5'; }),
+                operations: this.getDemoOperations().filter(op => op.jobId === 'job-5'),
                 dncPrograms: [],
                 history: [
                     {
@@ -482,7 +423,7 @@ exports.demoService = {
     /**
      * Get hardcoded demo operations
      */
-    getDemoOperations: function () {
+    getDemoOperations() {
         return [
             {
                 id: 'op-1',
@@ -699,7 +640,7 @@ exports.demoService = {
     /**
      * Get hardcoded demo machines
      */
-    getDemoMachines: function () {
+    getDemoMachines() {
         return [
             {
                 id: 'CNC-001',
@@ -836,7 +777,7 @@ exports.demoService = {
     /**
      * Get hardcoded demo users
      */
-    getDemoUsers: function () {
+    getDemoUsers() {
         return [
             {
                 id: 'user-1',
@@ -893,7 +834,7 @@ exports.demoService = {
     /**
      * Get hardcoded demo departments
      */
-    getDemoDepartments: function () {
+    getDemoDepartments() {
         return [
             {
                 id: 'cnc-machining',
@@ -1010,7 +951,7 @@ exports.demoService = {
     /**
      * Get hardcoded demo passdown notes
      */
-    getDemoPassdownNotes: function () {
+    getDemoPassdownNotes() {
         return [
             {
                 id: 'note-1',

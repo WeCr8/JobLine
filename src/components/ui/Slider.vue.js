@@ -1,19 +1,6 @@
-"use strict";
-var __assign = (this && this.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-var vue_1 = require("vue");
-var useElementSize_1 = require("../../composables/useElementSize");
-var props = withDefaults(defineProps(), {
+import { ref, computed, onMounted, watch } from 'vue';
+import { useElementSize } from '../../composables/useElementSize';
+const props = withDefaults(defineProps(), {
     min: 0,
     max: 100,
     step: 1,
@@ -22,121 +9,121 @@ var props = withDefaults(defineProps(), {
     range: false,
     showValue: false,
     showTicks: false,
-    ticks: function () { return []; },
-    id: "slider-".concat(Math.random().toString(36).substring(2, 9))
+    ticks: () => [],
+    id: `slider-${Math.random().toString(36).substring(2, 9)}`
 });
-var emit = defineEmits();
+const emit = defineEmits();
 // Refs
-var trackRef = (0, vue_1.ref)(null);
-var thumbRef = (0, vue_1.ref)(null);
-var minThumbRef = (0, vue_1.ref)(null);
-var maxThumbRef = (0, vue_1.ref)(null);
-var activeThumb = (0, vue_1.ref)(null);
+const trackRef = ref(null);
+const thumbRef = ref(null);
+const minThumbRef = ref(null);
+const maxThumbRef = ref(null);
+const activeThumb = ref(null);
 // Track size
-var _a = (0, useElementSize_1.useElementSize)(trackRef), trackWidth = _a.width, trackHeight = _a.height;
+const { width: trackWidth, height: trackHeight } = useElementSize(trackRef);
 // Computed values
-var normalizedValue = (0, vue_1.computed)(function () {
+const normalizedValue = computed(() => {
     if (props.range) {
-        var value = props.modelValue;
+        const value = props.modelValue;
         return [
             Math.max(props.min, Math.min(props.max, value[0])),
             Math.max(props.min, Math.min(props.max, value[1]))
         ];
     }
     else {
-        var value = props.modelValue;
+        const value = props.modelValue;
         return Math.max(props.min, Math.min(props.max, value));
     }
 });
-var valueToPosition = function (value) {
-    var range = props.max - props.min;
-    var percentage = ((value - props.min) / range) * 100;
+const valueToPosition = (value) => {
+    const range = props.max - props.min;
+    const percentage = ((value - props.min) / range) * 100;
     return Math.max(0, Math.min(100, percentage));
 };
-var thumbStyle = (0, vue_1.computed)(function () {
+const thumbStyle = computed(() => {
     if (props.vertical) {
-        var position = 100 - valueToPosition(normalizedValue.value);
-        return { top: "".concat(position, "%") };
+        const position = 100 - valueToPosition(normalizedValue.value);
+        return { top: `${position}%` };
     }
     else {
-        var position = valueToPosition(normalizedValue.value);
-        return { left: "".concat(position, "%") };
+        const position = valueToPosition(normalizedValue.value);
+        return { left: `${position}%` };
     }
 });
-var minThumbStyle = (0, vue_1.computed)(function () {
+const minThumbStyle = computed(() => {
     if (props.vertical) {
-        var position = 100 - valueToPosition(normalizedValue.value[0]);
-        return { top: "".concat(position, "%") };
+        const position = 100 - valueToPosition(normalizedValue.value[0]);
+        return { top: `${position}%` };
     }
     else {
-        var position = valueToPosition(normalizedValue.value[0]);
-        return { left: "".concat(position, "%") };
+        const position = valueToPosition(normalizedValue.value[0]);
+        return { left: `${position}%` };
     }
 });
-var maxThumbStyle = (0, vue_1.computed)(function () {
+const maxThumbStyle = computed(() => {
     if (props.vertical) {
-        var position = 100 - valueToPosition(normalizedValue.value[1]);
-        return { top: "".concat(position, "%") };
+        const position = 100 - valueToPosition(normalizedValue.value[1]);
+        return { top: `${position}%` };
     }
     else {
-        var position = valueToPosition(normalizedValue.value[1]);
-        return { left: "".concat(position, "%") };
+        const position = valueToPosition(normalizedValue.value[1]);
+        return { left: `${position}%` };
     }
 });
-var trackFillStyle = (0, vue_1.computed)(function () {
+const trackFillStyle = computed(() => {
     if (props.range) {
-        var minPos = valueToPosition(normalizedValue.value[0]);
-        var maxPos = valueToPosition(normalizedValue.value[1]);
+        const minPos = valueToPosition(normalizedValue.value[0]);
+        const maxPos = valueToPosition(normalizedValue.value[1]);
         if (props.vertical) {
             return {
-                bottom: "".concat(minPos, "%"),
-                height: "".concat(maxPos - minPos, "%")
+                bottom: `${minPos}%`,
+                height: `${maxPos - minPos}%`
             };
         }
         else {
             return {
-                left: "".concat(minPos, "%"),
-                width: "".concat(maxPos - minPos, "%")
+                left: `${minPos}%`,
+                width: `${maxPos - minPos}%`
             };
         }
     }
     else {
-        var position = valueToPosition(normalizedValue.value);
+        const position = valueToPosition(normalizedValue.value);
         if (props.vertical) {
             return {
-                height: "".concat(100 - position, "%")
+                height: `${100 - position}%`
             };
         }
         else {
             return {
-                width: "".concat(position, "%")
+                width: `${position}%`
             };
         }
     }
 });
 // Methods
-var positionToValue = function (position) {
-    var trackSize = props.vertical ? trackHeight.value : trackWidth.value;
-    var percentage = Math.max(0, Math.min(100, (position / trackSize) * 100));
+const positionToValue = (position) => {
+    const trackSize = props.vertical ? trackHeight.value : trackWidth.value;
+    const percentage = Math.max(0, Math.min(100, (position / trackSize) * 100));
     // Adjust for vertical orientation
-    var adjustedPercentage = props.vertical ? 100 - percentage : percentage;
-    var range = props.max - props.min;
-    var value = (adjustedPercentage / 100) * range + props.min;
+    const adjustedPercentage = props.vertical ? 100 - percentage : percentage;
+    const range = props.max - props.min;
+    let value = (adjustedPercentage / 100) * range + props.min;
     // Snap to step
     value = Math.round(value / props.step) * props.step;
     return Math.max(props.min, Math.min(props.max, value));
 };
-var handleTrackClick = function (event) {
+const handleTrackClick = (event) => {
     if (props.disabled)
         return;
-    var rect = trackRef.value.getBoundingClientRect();
-    var position = props.vertical
+    const rect = trackRef.value.getBoundingClientRect();
+    const position = props.vertical
         ? event.clientY - rect.top
         : event.clientX - rect.left;
-    var newValue = positionToValue(position);
+    const newValue = positionToValue(position);
     if (props.range) {
-        var _a = normalizedValue.value, min = _a[0], max = _a[1];
-        var midpoint = (min + max) / 2;
+        const [min, max] = normalizedValue.value;
+        const midpoint = (min + max) / 2;
         if (newValue <= midpoint) {
             emit('update:modelValue', [newValue, max]);
             emit('change', [newValue, max]);
@@ -151,58 +138,58 @@ var handleTrackClick = function (event) {
         emit('change', newValue);
     }
 };
-var handleThumbMouseDown = function (event, thumb) {
+const handleThumbMouseDown = (event, thumb) => {
     if (props.disabled)
         return;
     event.preventDefault();
     activeThumb.value = thumb;
-    var handleMouseMove = function (e) {
-        var rect = trackRef.value.getBoundingClientRect();
-        var position = props.vertical
+    const handleMouseMove = (e) => {
+        const rect = trackRef.value.getBoundingClientRect();
+        const position = props.vertical
             ? e.clientY - rect.top
             : e.clientX - rect.left;
         updateValueFromPosition(position, thumb);
     };
-    var handleMouseUp = function () {
+    const handleMouseUp = () => {
         document.removeEventListener('mousemove', handleMouseMove);
         document.removeEventListener('mouseup', handleMouseUp);
     };
     document.addEventListener('mousemove', handleMouseMove);
     document.addEventListener('mouseup', handleMouseUp);
 };
-var handleThumbTouchStart = function (event, thumb) {
+const handleThumbTouchStart = (event, thumb) => {
     if (props.disabled)
         return;
     event.preventDefault();
     activeThumb.value = thumb;
-    var handleTouchMove = function (e) {
-        var touch = e.touches[0];
-        var rect = trackRef.value.getBoundingClientRect();
-        var position = props.vertical
+    const handleTouchMove = (e) => {
+        const touch = e.touches[0];
+        const rect = trackRef.value.getBoundingClientRect();
+        const position = props.vertical
             ? touch.clientY - rect.top
             : touch.clientX - rect.left;
         updateValueFromPosition(position, thumb);
     };
-    var handleTouchEnd = function () {
+    const handleTouchEnd = () => {
         document.removeEventListener('touchmove', handleTouchMove);
         document.removeEventListener('touchend', handleTouchEnd);
     };
     document.addEventListener('touchmove', handleTouchMove);
     document.addEventListener('touchend', handleTouchEnd);
 };
-var updateValueFromPosition = function (position, thumb) {
-    var newValue = positionToValue(position);
+const updateValueFromPosition = (position, thumb) => {
+    const newValue = positionToValue(position);
     if (props.range) {
-        var _a = normalizedValue.value, min = _a[0], max = _a[1];
+        const [min, max] = normalizedValue.value;
         if (thumb === 'min') {
             // Ensure min doesn't exceed max
-            var updatedValue = Math.min(newValue, max);
+            const updatedValue = Math.min(newValue, max);
             emit('update:modelValue', [updatedValue, max]);
             emit('change', [updatedValue, max]);
         }
         else {
             // Ensure max doesn't go below min
-            var updatedValue = Math.max(newValue, min);
+            const updatedValue = Math.max(newValue, min);
             emit('update:modelValue', [min, updatedValue]);
             emit('change', [min, updatedValue]);
         }
@@ -212,13 +199,13 @@ var updateValueFromPosition = function (position, thumb) {
         emit('change', newValue);
     }
 };
-var handleKeyDown = function (event, thumb) {
+const handleKeyDown = (event, thumb) => {
     if (props.disabled)
         return;
-    var step = event.shiftKey ? props.step * 10 : props.step;
-    var newValue;
+    const step = event.shiftKey ? props.step * 10 : props.step;
+    let newValue;
     if (props.range) {
-        var _a = normalizedValue.value, min = _a[0], max = _a[1];
+        const [min, max] = normalizedValue.value;
         if (thumb === 'min') {
             switch (event.key) {
                 case 'ArrowRight':
@@ -261,7 +248,7 @@ var handleKeyDown = function (event, thumb) {
         }
     }
     else {
-        var value = normalizedValue.value;
+        const value = normalizedValue.value;
         switch (event.key) {
             case 'ArrowRight':
             case 'ArrowUp':
@@ -286,29 +273,29 @@ var handleKeyDown = function (event, thumb) {
     emit('change', newValue);
 };
 // Tick marks
-var isTickActive = function (tickValue) {
+const isTickActive = (tickValue) => {
     if (props.range) {
-        var _a = normalizedValue.value, min = _a[0], max = _a[1];
+        const [min, max] = normalizedValue.value;
         return tickValue >= min && tickValue <= max;
     }
     else {
-        var value = normalizedValue.value;
+        const value = normalizedValue.value;
         return tickValue <= value;
     }
 };
-var getTickStyle = function (tickValue) {
-    var position = valueToPosition(tickValue);
+const getTickStyle = (tickValue) => {
+    const position = valueToPosition(tickValue);
     if (props.vertical) {
-        return { top: "".concat(100 - position, "%") };
+        return { top: `${100 - position}%` };
     }
     else {
-        return { left: "".concat(position, "%") };
+        return { left: `${position}%` };
     }
 };
 // Ensure the initial value is valid
-(0, vue_1.onMounted)(function () {
+onMounted(() => {
     if (props.range) {
-        var value = props.modelValue;
+        const value = props.modelValue;
         if (!Array.isArray(value) || value.length !== 2) {
             console.warn('Slider: range mode requires modelValue to be an array of two numbers');
             emit('update:modelValue', [props.min, props.max]);
@@ -319,9 +306,9 @@ var getTickStyle = function (tickValue) {
     }
 });
 // Watch for external changes to modelValue
-(0, vue_1.watch)(function () { return props.modelValue; }, function (newValue) {
+watch(() => props.modelValue, (newValue) => {
     if (props.range) {
-        var value = newValue;
+        const value = newValue;
         if (!Array.isArray(value) || value.length !== 2) {
             console.warn('Slider: range mode requires modelValue to be an array of two numbers');
             emit('update:modelValue', [props.min, props.max]);
@@ -332,7 +319,7 @@ var getTickStyle = function (tickValue) {
     }
 }, { deep: true });
 debugger; /* PartiallyEnd: #3632/scriptSetup.vue */
-var __VLS_withDefaultsArg = (function (t) { return t; })({
+const __VLS_withDefaultsArg = (function (t) { return t; })({
     min: 0,
     max: 100,
     step: 1,
@@ -341,12 +328,12 @@ var __VLS_withDefaultsArg = (function (t) { return t; })({
     range: false,
     showValue: false,
     showTicks: false,
-    ticks: function () { return []; },
-    id: "slider-".concat(Math.random().toString(36).substring(2, 9))
+    ticks: () => [],
+    id: `slider-${Math.random().toString(36).substring(2, 9)}`
 });
-var __VLS_ctx = {};
-var __VLS_components;
-var __VLS_directives;
+const __VLS_ctx = {};
+let __VLS_components;
+let __VLS_directives;
 /** @type {__VLS_StyleScopedClasses['slider-container']} */ ;
 /** @type {__VLS_StyleScopedClasses['slider-track-vertical']} */ ;
 /** @type {__VLS_StyleScopedClasses['slider-track-fill']} */ ;
@@ -378,163 +365,164 @@ var __VLS_directives;
 /** @type {__VLS_StyleScopedClasses['slider-tick-active']} */ ;
 // CSS variable injection 
 // CSS variable injection end 
-__VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)(__assign(__assign({ class: "slider-container" }, { class: ({ 'slider-disabled': __VLS_ctx.disabled }) }), { 'data-orientation': (__VLS_ctx.vertical ? 'vertical' : 'horizontal') }));
+__VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({
+    ...{ class: "slider-container" },
+    ...{ class: ({ 'slider-disabled': __VLS_ctx.disabled }) },
+    'data-orientation': (__VLS_ctx.vertical ? 'vertical' : 'horizontal'),
+});
 if (__VLS_ctx.label) {
-    __VLS_asFunctionalElement(__VLS_intrinsicElements.label, __VLS_intrinsicElements.label)(__assign({ for: (__VLS_ctx.id) }, { class: "slider-label" }));
+    __VLS_asFunctionalElement(__VLS_intrinsicElements.label, __VLS_intrinsicElements.label)({
+        for: (__VLS_ctx.id),
+        ...{ class: "slider-label" },
+    });
     (__VLS_ctx.label);
 }
-__VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)(__assign(__assign(__assign({ onClick: (__VLS_ctx.handleTrackClick) }, { ref: "trackRef" }), { class: "slider-track" }), { class: ({ 'slider-track-vertical': __VLS_ctx.vertical }) }));
+__VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({
+    ...{ onClick: (__VLS_ctx.handleTrackClick) },
+    ref: "trackRef",
+    ...{ class: "slider-track" },
+    ...{ class: ({ 'slider-track-vertical': __VLS_ctx.vertical }) },
+});
 /** @type {typeof __VLS_ctx.trackRef} */ ;
-__VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)(__assign({ class: "slider-track-bg" }));
-__VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)(__assign({ class: "slider-track-fill" }, { style: (__VLS_ctx.trackFillStyle) }));
+__VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({
+    ...{ class: "slider-track-bg" },
+});
+__VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({
+    ...{ class: "slider-track-fill" },
+    ...{ style: (__VLS_ctx.trackFillStyle) },
+});
 if (__VLS_ctx.range) {
-    __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)(__assign(__assign(__assign(__assign(__assign(__assign(__assign(__assign(__assign({ onKeydown: function () {
-            var _a = [];
-            for (var _i = 0; _i < arguments.length; _i++) {
-                _a[_i] = arguments[_i];
-            }
-            var $event = _a[0];
-            if (!(__VLS_ctx.range))
-                return;
-            __VLS_ctx.handleKeyDown($event, 'min');
-        } }, { onMousedown: function () {
-            var _a = [];
-            for (var _i = 0; _i < arguments.length; _i++) {
-                _a[_i] = arguments[_i];
-            }
-            var $event = _a[0];
-            if (!(__VLS_ctx.range))
-                return;
-            __VLS_ctx.handleThumbMouseDown($event, 'min');
-        } }), { onTouchstart: function () {
-            var _a = [];
-            for (var _i = 0; _i < arguments.length; _i++) {
-                _a[_i] = arguments[_i];
-            }
-            var $event = _a[0];
-            if (!(__VLS_ctx.range))
-                return;
-            __VLS_ctx.handleThumbTouchStart($event, 'min');
-        } }), { onFocus: function () {
-            var _a = [];
-            for (var _i = 0; _i < arguments.length; _i++) {
-                _a[_i] = arguments[_i];
-            }
-            var $event = _a[0];
-            if (!(__VLS_ctx.range))
-                return;
-            __VLS_ctx.activeThumb = 'min';
-        } }), { onBlur: function () {
-            var _a = [];
-            for (var _i = 0; _i < arguments.length; _i++) {
-                _a[_i] = arguments[_i];
-            }
-            var $event = _a[0];
-            if (!(__VLS_ctx.range))
-                return;
-            __VLS_ctx.activeThumb = null;
-        } }), { ref: "minThumbRef", role: "slider", tabindex: "0", id: ("".concat(__VLS_ctx.id, "-min")) }), { class: "slider-thumb" }), { class: ({ 'slider-thumb-active': __VLS_ctx.activeThumb === 'min' }) }), { style: (__VLS_ctx.minThumbStyle) }), { 'aria-valuemin': (__VLS_ctx.min), 'aria-valuemax': (__VLS_ctx.max), 'aria-valuenow': (__VLS_ctx.modelValue[0]), 'aria-labelledby': (__VLS_ctx.ariaLabelledby), 'aria-label': (__VLS_ctx.ariaLabel ? "".concat(__VLS_ctx.ariaLabel, " minimum value") : undefined), 'aria-disabled': (__VLS_ctx.disabled) }));
+    __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({
+        ...{ onKeydown: (...[$event]) => {
+                if (!(__VLS_ctx.range))
+                    return;
+                __VLS_ctx.handleKeyDown($event, 'min');
+            } },
+        ...{ onMousedown: (...[$event]) => {
+                if (!(__VLS_ctx.range))
+                    return;
+                __VLS_ctx.handleThumbMouseDown($event, 'min');
+            } },
+        ...{ onTouchstart: (...[$event]) => {
+                if (!(__VLS_ctx.range))
+                    return;
+                __VLS_ctx.handleThumbTouchStart($event, 'min');
+            } },
+        ...{ onFocus: (...[$event]) => {
+                if (!(__VLS_ctx.range))
+                    return;
+                __VLS_ctx.activeThumb = 'min';
+            } },
+        ...{ onBlur: (...[$event]) => {
+                if (!(__VLS_ctx.range))
+                    return;
+                __VLS_ctx.activeThumb = null;
+            } },
+        ref: "minThumbRef",
+        role: "slider",
+        tabindex: "0",
+        id: (`${__VLS_ctx.id}-min`),
+        ...{ class: "slider-thumb" },
+        ...{ class: ({ 'slider-thumb-active': __VLS_ctx.activeThumb === 'min' }) },
+        ...{ style: (__VLS_ctx.minThumbStyle) },
+        'aria-valuemin': (__VLS_ctx.min),
+        'aria-valuemax': (__VLS_ctx.max),
+        'aria-valuenow': (Array.isArray(__VLS_ctx.modelValue) ? __VLS_ctx.modelValue[0] : __VLS_ctx.modelValue),
+        'aria-labelledby': (__VLS_ctx.ariaLabelledby),
+        'aria-label': (__VLS_ctx.ariaLabel ? `${__VLS_ctx.ariaLabel} minimum value` : undefined),
+        'aria-disabled': (__VLS_ctx.disabled),
+    });
     /** @type {typeof __VLS_ctx.minThumbRef} */ ;
-    __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)(__assign(__assign(__assign(__assign(__assign(__assign(__assign(__assign(__assign({ onKeydown: function () {
-            var _a = [];
-            for (var _i = 0; _i < arguments.length; _i++) {
-                _a[_i] = arguments[_i];
-            }
-            var $event = _a[0];
-            if (!(__VLS_ctx.range))
-                return;
-            __VLS_ctx.handleKeyDown($event, 'max');
-        } }, { onMousedown: function () {
-            var _a = [];
-            for (var _i = 0; _i < arguments.length; _i++) {
-                _a[_i] = arguments[_i];
-            }
-            var $event = _a[0];
-            if (!(__VLS_ctx.range))
-                return;
-            __VLS_ctx.handleThumbMouseDown($event, 'max');
-        } }), { onTouchstart: function () {
-            var _a = [];
-            for (var _i = 0; _i < arguments.length; _i++) {
-                _a[_i] = arguments[_i];
-            }
-            var $event = _a[0];
-            if (!(__VLS_ctx.range))
-                return;
-            __VLS_ctx.handleThumbTouchStart($event, 'max');
-        } }), { onFocus: function () {
-            var _a = [];
-            for (var _i = 0; _i < arguments.length; _i++) {
-                _a[_i] = arguments[_i];
-            }
-            var $event = _a[0];
-            if (!(__VLS_ctx.range))
-                return;
-            __VLS_ctx.activeThumb = 'max';
-        } }), { onBlur: function () {
-            var _a = [];
-            for (var _i = 0; _i < arguments.length; _i++) {
-                _a[_i] = arguments[_i];
-            }
-            var $event = _a[0];
-            if (!(__VLS_ctx.range))
-                return;
-            __VLS_ctx.activeThumb = null;
-        } }), { ref: "maxThumbRef", role: "slider", tabindex: "0", id: ("".concat(__VLS_ctx.id, "-max")) }), { class: "slider-thumb" }), { class: ({ 'slider-thumb-active': __VLS_ctx.activeThumb === 'max' }) }), { style: (__VLS_ctx.maxThumbStyle) }), { 'aria-valuemin': (__VLS_ctx.min), 'aria-valuemax': (__VLS_ctx.max), 'aria-valuenow': (__VLS_ctx.modelValue[1]), 'aria-labelledby': (__VLS_ctx.ariaLabelledby), 'aria-label': (__VLS_ctx.ariaLabel ? "".concat(__VLS_ctx.ariaLabel, " maximum value") : undefined), 'aria-disabled': (__VLS_ctx.disabled) }));
+    __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({
+        ...{ onKeydown: (...[$event]) => {
+                if (!(__VLS_ctx.range))
+                    return;
+                __VLS_ctx.handleKeyDown($event, 'max');
+            } },
+        ...{ onMousedown: (...[$event]) => {
+                if (!(__VLS_ctx.range))
+                    return;
+                __VLS_ctx.handleThumbMouseDown($event, 'max');
+            } },
+        ...{ onTouchstart: (...[$event]) => {
+                if (!(__VLS_ctx.range))
+                    return;
+                __VLS_ctx.handleThumbTouchStart($event, 'max');
+            } },
+        ...{ onFocus: (...[$event]) => {
+                if (!(__VLS_ctx.range))
+                    return;
+                __VLS_ctx.activeThumb = 'max';
+            } },
+        ...{ onBlur: (...[$event]) => {
+                if (!(__VLS_ctx.range))
+                    return;
+                __VLS_ctx.activeThumb = null;
+            } },
+        ref: "maxThumbRef",
+        role: "slider",
+        tabindex: "0",
+        id: (`${__VLS_ctx.id}-max`),
+        ...{ class: "slider-thumb" },
+        ...{ class: ({ 'slider-thumb-active': __VLS_ctx.activeThumb === 'max' }) },
+        ...{ style: (__VLS_ctx.maxThumbStyle) },
+        'aria-valuemin': (__VLS_ctx.min),
+        'aria-valuemax': (__VLS_ctx.max),
+        'aria-valuenow': (Array.isArray(__VLS_ctx.modelValue) ? __VLS_ctx.modelValue[1] : __VLS_ctx.modelValue),
+        'aria-labelledby': (__VLS_ctx.ariaLabelledby),
+        'aria-label': (__VLS_ctx.ariaLabel ? `${__VLS_ctx.ariaLabel} maximum value` : undefined),
+        'aria-disabled': (__VLS_ctx.disabled),
+    });
     /** @type {typeof __VLS_ctx.maxThumbRef} */ ;
 }
 else {
-    __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)(__assign(__assign(__assign(__assign(__assign(__assign(__assign(__assign(__assign({ onKeydown: function () {
-            var _a = [];
-            for (var _i = 0; _i < arguments.length; _i++) {
-                _a[_i] = arguments[_i];
-            }
-            var $event = _a[0];
-            if (!!(__VLS_ctx.range))
-                return;
-            __VLS_ctx.handleKeyDown($event, 'single');
-        } }, { onMousedown: function () {
-            var _a = [];
-            for (var _i = 0; _i < arguments.length; _i++) {
-                _a[_i] = arguments[_i];
-            }
-            var $event = _a[0];
-            if (!!(__VLS_ctx.range))
-                return;
-            __VLS_ctx.handleThumbMouseDown($event, 'single');
-        } }), { onTouchstart: function () {
-            var _a = [];
-            for (var _i = 0; _i < arguments.length; _i++) {
-                _a[_i] = arguments[_i];
-            }
-            var $event = _a[0];
-            if (!!(__VLS_ctx.range))
-                return;
-            __VLS_ctx.handleThumbTouchStart($event, 'single');
-        } }), { onFocus: function () {
-            var _a = [];
-            for (var _i = 0; _i < arguments.length; _i++) {
-                _a[_i] = arguments[_i];
-            }
-            var $event = _a[0];
-            if (!!(__VLS_ctx.range))
-                return;
-            __VLS_ctx.activeThumb = 'single';
-        } }), { onBlur: function () {
-            var _a = [];
-            for (var _i = 0; _i < arguments.length; _i++) {
-                _a[_i] = arguments[_i];
-            }
-            var $event = _a[0];
-            if (!!(__VLS_ctx.range))
-                return;
-            __VLS_ctx.activeThumb = null;
-        } }), { ref: "thumbRef", role: "slider", tabindex: "0", id: (__VLS_ctx.id) }), { class: "slider-thumb" }), { class: ({ 'slider-thumb-active': __VLS_ctx.activeThumb === 'single' }) }), { style: (__VLS_ctx.thumbStyle) }), { 'aria-valuemin': (__VLS_ctx.min), 'aria-valuemax': (__VLS_ctx.max), 'aria-valuenow': (__VLS_ctx.modelValue), 'aria-labelledby': (__VLS_ctx.ariaLabelledby), 'aria-label': (__VLS_ctx.ariaLabel), 'aria-disabled': (__VLS_ctx.disabled) }));
+    __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({
+        ...{ onKeydown: (...[$event]) => {
+                if (!!(__VLS_ctx.range))
+                    return;
+                __VLS_ctx.handleKeyDown($event, 'single');
+            } },
+        ...{ onMousedown: (...[$event]) => {
+                if (!!(__VLS_ctx.range))
+                    return;
+                __VLS_ctx.handleThumbMouseDown($event, 'single');
+            } },
+        ...{ onTouchstart: (...[$event]) => {
+                if (!!(__VLS_ctx.range))
+                    return;
+                __VLS_ctx.handleThumbTouchStart($event, 'single');
+            } },
+        ...{ onFocus: (...[$event]) => {
+                if (!!(__VLS_ctx.range))
+                    return;
+                __VLS_ctx.activeThumb = 'single';
+            } },
+        ...{ onBlur: (...[$event]) => {
+                if (!!(__VLS_ctx.range))
+                    return;
+                __VLS_ctx.activeThumb = null;
+            } },
+        ref: "thumbRef",
+        role: "slider",
+        tabindex: "0",
+        id: (__VLS_ctx.id),
+        ...{ class: "slider-thumb" },
+        ...{ class: ({ 'slider-thumb-active': __VLS_ctx.activeThumb === 'single' }) },
+        ...{ style: (__VLS_ctx.thumbStyle) },
+        'aria-valuemin': (__VLS_ctx.min),
+        'aria-valuemax': (__VLS_ctx.max),
+        'aria-valuenow': (Array.isArray(__VLS_ctx.modelValue) ? undefined : __VLS_ctx.modelValue),
+        'aria-labelledby': (__VLS_ctx.ariaLabelledby),
+        'aria-label': (__VLS_ctx.ariaLabel),
+        'aria-disabled': (__VLS_ctx.disabled),
+    });
     /** @type {typeof __VLS_ctx.thumbRef} */ ;
 }
 if (__VLS_ctx.showValue) {
-    __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)(__assign({ class: "slider-value" }));
-    if (__VLS_ctx.range) {
+    __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({
+        ...{ class: "slider-value" },
+    });
+    if (__VLS_ctx.range && Array.isArray(__VLS_ctx.modelValue)) {
         __VLS_asFunctionalElement(__VLS_intrinsicElements.span, __VLS_intrinsicElements.span)({});
         (__VLS_ctx.modelValue[0]);
         (__VLS_ctx.modelValue[1]);
@@ -545,12 +533,21 @@ if (__VLS_ctx.showValue) {
     }
 }
 if (__VLS_ctx.showTicks) {
-    __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)(__assign({ class: "slider-ticks" }, { class: ({ 'slider-ticks-vertical': __VLS_ctx.vertical }) }));
-    for (var _i = 0, _b = __VLS_getVForSourceType((__VLS_ctx.ticks)); _i < _b.length; _i++) {
-        var tick = _b[_i][0];
-        __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)(__assign(__assign(__assign({ key: (tick.value) }, { class: "slider-tick" }), { class: ({ 'slider-tick-active': __VLS_ctx.isTickActive(tick.value) }) }), { style: (__VLS_ctx.getTickStyle(tick.value)) }));
+    __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({
+        ...{ class: "slider-ticks" },
+        ...{ class: ({ 'slider-ticks-vertical': __VLS_ctx.vertical }) },
+    });
+    for (const [tick] of __VLS_getVForSourceType((__VLS_ctx.ticks))) {
+        __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({
+            key: (tick.value),
+            ...{ class: "slider-tick" },
+            ...{ class: ({ 'slider-tick-active': __VLS_ctx.isTickActive(tick.value) }) },
+            ...{ style: (__VLS_ctx.getTickStyle(tick.value)) },
+        });
         if (tick.label) {
-            __VLS_asFunctionalElement(__VLS_intrinsicElements.span, __VLS_intrinsicElements.span)(__assign({ class: "slider-tick-label" }));
+            __VLS_asFunctionalElement(__VLS_intrinsicElements.span, __VLS_intrinsicElements.span)({
+                ...{ class: "slider-tick-label" },
+            });
             (tick.label);
         }
     }
@@ -575,8 +572,8 @@ if (__VLS_ctx.showTicks) {
 /** @type {__VLS_StyleScopedClasses['slider-tick-active']} */ ;
 /** @type {__VLS_StyleScopedClasses['slider-tick-label']} */ ;
 var __VLS_dollars;
-var __VLS_self = (await Promise.resolve().then(function () { return require('vue'); })).defineComponent({
-    setup: function () {
+const __VLS_self = (await import('vue')).defineComponent({
+    setup() {
         return {
             trackRef: trackRef,
             thumbRef: thumbRef,
@@ -599,8 +596,8 @@ var __VLS_self = (await Promise.resolve().then(function () { return require('vue
     __typeProps: {},
     props: {},
 });
-exports.default = (await Promise.resolve().then(function () { return require('vue'); })).defineComponent({
-    setup: function () {
+export default (await import('vue')).defineComponent({
+    setup() {
         return {};
     },
     __typeEmits: {},

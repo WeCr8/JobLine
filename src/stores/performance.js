@@ -1,79 +1,20 @@
-"use strict";
-var __assign = (this && this.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g = Object.create((typeof Iterator === "function" ? Iterator : Object).prototype);
-    return g.next = verb(0), g["throw"] = verb(1), g["return"] = verb(2), typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (g && (g = 0, op[0] && (_ = 0)), _) try {
-            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [op[0] & 2, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
-};
-var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
-    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
-        if (ar || !(i in from)) {
-            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
-            ar[i] = from[i];
-        }
-    }
-    return to.concat(ar || Array.prototype.slice.call(from));
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.usePerformanceStore = void 0;
-var pinia_1 = require("pinia");
-var vue_1 = require("vue");
-exports.usePerformanceStore = (0, pinia_1.defineStore)('performance', function () {
-    var userMetrics = (0, vue_1.ref)(null);
-    var achievements = (0, vue_1.ref)([]);
-    var teamChallenges = (0, vue_1.ref)([]);
-    var skillDevelopment = (0, vue_1.ref)([]);
-    var bonusStructures = (0, vue_1.ref)([]);
-    var innovations = (0, vue_1.ref)([]);
-    var leaderboard = (0, vue_1.ref)([]);
-    var seasonalEvents = (0, vue_1.ref)([]);
-    var mentorships = (0, vue_1.ref)([]);
-    var insights = (0, vue_1.ref)([]);
-    var companyPerformance = (0, vue_1.ref)(null);
-    var loading = (0, vue_1.ref)(false);
+import { defineStore } from 'pinia';
+import { ref, computed } from 'vue';
+export const usePerformanceStore = defineStore('performance', () => {
+    const userMetrics = ref(null);
+    const achievements = ref([]);
+    const teamChallenges = ref([]);
+    const skillDevelopment = ref([]);
+    const bonusStructures = ref([]);
+    const innovations = ref([]);
+    const leaderboard = ref([]);
+    const seasonalEvents = ref([]);
+    const mentorships = ref([]);
+    const insights = ref([]);
+    const companyPerformance = ref(null);
+    const loading = ref(false);
     // Mock data for demonstration
-    var mockUserMetrics = {
+    const mockUserMetrics = {
         id: '1',
         userId: 'user-1',
         period: 'monthly',
@@ -124,7 +65,7 @@ exports.usePerformanceStore = (0, pinia_1.defineStore)('performance', function (
             }
         ]
     };
-    var mockAchievements = [
+    const mockAchievements = [
         {
             id: 'ach-1',
             name: 'Quality Champion',
@@ -188,7 +129,7 @@ exports.usePerformanceStore = (0, pinia_1.defineStore)('performance', function (
             rarity: 'uncommon'
         }
     ];
-    var mockTeamChallenges = [
+    const mockTeamChallenges = [
         {
             id: 'challenge-1',
             name: 'Efficiency Excellence',
@@ -246,7 +187,7 @@ exports.usePerformanceStore = (0, pinia_1.defineStore)('performance', function (
             ]
         }
     ];
-    var mockBonusStructures = [
+    const mockBonusStructures = [
         {
             id: 'bonus-1',
             name: 'Performance Excellence Bonus',
@@ -301,7 +242,7 @@ exports.usePerformanceStore = (0, pinia_1.defineStore)('performance', function (
             isActive: true
         }
     ];
-    var mockLeaderboard = [
+    const mockLeaderboard = [
         {
             userId: 'user-1',
             userName: 'Sarah Johnson',
@@ -345,7 +286,7 @@ exports.usePerformanceStore = (0, pinia_1.defineStore)('performance', function (
             level: 6
         }
     ];
-    var mockSeasonalEvents = [
+    const mockSeasonalEvents = [
         {
             id: 'event-1',
             name: 'Winter Excellence Challenge',
@@ -378,7 +319,7 @@ exports.usePerformanceStore = (0, pinia_1.defineStore)('performance', function (
             isActive: false
         }
     ];
-    var mockInsights = [
+    const mockInsights = [
         {
             id: 'insight-1',
             userId: 'user-1',
@@ -412,149 +353,76 @@ exports.usePerformanceStore = (0, pinia_1.defineStore)('performance', function (
             generatedDate: '2024-01-20T14:30:00Z'
         }
     ];
-    var fetchUserMetrics = function (userId_1) {
-        var args_1 = [];
-        for (var _i = 1; _i < arguments.length; _i++) {
-            args_1[_i - 1] = arguments[_i];
-        }
-        return __awaiter(void 0, __spreadArray([userId_1], args_1, true), void 0, function (userId, period) {
-            if (period === void 0) { period = 'monthly'; }
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        loading.value = true;
-                        return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 800); })];
-                    case 1:
-                        _a.sent();
-                        userMetrics.value = mockUserMetrics;
-                        loading.value = false;
-                        return [2 /*return*/];
-                }
-            });
-        });
+    const fetchUserMetrics = async () => {
+        loading.value = true;
+        await new Promise(resolve => setTimeout(resolve, 800));
+        userMetrics.value = mockUserMetrics;
+        loading.value = false;
     };
-    var fetchAchievements = function (userId) { return __awaiter(void 0, void 0, void 0, function () {
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    loading.value = true;
-                    return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 600); })];
-                case 1:
-                    _a.sent();
-                    achievements.value = mockAchievements;
-                    loading.value = false;
-                    return [2 /*return*/];
-            }
-        });
-    }); };
-    var fetchTeamChallenges = function () { return __awaiter(void 0, void 0, void 0, function () {
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    loading.value = true;
-                    return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 500); })];
-                case 1:
-                    _a.sent();
-                    teamChallenges.value = mockTeamChallenges;
-                    loading.value = false;
-                    return [2 /*return*/];
-            }
-        });
-    }); };
-    var fetchBonusStructures = function () { return __awaiter(void 0, void 0, void 0, function () {
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    loading.value = true;
-                    return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 400); })];
-                case 1:
-                    _a.sent();
-                    bonusStructures.value = mockBonusStructures;
-                    loading.value = false;
-                    return [2 /*return*/];
-            }
-        });
-    }); };
-    var fetchLeaderboard = function () {
-        var args_1 = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            args_1[_i] = arguments[_i];
-        }
-        return __awaiter(void 0, __spreadArray([], args_1, true), void 0, function (period, department) {
-            if (period === void 0) { period = 'monthly'; }
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        loading.value = true;
-                        return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 700); })];
-                    case 1:
-                        _a.sent();
-                        leaderboard.value = mockLeaderboard;
-                        loading.value = false;
-                        return [2 /*return*/];
-                }
-            });
-        });
+    const fetchAchievements = async () => {
+        loading.value = true;
+        await new Promise(resolve => setTimeout(resolve, 600));
+        achievements.value = mockAchievements;
+        loading.value = false;
     };
-    var fetchSeasonalEvents = function () { return __awaiter(void 0, void 0, void 0, function () {
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    loading.value = true;
-                    return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 300); })];
-                case 1:
-                    _a.sent();
-                    seasonalEvents.value = mockSeasonalEvents;
-                    loading.value = false;
-                    return [2 /*return*/];
-            }
-        });
-    }); };
-    var fetchInsights = function (userId) { return __awaiter(void 0, void 0, void 0, function () {
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    loading.value = true;
-                    return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 500); })];
-                case 1:
-                    _a.sent();
-                    insights.value = mockInsights;
-                    loading.value = false;
-                    return [2 /*return*/];
-            }
-        });
-    }); };
-    var submitInnovation = function (innovation) { return __awaiter(void 0, void 0, void 0, function () {
-        var newInnovation;
-        return __generator(this, function (_a) {
-            newInnovation = __assign(__assign({}, innovation), { id: Date.now().toString(), submittedDate: new Date().toISOString(), status: 'pending', votes: [] });
-            innovations.value.unshift(newInnovation);
-            return [2 /*return*/];
-        });
-    }); };
-    var joinChallenge = function (challengeId, teamId) { return __awaiter(void 0, void 0, void 0, function () {
-        var challenge;
-        return __generator(this, function (_a) {
-            challenge = teamChallenges.value.find(function (c) { return c.id === challengeId; });
-            if (challenge) {
-                // Implementation would add user to team
-                console.log('Joining challenge:', challengeId, 'team:', teamId);
-            }
-            return [2 /*return*/];
-        });
-    }); };
-    var calculateBonus = function (metrics, bonusStructure) {
-        var bonus = bonusStructure.baseAmount;
+    const fetchTeamChallenges = async () => {
+        loading.value = true;
+        await new Promise(resolve => setTimeout(resolve, 500));
+        teamChallenges.value = mockTeamChallenges;
+        loading.value = false;
+    };
+    const fetchBonusStructures = async () => {
+        loading.value = true;
+        await new Promise(resolve => setTimeout(resolve, 400));
+        bonusStructures.value = mockBonusStructures;
+        loading.value = false;
+    };
+    const fetchLeaderboard = async () => {
+        loading.value = true;
+        await new Promise(resolve => setTimeout(resolve, 700));
+        leaderboard.value = mockLeaderboard;
+        loading.value = false;
+    };
+    const fetchSeasonalEvents = async () => {
+        loading.value = true;
+        await new Promise(resolve => setTimeout(resolve, 300));
+        seasonalEvents.value = mockSeasonalEvents;
+        loading.value = false;
+    };
+    const fetchInsights = async () => {
+        loading.value = true;
+        await new Promise(resolve => setTimeout(resolve, 500));
+        insights.value = mockInsights;
+        loading.value = false;
+    };
+    const submitInnovation = async (innovation) => {
+        const newInnovation = {
+            ...innovation,
+            id: Date.now().toString(),
+            submittedDate: new Date().toISOString(),
+            status: 'pending',
+            votes: []
+        };
+        innovations.value.unshift(newInnovation);
+    };
+    const joinChallenge = async (challengeId, teamId) => {
+        const challenge = teamChallenges.value.find(c => c.id === challengeId);
+        if (challenge) {
+            // Implementation would add user to team
+            console.log('Joining challenge:', challengeId, 'team:', teamId);
+        }
+    };
+    const calculateBonus = (metrics, bonusStructure) => {
+        let bonus = bonusStructure.baseAmount;
         // Apply multipliers based on performance
-        for (var _i = 0, _a = bonusStructure.multipliers; _i < _a.length; _i++) {
-            var multiplier = _a[_i];
+        for (const multiplier of bonusStructure.multipliers) {
             if (evaluateCondition(multiplier.condition, metrics)) {
                 bonus *= multiplier.multiplier;
                 break; // Apply only the first matching multiplier
             }
         }
         // Apply streak bonuses
-        metrics.streaks.forEach(function (streak) {
+        metrics.streaks.forEach(streak => {
             if (streak.isActive) {
                 bonus += streak.bonusPerDay * streak.currentStreak;
             }
@@ -565,58 +433,56 @@ exports.usePerformanceStore = (0, pinia_1.defineStore)('performance', function (
         }
         return Math.round(bonus);
     };
-    var evaluateCondition = function (condition, metrics) {
+    const evaluateCondition = (condition, metrics) => {
         // Simple condition evaluation (would be more sophisticated in real implementation)
         if (condition.includes('score >=')) {
-            var threshold = parseInt(condition.split('>=')[1].trim());
+            const threshold = parseInt(condition.split('>=')[1].trim());
             return metrics.totalScore >= threshold;
         }
         return false;
     };
     // Computed properties
-    var userLevel = (0, vue_1.computed)(function () {
+    const userLevel = computed(() => {
         if (!userMetrics.value)
             return 1;
         return Math.floor(userMetrics.value.totalScore / 10) + 1;
     });
-    var nextLevelProgress = (0, vue_1.computed)(function () {
+    const nextLevelProgress = computed(() => {
         if (!userMetrics.value)
             return 0;
-        var currentLevelMin = (userLevel.value - 1) * 10;
-        var nextLevelMin = userLevel.value * 10;
+        const currentLevelMin = (userLevel.value - 1) * 10;
+        const nextLevelMin = userLevel.value * 10;
         return ((userMetrics.value.totalScore - currentLevelMin) / (nextLevelMin - currentLevelMin)) * 100;
     });
-    var totalBonusEarned = (0, vue_1.computed)(function () {
-        var _a;
-        return ((_a = userMetrics.value) === null || _a === void 0 ? void 0 : _a.bonusEarned) || 0;
+    const totalBonusEarned = computed(() => {
+        return userMetrics.value?.bonusEarned || 0;
     });
-    var activeStreaks = (0, vue_1.computed)(function () {
-        var _a;
-        return ((_a = userMetrics.value) === null || _a === void 0 ? void 0 : _a.streaks.filter(function (s) { return s.isActive; })) || [];
+    const activeStreaks = computed(() => {
+        return userMetrics.value?.streaks.filter(s => s.isActive) || [];
     });
-    var recentAchievements = (0, vue_1.computed)(function () {
+    const recentAchievements = computed(() => {
         return achievements.value
-            .sort(function (a, b) { return new Date(b.unlockedAt).getTime() - new Date(a.unlockedAt).getTime(); })
+            .sort((a, b) => new Date(b.unlockedAt).getTime() - new Date(a.unlockedAt).getTime())
             .slice(0, 5);
     });
-    var activeChallenges = (0, vue_1.computed)(function () {
-        return teamChallenges.value.filter(function (c) { return c.status === 'active'; });
+    const activeChallenges = computed(() => {
+        return teamChallenges.value.filter(c => c.status === 'active');
     });
-    var upcomingChallenges = (0, vue_1.computed)(function () {
-        return teamChallenges.value.filter(function (c) { return c.status === 'upcoming'; });
+    const upcomingChallenges = computed(() => {
+        return teamChallenges.value.filter(c => c.status === 'upcoming');
     });
-    var currentSeasonalEvent = (0, vue_1.computed)(function () {
-        var now = new Date();
-        return seasonalEvents.value.find(function (event) {
-            var start = new Date(event.startDate);
-            var end = new Date(event.endDate);
+    const currentSeasonalEvent = computed(() => {
+        const now = new Date();
+        return seasonalEvents.value.find(event => {
+            const start = new Date(event.startDate);
+            const end = new Date(event.endDate);
             return now >= start && now <= end && event.isActive;
         });
     });
-    var performanceGrade = (0, vue_1.computed)(function () {
+    const performanceGrade = computed(() => {
         if (!userMetrics.value)
             return 'F';
-        var score = userMetrics.value.totalScore;
+        const score = userMetrics.value.totalScore;
         if (score >= 95)
             return 'A+';
         if (score >= 90)
@@ -634,36 +500,36 @@ exports.usePerformanceStore = (0, pinia_1.defineStore)('performance', function (
         return 'F';
     });
     return {
-        userMetrics: userMetrics,
-        achievements: achievements,
-        teamChallenges: teamChallenges,
-        skillDevelopment: skillDevelopment,
-        bonusStructures: bonusStructures,
-        innovations: innovations,
-        leaderboard: leaderboard,
-        seasonalEvents: seasonalEvents,
-        mentorships: mentorships,
-        insights: insights,
-        companyPerformance: companyPerformance,
-        loading: loading,
-        userLevel: userLevel,
-        nextLevelProgress: nextLevelProgress,
-        totalBonusEarned: totalBonusEarned,
-        activeStreaks: activeStreaks,
-        recentAchievements: recentAchievements,
-        activeChallenges: activeChallenges,
-        upcomingChallenges: upcomingChallenges,
-        currentSeasonalEvent: currentSeasonalEvent,
-        performanceGrade: performanceGrade,
-        fetchUserMetrics: fetchUserMetrics,
-        fetchAchievements: fetchAchievements,
-        fetchTeamChallenges: fetchTeamChallenges,
-        fetchBonusStructures: fetchBonusStructures,
-        fetchLeaderboard: fetchLeaderboard,
-        fetchSeasonalEvents: fetchSeasonalEvents,
-        fetchInsights: fetchInsights,
-        submitInnovation: submitInnovation,
-        joinChallenge: joinChallenge,
-        calculateBonus: calculateBonus
+        userMetrics,
+        achievements,
+        teamChallenges,
+        skillDevelopment,
+        bonusStructures,
+        innovations,
+        leaderboard,
+        seasonalEvents,
+        mentorships,
+        insights,
+        companyPerformance,
+        loading,
+        userLevel,
+        nextLevelProgress,
+        totalBonusEarned,
+        activeStreaks,
+        recentAchievements,
+        activeChallenges,
+        upcomingChallenges,
+        currentSeasonalEvent,
+        performanceGrade,
+        fetchUserMetrics,
+        fetchAchievements,
+        fetchTeamChallenges,
+        fetchBonusStructures,
+        fetchLeaderboard,
+        fetchSeasonalEvents,
+        fetchInsights,
+        submitInnovation,
+        joinChallenge,
+        calculateBonus
     };
 });

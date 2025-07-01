@@ -1,62 +1,39 @@
-"use strict";
-var __assign = (this && this.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
-var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
-    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
-        if (ar || !(i in from)) {
-            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
-            ar[i] = from[i];
-        }
-    }
-    return to.concat(ar || Array.prototype.slice.call(from));
-};
-var _a, _b, _c;
-Object.defineProperty(exports, "__esModule", { value: true });
-var vue_1 = require("vue");
-var vue_router_1 = require("vue-router");
-var auth_1 = require("../stores/auth");
-var chat_1 = require("../stores/chat");
-var performance_1 = require("../stores/performance");
-var accessibility_1 = require("../utils/accessibility");
-var gesture_1 = require("../utils/gesture");
-var outline_1 = require("@heroicons/vue/24/outline");
-var router = (0, vue_router_1.useRouter)();
-var authStore = (0, auth_1.useAuthStore)();
-var chatStore = (0, chat_1.useChatStore)();
-var performanceStore = (0, performance_1.usePerformanceStore)();
-var showUserMenu = (0, vue_1.ref)(false);
-var voiceMode = (0, vue_1.ref)(false);
-var notificationCount = (0, vue_1.ref)(3);
-var userMenuRef = (0, vue_1.ref)(null);
+import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { useRouter } from 'vue-router';
+import { useAuthStore } from '../stores/auth';
+import { useChatStore } from '../stores/chat';
+import { usePerformanceStore } from '../stores/performance';
+import { createAccessibleFocusTrap } from '../utils/accessibility';
+import { addTapGesture } from '../utils/gesture';
+import { HomeIcon, BriefcaseIcon, ChatBubbleLeftRightIcon, CogIcon, DocumentTextIcon, BellIcon, MicrophoneIcon, TrophyIcon } from '@heroicons/vue/24/outline';
+const router = useRouter();
+const authStore = useAuthStore();
+const chatStore = useChatStore();
+const performanceStore = usePerformanceStore();
+const showUserMenu = ref(false);
+const voiceMode = ref(false);
+const notificationCount = ref(3);
+const userMenuRef = ref(null);
 // Focus trap for accessibility
-var focusTrap = null;
-var mobileNavigation = (0, vue_1.computed)(function () {
-    var baseNav = [
-        { name: 'Dashboard', href: '/dashboard', icon: outline_1.HomeIcon },
-        { name: 'Jobs', href: '/jobs', icon: outline_1.BriefcaseIcon },
-        { name: 'Chat', href: '/chat', icon: outline_1.ChatBubbleLeftRightIcon },
-        { name: 'Passdown', href: '/passdown', icon: outline_1.DocumentTextIcon },
-        { name: 'Machines', href: '/machines', icon: outline_1.CogIcon }
+let focusTrap = null;
+const mobileNavigation = computed(() => {
+    const baseNav = [
+        { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
+        { name: 'Jobs', href: '/jobs', icon: BriefcaseIcon },
+        { name: 'Chat', href: '/chat', icon: ChatBubbleLeftRightIcon },
+        { name: 'Passdown', href: '/passdown', icon: DocumentTextIcon },
+        { name: 'Machines', href: '/machines', icon: CogIcon }
     ];
     // Filter based on user role
     if (!authStore.user)
         return baseNav;
-    return baseNav.filter(function (item) {
+    return baseNav.filter(item => {
         // All users can access these
-        var publicRoutes = ['Dashboard', 'Jobs', 'Chat', 'Passdown', 'Machines'];
+        const publicRoutes = ['Dashboard', 'Jobs', 'Chat', 'Passdown', 'Machines'];
         return publicRoutes.includes(item.name);
     });
 });
-var toggleVoiceMode = function () {
+const toggleVoiceMode = () => {
     voiceMode.value = !voiceMode.value;
     if (voiceMode.value) {
         chatStore.startVoiceListening();
@@ -65,36 +42,36 @@ var toggleVoiceMode = function () {
         chatStore.stopVoiceListening();
     }
 };
-var handleLogout = function () {
+const handleLogout = () => {
     authStore.logout();
     router.push('/login');
     showUserMenu.value = false;
 };
-var handleClickOutside = function (event) {
-    var target = event.target;
+const handleClickOutside = (event) => {
+    const target = event.target;
     if (userMenuRef.value && !userMenuRef.value.contains(target) && !target.closest('button')) {
         showUserMenu.value = false;
     }
 };
-(0, vue_1.onMounted)(function () {
+onMounted(() => {
     document.addEventListener('click', handleClickOutside);
     // Set up focus trap for user menu
     if (userMenuRef.value) {
-        focusTrap = (0, accessibility_1.createAccessibleFocusTrap)(userMenuRef.value);
+        focusTrap = createAccessibleFocusTrap(userMenuRef.value);
     }
     // Add tap gestures for better mobile experience
-    var navLinks = document.querySelectorAll('.grid-cols-5 > a');
-    navLinks.forEach(function (link) {
-        (0, gesture_1.addTapGesture)(link, function () {
+    const navLinks = document.querySelectorAll('.grid-cols-5 > a');
+    navLinks.forEach(link => {
+        addTapGesture(link, () => {
             // The router-link will handle navigation
         });
     });
     // Load user performance data
     if (authStore.user) {
-        performanceStore.fetchUserMetrics(authStore.user.id);
+        performanceStore.fetchUserMetrics();
     }
 });
-(0, vue_1.onUnmounted)(function () {
+onUnmounted(() => {
     document.removeEventListener('click', handleClickOutside);
     // Clean up focus trap
     if (focusTrap) {
@@ -102,100 +79,175 @@ var handleClickOutside = function (event) {
     }
 });
 debugger; /* PartiallyEnd: #3632/scriptSetup.vue */
-var __VLS_ctx = {};
-var __VLS_components;
-var __VLS_directives;
+const __VLS_ctx = {};
+let __VLS_components;
+let __VLS_directives;
 /** @type {__VLS_StyleScopedClasses['ios-device']} */ ;
 // CSS variable injection 
 // CSS variable injection end 
-__VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)(__assign({ class: "md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 safe-area-bottom z-50" }));
-__VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)(__assign({ class: "grid grid-cols-5 h-16" }));
-for (var _i = 0, _d = __VLS_getVForSourceType((__VLS_ctx.mobileNavigation)); _i < _d.length; _i++) {
-    var item = _d[_i][0];
-    var __VLS_0 = {}.RouterLink;
+__VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({
+    ...{ class: "md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 safe-area-bottom z-50" },
+});
+__VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({
+    ...{ class: "grid grid-cols-5 h-16" },
+});
+for (const [item] of __VLS_getVForSourceType((__VLS_ctx.mobileNavigation))) {
+    const __VLS_0 = {}.RouterLink;
     /** @type {[typeof __VLS_components.RouterLink, typeof __VLS_components.routerLink, typeof __VLS_components.RouterLink, typeof __VLS_components.routerLink, ]} */ ;
     // @ts-ignore
-    var __VLS_1 = __VLS_asFunctionalComponent(__VLS_0, new __VLS_0(__assign(__assign(__assign({ key: (item.name), to: (item.href) }, { class: "flex flex-col items-center justify-center space-y-1 text-xs transition-colors duration-200 tap-highlight" }), { class: (__VLS_ctx.$route.path.startsWith(item.href)
-            ? 'text-primary-600 bg-primary-50'
-            : 'text-gray-500 hover:text-gray-700') }), { activeClass: "text-primary-600 bg-primary-50" })));
-    var __VLS_2 = __VLS_1.apply(void 0, __spreadArray([__assign(__assign(__assign({ key: (item.name), to: (item.href) }, { class: "flex flex-col items-center justify-center space-y-1 text-xs transition-colors duration-200 tap-highlight" }), { class: (__VLS_ctx.$route.path.startsWith(item.href)
+    const __VLS_1 = __VLS_asFunctionalComponent(__VLS_0, new __VLS_0({
+        key: (item.name),
+        to: (item.href),
+        ...{ class: "flex flex-col items-center justify-center space-y-1 text-xs transition-colors duration-200 tap-highlight" },
+        ...{ class: (__VLS_ctx.$route.path.startsWith(item.href)
                 ? 'text-primary-600 bg-primary-50'
-                : 'text-gray-500 hover:text-gray-700') }), { activeClass: "text-primary-600 bg-primary-50" })], __VLS_functionalComponentArgsRest(__VLS_1), false));
+                : 'text-gray-500 hover:text-gray-700') },
+        activeClass: "text-primary-600 bg-primary-50",
+    }));
+    const __VLS_2 = __VLS_1({
+        key: (item.name),
+        to: (item.href),
+        ...{ class: "flex flex-col items-center justify-center space-y-1 text-xs transition-colors duration-200 tap-highlight" },
+        ...{ class: (__VLS_ctx.$route.path.startsWith(item.href)
+                ? 'text-primary-600 bg-primary-50'
+                : 'text-gray-500 hover:text-gray-700') },
+        activeClass: "text-primary-600 bg-primary-50",
+    }, ...__VLS_functionalComponentArgsRest(__VLS_1));
     __VLS_3.slots.default;
-    var __VLS_4 = ((item.icon));
+    const __VLS_4 = ((item.icon));
     // @ts-ignore
-    var __VLS_5 = __VLS_asFunctionalComponent(__VLS_4, new __VLS_4(__assign({ class: "w-5 h-5" })));
-    var __VLS_6 = __VLS_5.apply(void 0, __spreadArray([__assign({ class: "w-5 h-5" })], __VLS_functionalComponentArgsRest(__VLS_5), false));
-    __VLS_asFunctionalElement(__VLS_intrinsicElements.span, __VLS_intrinsicElements.span)(__assign({ class: "font-medium" }));
+    const __VLS_5 = __VLS_asFunctionalComponent(__VLS_4, new __VLS_4({
+        ...{ class: "w-5 h-5" },
+    }));
+    const __VLS_6 = __VLS_5({
+        ...{ class: "w-5 h-5" },
+    }, ...__VLS_functionalComponentArgsRest(__VLS_5));
+    __VLS_asFunctionalElement(__VLS_intrinsicElements.span, __VLS_intrinsicElements.span)({
+        ...{ class: "font-medium" },
+    });
     (item.name);
     var __VLS_3;
 }
-__VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)(__assign({ class: "md:hidden bg-white shadow-sm border-b border-gray-200 safe-area-top" }));
-__VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)(__assign({ class: "flex items-center justify-between h-16 px-4" }));
-__VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)(__assign({ class: "flex items-center" }));
-__VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)(__assign({ class: "w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center" }));
-__VLS_asFunctionalElement(__VLS_intrinsicElements.span, __VLS_intrinsicElements.span)(__assign({ class: "text-white font-bold text-sm" }));
-__VLS_asFunctionalElement(__VLS_intrinsicElements.span, __VLS_intrinsicElements.span)(__assign({ class: "ml-2 text-lg font-semibold text-gray-900" }));
-__VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)(__assign({ class: "flex items-center space-x-2" }));
+__VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({
+    ...{ class: "md:hidden bg-white shadow-sm border-b border-gray-200 safe-area-top" },
+});
+__VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({
+    ...{ class: "flex items-center justify-between h-16 px-4" },
+});
+__VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({
+    ...{ class: "flex items-center" },
+});
+__VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({
+    ...{ class: "w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center" },
+});
+__VLS_asFunctionalElement(__VLS_intrinsicElements.span, __VLS_intrinsicElements.span)({
+    ...{ class: "text-white font-bold text-sm" },
+});
+__VLS_asFunctionalElement(__VLS_intrinsicElements.span, __VLS_intrinsicElements.span)({
+    ...{ class: "ml-2 text-lg font-semibold text-gray-900" },
+});
+__VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({
+    ...{ class: "flex items-center space-x-2" },
+});
 if (__VLS_ctx.performanceStore.userMetrics) {
-    __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)(__assign({ class: "flex items-center space-x-1 px-2 py-1 bg-purple-50 rounded-full" }));
-    var __VLS_8 = {}.TrophyIcon;
+    __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({
+        ...{ class: "flex items-center space-x-1 px-2 py-1 bg-purple-50 rounded-full" },
+    });
+    const __VLS_8 = {}.TrophyIcon;
     /** @type {[typeof __VLS_components.TrophyIcon, ]} */ ;
     // @ts-ignore
-    var __VLS_9 = __VLS_asFunctionalComponent(__VLS_8, new __VLS_8(__assign({ class: "w-3 h-3 text-purple-600" })));
-    var __VLS_10 = __VLS_9.apply(void 0, __spreadArray([__assign({ class: "w-3 h-3 text-purple-600" })], __VLS_functionalComponentArgsRest(__VLS_9), false));
-    __VLS_asFunctionalElement(__VLS_intrinsicElements.span, __VLS_intrinsicElements.span)(__assign({ class: "text-xs font-medium text-purple-900" }));
+    const __VLS_9 = __VLS_asFunctionalComponent(__VLS_8, new __VLS_8({
+        ...{ class: "w-3 h-3 text-purple-600" },
+    }));
+    const __VLS_10 = __VLS_9({
+        ...{ class: "w-3 h-3 text-purple-600" },
+    }, ...__VLS_functionalComponentArgsRest(__VLS_9));
+    __VLS_asFunctionalElement(__VLS_intrinsicElements.span, __VLS_intrinsicElements.span)({
+        ...{ class: "text-xs font-medium text-purple-900" },
+    });
     (__VLS_ctx.performanceStore.userMetrics.totalScore);
 }
 if (__VLS_ctx.chatStore.voiceEnabled) {
-    __VLS_asFunctionalElement(__VLS_intrinsicElements.button, __VLS_intrinsicElements.button)(__assign(__assign(__assign({ onClick: (__VLS_ctx.toggleVoiceMode) }, { class: (__VLS_ctx.voiceMode ? 'bg-red-100 text-red-600' : 'bg-gray-100 text-gray-600') }), { class: "p-2 rounded-full transition-colors duration-200 tap-highlight" }), { 'aria-label': "Toggle voice mode" }));
-    var __VLS_12 = {}.MicrophoneIcon;
+    __VLS_asFunctionalElement(__VLS_intrinsicElements.button, __VLS_intrinsicElements.button)({
+        ...{ onClick: (__VLS_ctx.toggleVoiceMode) },
+        ...{ class: (__VLS_ctx.voiceMode ? 'bg-red-100 text-red-600' : 'bg-gray-100 text-gray-600') },
+        ...{ class: "p-2 rounded-full transition-colors duration-200 tap-highlight" },
+        'aria-label': "Toggle voice mode",
+    });
+    const __VLS_12 = {}.MicrophoneIcon;
     /** @type {[typeof __VLS_components.MicrophoneIcon, ]} */ ;
     // @ts-ignore
-    var __VLS_13 = __VLS_asFunctionalComponent(__VLS_12, new __VLS_12(__assign({ class: "w-5 h-5" })));
-    var __VLS_14 = __VLS_13.apply(void 0, __spreadArray([__assign({ class: "w-5 h-5" })], __VLS_functionalComponentArgsRest(__VLS_13), false));
+    const __VLS_13 = __VLS_asFunctionalComponent(__VLS_12, new __VLS_12({
+        ...{ class: "w-5 h-5" },
+    }));
+    const __VLS_14 = __VLS_13({
+        ...{ class: "w-5 h-5" },
+    }, ...__VLS_functionalComponentArgsRest(__VLS_13));
 }
-__VLS_asFunctionalElement(__VLS_intrinsicElements.button, __VLS_intrinsicElements.button)(__assign({ class: "p-2 text-gray-400 hover:text-gray-500 transition-colors duration-200 relative tap-highlight" }, { 'aria-label': "Notifications" }));
-var __VLS_16 = {}.BellIcon;
+__VLS_asFunctionalElement(__VLS_intrinsicElements.button, __VLS_intrinsicElements.button)({
+    ...{ class: "p-2 text-gray-400 hover:text-gray-500 transition-colors duration-200 relative tap-highlight" },
+    'aria-label': "Notifications",
+});
+const __VLS_16 = {}.BellIcon;
 /** @type {[typeof __VLS_components.BellIcon, ]} */ ;
 // @ts-ignore
-var __VLS_17 = __VLS_asFunctionalComponent(__VLS_16, new __VLS_16(__assign({ class: "w-5 h-5" })));
-var __VLS_18 = __VLS_17.apply(void 0, __spreadArray([__assign({ class: "w-5 h-5" })], __VLS_functionalComponentArgsRest(__VLS_17), false));
+const __VLS_17 = __VLS_asFunctionalComponent(__VLS_16, new __VLS_16({
+    ...{ class: "w-5 h-5" },
+}));
+const __VLS_18 = __VLS_17({
+    ...{ class: "w-5 h-5" },
+}, ...__VLS_functionalComponentArgsRest(__VLS_17));
 if (__VLS_ctx.notificationCount > 0) {
-    __VLS_asFunctionalElement(__VLS_intrinsicElements.span, __VLS_intrinsicElements.span)(__assign({ class: "absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center" }));
+    __VLS_asFunctionalElement(__VLS_intrinsicElements.span, __VLS_intrinsicElements.span)({
+        ...{ class: "absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center" },
+    });
     (__VLS_ctx.notificationCount);
 }
-__VLS_asFunctionalElement(__VLS_intrinsicElements.button, __VLS_intrinsicElements.button)(__assign(__assign({ onClick: function () {
-        var _a = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            _a[_i] = arguments[_i];
-        }
-        var $event = _a[0];
-        __VLS_ctx.showUserMenu = !__VLS_ctx.showUserMenu;
-    } }, { class: "flex items-center space-x-2 text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 tap-highlight" }), { 'aria-label': "User menu", 'aria-expanded': "showUserMenu", 'aria-controls': "user-menu" }));
-__VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)(__assign({ class: "w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center" }));
-__VLS_asFunctionalElement(__VLS_intrinsicElements.span, __VLS_intrinsicElements.span)(__assign({ class: "text-primary-600 font-medium text-sm" }));
-((_b = (_a = __VLS_ctx.authStore.user) === null || _a === void 0 ? void 0 : _a.name) === null || _b === void 0 ? void 0 : _b.charAt(0));
+__VLS_asFunctionalElement(__VLS_intrinsicElements.button, __VLS_intrinsicElements.button)({
+    ...{ onClick: (...[$event]) => {
+            __VLS_ctx.showUserMenu = !__VLS_ctx.showUserMenu;
+        } },
+    ...{ class: "flex items-center space-x-2 text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 tap-highlight" },
+    'aria-label': "User menu",
+    'aria-expanded': (__VLS_ctx.showUserMenu),
+    'aria-controls': "user-menu",
+});
+__VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({
+    ...{ class: "w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center" },
+});
+__VLS_asFunctionalElement(__VLS_intrinsicElements.span, __VLS_intrinsicElements.span)({
+    ...{ class: "text-primary-600 font-medium text-sm" },
+});
+(__VLS_ctx.authStore.user?.name?.charAt(0));
 if (__VLS_ctx.showUserMenu) {
-    __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)(__assign(__assign({ id: "user-menu" }, { class: "absolute right-4 top-16 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200" }), { ref: "userMenuRef" }));
+    __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({
+        id: "user-menu",
+        ...{ class: "absolute right-4 top-16 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200" },
+        ref: "userMenuRef",
+    });
     /** @type {typeof __VLS_ctx.userMenuRef} */ ;
-    __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)(__assign({ class: "px-4 py-2 text-sm text-gray-500 border-b border-gray-100" }));
-    ((_c = __VLS_ctx.authStore.user) === null || _c === void 0 ? void 0 : _c.email);
-    var __VLS_20 = {}.RouterLink;
+    __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({
+        ...{ class: "px-4 py-2 text-sm text-gray-500 border-b border-gray-100" },
+    });
+    (__VLS_ctx.authStore.user?.email);
+    const __VLS_20 = {}.RouterLink;
     /** @type {[typeof __VLS_components.RouterLink, typeof __VLS_components.routerLink, typeof __VLS_components.RouterLink, typeof __VLS_components.routerLink, ]} */ ;
     // @ts-ignore
-    var __VLS_21 = __VLS_asFunctionalComponent(__VLS_20, new __VLS_20(__assign(__assign({ 'onClick': {} }, { to: "/performance" }), { class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200" })));
-    var __VLS_22 = __VLS_21.apply(void 0, __spreadArray([__assign(__assign({ 'onClick': {} }, { to: "/performance" }), { class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200" })], __VLS_functionalComponentArgsRest(__VLS_21), false));
-    var __VLS_24 = void 0;
-    var __VLS_25 = void 0;
-    var __VLS_26 = void 0;
-    var __VLS_27 = {
-        onClick: function () {
-            var _a = [];
-            for (var _i = 0; _i < arguments.length; _i++) {
-                _a[_i] = arguments[_i];
-            }
-            var $event = _a[0];
+    const __VLS_21 = __VLS_asFunctionalComponent(__VLS_20, new __VLS_20({
+        ...{ 'onClick': {} },
+        to: "/performance",
+        ...{ class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200" },
+    }));
+    const __VLS_22 = __VLS_21({
+        ...{ 'onClick': {} },
+        to: "/performance",
+        ...{ class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200" },
+    }, ...__VLS_functionalComponentArgsRest(__VLS_21));
+    let __VLS_24;
+    let __VLS_25;
+    let __VLS_26;
+    const __VLS_27 = {
+        onClick: (...[$event]) => {
             if (!(__VLS_ctx.showUserMenu))
                 return;
             __VLS_ctx.showUserMenu = false;
@@ -203,15 +255,31 @@ if (__VLS_ctx.showUserMenu) {
     };
     __VLS_23.slots.default;
     var __VLS_23;
-    __VLS_asFunctionalElement(__VLS_intrinsicElements.button, __VLS_intrinsicElements.button)(__assign({ onClick: (__VLS_ctx.handleLogout) }, { class: "block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200" }));
+    __VLS_asFunctionalElement(__VLS_intrinsicElements.button, __VLS_intrinsicElements.button)({
+        ...{ onClick: (__VLS_ctx.handleLogout) },
+        ...{ class: "block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200" },
+    });
 }
 if (__VLS_ctx.voiceMode) {
-    __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)(__assign({ class: "md:hidden fixed top-20 left-4 right-4 bg-gradient-to-r from-red-500 to-pink-500 text-white p-3 rounded-lg z-40 safe-area-top" }));
-    __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)(__assign({ class: "flex items-center justify-between" }));
-    __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)(__assign({ class: "flex items-center space-x-2" }));
-    __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)(__assign({ class: "w-2 h-2 bg-white rounded-full animate-pulse" }));
-    __VLS_asFunctionalElement(__VLS_intrinsicElements.span, __VLS_intrinsicElements.span)(__assign({ class: "text-sm font-medium" }));
-    __VLS_asFunctionalElement(__VLS_intrinsicElements.button, __VLS_intrinsicElements.button)(__assign({ onClick: (__VLS_ctx.toggleVoiceMode) }, { class: "bg-white bg-opacity-20 hover:bg-opacity-30 px-2 py-1 rounded text-xs transition-colors duration-200" }));
+    __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({
+        ...{ class: "md:hidden fixed top-20 left-4 right-4 bg-gradient-to-r from-red-500 to-pink-500 text-white p-3 rounded-lg z-40 safe-area-top" },
+    });
+    __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({
+        ...{ class: "flex items-center justify-between" },
+    });
+    __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({
+        ...{ class: "flex items-center space-x-2" },
+    });
+    __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({
+        ...{ class: "w-2 h-2 bg-white rounded-full animate-pulse" },
+    });
+    __VLS_asFunctionalElement(__VLS_intrinsicElements.span, __VLS_intrinsicElements.span)({
+        ...{ class: "text-sm font-medium" },
+    });
+    __VLS_asFunctionalElement(__VLS_intrinsicElements.button, __VLS_intrinsicElements.button)({
+        ...{ onClick: (__VLS_ctx.toggleVoiceMode) },
+        ...{ class: "bg-white bg-opacity-20 hover:bg-opacity-30 px-2 py-1 rounded text-xs transition-colors duration-200" },
+    });
 }
 /** @type {__VLS_StyleScopedClasses['md:hidden']} */ ;
 /** @type {__VLS_StyleScopedClasses['fixed']} */ ;
@@ -400,12 +468,12 @@ if (__VLS_ctx.voiceMode) {
 /** @type {__VLS_StyleScopedClasses['transition-colors']} */ ;
 /** @type {__VLS_StyleScopedClasses['duration-200']} */ ;
 var __VLS_dollars;
-var __VLS_self = (await Promise.resolve().then(function () { return require('vue'); })).defineComponent({
-    setup: function () {
+const __VLS_self = (await import('vue')).defineComponent({
+    setup() {
         return {
-            BellIcon: outline_1.BellIcon,
-            MicrophoneIcon: outline_1.MicrophoneIcon,
-            TrophyIcon: outline_1.TrophyIcon,
+            BellIcon: BellIcon,
+            MicrophoneIcon: MicrophoneIcon,
+            TrophyIcon: TrophyIcon,
             authStore: authStore,
             chatStore: chatStore,
             performanceStore: performanceStore,
@@ -419,8 +487,8 @@ var __VLS_self = (await Promise.resolve().then(function () { return require('vue
         };
     },
 });
-exports.default = (await Promise.resolve().then(function () { return require('vue'); })).defineComponent({
-    setup: function () {
+export default (await import('vue')).defineComponent({
+    setup() {
         return {};
     },
 });

@@ -1,22 +1,19 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.useElementSize = useElementSize;
 /**
  * Composable for tracking element size changes
  */
-var vue_1 = require("vue");
-function useElementSize(elementRef) {
-    var width = (0, vue_1.ref)(0);
-    var height = (0, vue_1.ref)(0);
-    var resizeObserver = null;
-    var updateSize = function () {
+import { ref, onMounted, onUnmounted } from 'vue';
+export function useElementSize(elementRef) {
+    const width = ref(0);
+    const height = ref(0);
+    let resizeObserver = null;
+    const updateSize = () => {
         if (elementRef.value) {
-            var rect = elementRef.value.getBoundingClientRect();
+            const rect = elementRef.value.getBoundingClientRect();
             width.value = rect.width;
             height.value = rect.height;
         }
     };
-    (0, vue_1.onMounted)(function () {
+    onMounted(() => {
         updateSize();
         if (window.ResizeObserver) {
             resizeObserver = new ResizeObserver(updateSize);
@@ -29,7 +26,7 @@ function useElementSize(elementRef) {
             window.addEventListener('resize', updateSize);
         }
         // Watch for element reference changes
-        var unwatch = (0, vue_2.watch)(elementRef, function (newEl, oldEl) {
+        watch(elementRef, (newEl, oldEl) => {
             if (resizeObserver) {
                 if (oldEl) {
                     resizeObserver.unobserve(oldEl);
@@ -41,7 +38,7 @@ function useElementSize(elementRef) {
             }
         });
     });
-    (0, vue_1.onUnmounted)(function () {
+    onUnmounted(() => {
         if (resizeObserver) {
             if (elementRef.value) {
                 resizeObserver.unobserve(elementRef.value);
@@ -52,6 +49,6 @@ function useElementSize(elementRef) {
             window.removeEventListener('resize', updateSize);
         }
     });
-    return { width: width, height: height };
+    return { width, height };
 }
-var vue_2 = require("vue");
+import { watch } from 'vue';

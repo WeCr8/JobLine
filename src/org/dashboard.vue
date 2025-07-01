@@ -190,7 +190,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { format } from 'date-fns';
-import { useOrganizationStore } from '../stores/organization.ts';
+import { useOrganizationStore } from '../stores/organization';
 import {
   UserGroupIcon,
   BuildingOfficeIcon,

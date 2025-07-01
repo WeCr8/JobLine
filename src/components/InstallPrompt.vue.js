@@ -1,37 +1,24 @@
-"use strict";
-var __assign = (this && this.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-var vue_1 = require("vue");
-var platform_1 = require("../utils/platform");
-var showInstallPrompt = (0, vue_1.ref)(false);
+import { ref, onMounted, onUnmounted } from 'vue';
+import { isIOS, isAndroid, isStandalone } from '../utils/platform';
+const showInstallPrompt = ref(false);
 // Check if the app is already installed
-var isAppInstalled = function () {
-    return (0, platform_1.isStandalone)();
+const isAppInstalled = () => {
+    return isStandalone();
 };
 // Check if the install prompt was previously dismissed
-var wasPromptDismissed = function () {
+const wasPromptDismissed = () => {
     return localStorage.getItem('installPromptDismissed') === 'true';
 };
 // Show iOS specific install instructions
-var showIOSInstructions = function () {
+const showIOSInstructions = () => {
     // For iOS, we need to show custom instructions since there's no install API
-    if ((0, platform_1.isIOS)() && !isAppInstalled() && !wasPromptDismissed()) {
+    if (isIOS() && !isAppInstalled() && !wasPromptDismissed()) {
         showInstallPrompt.value = true;
     }
 };
 // Handle install button click
-var installApp = function () {
-    if ((0, platform_1.isIOS)()) {
+const installApp = () => {
+    if (isIOS()) {
         // Show iOS-specific instructions
         alert('To install this app on your iPhone:\n\n1. Tap the Share button\n2. Scroll down and tap "Add to Home Screen"\n3. Tap "Add" in the top-right corner');
     }
@@ -42,18 +29,18 @@ var installApp = function () {
     showInstallPrompt.value = false;
 };
 // Dismiss the install prompt
-var dismissInstallPrompt = function () {
+const dismissInstallPrompt = () => {
     showInstallPrompt.value = false;
     localStorage.setItem('installPromptDismissed', 'true');
 };
 // Handle the beforeinstallprompt event
-var handleBeforeInstallPrompt = function () {
+const handleBeforeInstallPrompt = () => {
     // Only show for Android, as iOS uses different mechanism
-    if ((0, platform_1.isAndroid)() && !isAppInstalled() && !wasPromptDismissed()) {
+    if (isAndroid() && !isAppInstalled() && !wasPromptDismissed()) {
         showInstallPrompt.value = true;
     }
 };
-(0, vue_1.onMounted)(function () {
+onMounted(() => {
     // Don't show if already installed
     if (isAppInstalled()) {
         return;
@@ -63,35 +50,54 @@ var handleBeforeInstallPrompt = function () {
         return;
     }
     // For iOS, show custom instructions
-    if ((0, platform_1.isIOS)()) {
+    if (isIOS()) {
         // Delay showing the prompt to avoid overwhelming the user
         setTimeout(showIOSInstructions, 3000);
     }
     // For Android/Chrome, listen for the beforeinstallprompt event
     window.addEventListener('pwaInstallable', handleBeforeInstallPrompt);
     // Hide prompt if app gets installed
-    window.addEventListener('pwaInstalled', function () {
+    window.addEventListener('pwaInstalled', () => {
         showInstallPrompt.value = false;
     });
 });
-(0, vue_1.onUnmounted)(function () {
+onUnmounted(() => {
     window.removeEventListener('pwaInstallable', handleBeforeInstallPrompt);
 });
 debugger; /* PartiallyEnd: #3632/scriptSetup.vue */
-var __VLS_ctx = {};
-var __VLS_components;
-var __VLS_directives;
+const __VLS_ctx = {};
+let __VLS_components;
+let __VLS_directives;
 // CSS variable injection 
 // CSS variable injection end 
 if (__VLS_ctx.showInstallPrompt) {
-    __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)(__assign({ class: "fixed top-4 left-4 right-4 bg-primary-600 text-white p-3 rounded-lg z-40 safe-area-top" }, { role: "alert" }));
-    __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)(__assign({ class: "flex items-center justify-between" }));
+    __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({
+        ...{ class: "fixed top-4 left-4 right-4 bg-primary-600 text-white p-3 rounded-lg z-40 safe-area-top" },
+        role: "alert",
+    });
+    __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({
+        ...{ class: "flex items-center justify-between" },
+    });
     __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({});
-    __VLS_asFunctionalElement(__VLS_intrinsicElements.p, __VLS_intrinsicElements.p)(__assign({ class: "text-sm font-medium" }));
-    __VLS_asFunctionalElement(__VLS_intrinsicElements.p, __VLS_intrinsicElements.p)(__assign({ class: "text-xs opacity-90" }));
-    __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)(__assign({ class: "flex space-x-2" }));
-    __VLS_asFunctionalElement(__VLS_intrinsicElements.button, __VLS_intrinsicElements.button)(__assign(__assign({ onClick: (__VLS_ctx.installApp) }, { class: "bg-white bg-opacity-20 hover:bg-opacity-30 px-3 py-1 rounded text-xs transition-colors duration-200" }), { 'aria-label': "Install app" }));
-    __VLS_asFunctionalElement(__VLS_intrinsicElements.button, __VLS_intrinsicElements.button)(__assign(__assign({ onClick: (__VLS_ctx.dismissInstallPrompt) }, { class: "bg-white bg-opacity-20 hover:bg-opacity-30 px-2 py-1 rounded text-xs transition-colors duration-200" }), { 'aria-label': "Dismiss installation prompt" }));
+    __VLS_asFunctionalElement(__VLS_intrinsicElements.p, __VLS_intrinsicElements.p)({
+        ...{ class: "text-sm font-medium" },
+    });
+    __VLS_asFunctionalElement(__VLS_intrinsicElements.p, __VLS_intrinsicElements.p)({
+        ...{ class: "text-xs opacity-90" },
+    });
+    __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({
+        ...{ class: "flex space-x-2" },
+    });
+    __VLS_asFunctionalElement(__VLS_intrinsicElements.button, __VLS_intrinsicElements.button)({
+        ...{ onClick: (__VLS_ctx.installApp) },
+        ...{ class: "bg-white bg-opacity-20 hover:bg-opacity-30 px-3 py-1 rounded text-xs transition-colors duration-200" },
+        'aria-label': "Install app",
+    });
+    __VLS_asFunctionalElement(__VLS_intrinsicElements.button, __VLS_intrinsicElements.button)({
+        ...{ onClick: (__VLS_ctx.dismissInstallPrompt) },
+        ...{ class: "bg-white bg-opacity-20 hover:bg-opacity-30 px-2 py-1 rounded text-xs transition-colors duration-200" },
+        'aria-label': "Dismiss installation prompt",
+    });
 }
 /** @type {__VLS_StyleScopedClasses['fixed']} */ ;
 /** @type {__VLS_StyleScopedClasses['top-4']} */ ;
@@ -131,8 +137,8 @@ if (__VLS_ctx.showInstallPrompt) {
 /** @type {__VLS_StyleScopedClasses['transition-colors']} */ ;
 /** @type {__VLS_StyleScopedClasses['duration-200']} */ ;
 var __VLS_dollars;
-var __VLS_self = (await Promise.resolve().then(function () { return require('vue'); })).defineComponent({
-    setup: function () {
+const __VLS_self = (await import('vue')).defineComponent({
+    setup() {
         return {
             showInstallPrompt: showInstallPrompt,
             installApp: installApp,
@@ -140,8 +146,8 @@ var __VLS_self = (await Promise.resolve().then(function () { return require('vue
         };
     },
 });
-exports.default = (await Promise.resolve().then(function () { return require('vue'); })).defineComponent({
-    setup: function () {
+export default (await import('vue')).defineComponent({
+    setup() {
         return {};
     },
 });

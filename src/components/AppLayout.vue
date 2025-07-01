@@ -138,9 +138,9 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { useAuthStore } from '../stores/auth.ts';
-import { usePerformanceStore } from '../stores/performance.ts';
-import { useSubscriptionStore } from '../stores/subscription.ts';
+import { useAuthStore } from '../stores/auth';
+import { usePerformanceStore } from '../stores/performance';
+import { useSubscriptionStore } from '../stores/subscription';
 import MobileNavigation from './MobileNavigation.vue';
 import {
   HomeIcon,

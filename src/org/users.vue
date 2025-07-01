@@ -329,7 +329,7 @@
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted } from 'vue';
 import { format } from 'date-fns';
-import { useOrganizationStore } from '../stores/organization.ts';
+import { useOrganizationStore } from '../stores/organization';
 import type { User, Invite } from '../types';
 import { ArrowPathIcon, EnvelopeIcon } from '@heroicons/vue/24/outline';
 
