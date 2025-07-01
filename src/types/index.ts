@@ -1,4 +1,4 @@
-import type { AIRecommendation } from './integration';
+import type { AIRecommendation } from './integration.ts';
 
 export interface Job {
   id: string;

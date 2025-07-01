@@ -1,4 +1,4 @@
-import { supabase } from './api.service';
+import { supabase } from './api.service.ts';
 import type { Organization, User, Invite } from '../types';
 
 export const organizationService = {

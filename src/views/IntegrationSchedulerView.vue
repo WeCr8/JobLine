@@ -91,7 +91,7 @@
 import { ref, onMounted } from 'vue';
 import { format } from 'date-fns';
 import { useJobsStore } from '../stores/jobs.ts';
-import { integrationService } from '../services/integration.service';
+import { integrationService } from '../services/integration.service.ts';
 import IntegrationJobScheduler from '../components/IntegrationJobScheduler.vue';
 import {
   ArrowPathIcon,
