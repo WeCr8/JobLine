@@ -296,7 +296,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { format } from 'date-fns';
-import { integrationService } from '../services/integration.service';
+import { integrationService } from '../services/integration.service.ts';
 import type { Job } from '../types';
 import {
   ClipboardDocumentCheckIcon,

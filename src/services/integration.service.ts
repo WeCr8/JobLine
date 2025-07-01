@@ -1,4 +1,4 @@
-import { supabase } from './api.service';
+import { supabase } from './api.service.ts';
 import type { 
   ConnectionConfig, 
   ImportJob, 
@@ -8,7 +8,7 @@ import type {
   ImportMapping
 } from '../types/integration';
 import axios from 'axios';
-import { storeOfflineData, getOfflineData, registerBackgroundSync } from '../utils/offline';
+import { storeOfflineData, getOfflineData, registerBackgroundSync } from '../utils/offline.ts';
 
 export const integrationService = {
   /**

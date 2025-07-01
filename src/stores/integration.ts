@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import { integrationService } from '../services/integration.service';
+import { integrationService } from '../services/integration.service.ts';
 import type { 
   ConnectionConfig, 
   ImportJob, 
