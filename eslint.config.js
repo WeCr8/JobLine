@@ -1,21 +1,8 @@
 import js from '@eslint/js';
-import { FlatCompat } from '@eslint/eslintrc';
 import tseslint from '@typescript-eslint/eslint-plugin';
 import tsParser from '@typescript-eslint/parser';
 import importPlugin from 'eslint-plugin-import';
 import vuePlugin from 'eslint-plugin-vue';
-import path from 'path';
-import { fileURLToPath } from 'url';
-
-// Convert URL to path
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// Create a compatibility instance
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
-  recommendedConfig: js.configs.recommended,
-});
 
 export default [
   {
@@ -25,12 +12,20 @@ export default [
       'public/',
       '*.config.js',
       '*.d.ts',
+      '**/*.vue.js',
+      '**/*.vue.ts',
+      'supabase/functions/**/*.ts',
     ],
   },
-  // Base JS configuration
-  ...compat.config({ extends: ['eslint:recommended'] }),
-  
-  // TypeScript configuration
+  // Base JS config
+  {
+    languageOptions: {
+      ecmaVersion: 'latest',
+      sourceType: 'module',
+    },
+    rules: js.configs.recommended.rules,
+  },
+  // TypeScript config
   {
     files: ['**/*.ts', '**/*.tsx', '**/*.vue'],
     languageOptions: {
@@ -38,9 +33,6 @@ export default [
       parserOptions: {
         ecmaVersion: 'latest',
         sourceType: 'module',
-        ecmaFeatures: {
-          jsx: true,
-        },
         project: './tsconfig.json',
       },
     },
@@ -62,16 +54,23 @@ export default [
       '@typescript-eslint/no-empty-function': 'warn',
     },
   },
-  
-  // Vue specific configuration
+  // Vue config
   {
     files: ['**/*.vue'],
-    ...compat.config({
-      extends: [
-        'plugin:vue/vue3-recommended',
-      ],
-    }),
+    languageOptions: {
+      parser: tsParser,
+      parserOptions: {
+        ecmaVersion: 'latest',
+        sourceType: 'module',
+        project: './tsconfig.json',
+        extraFileExtensions: ['.vue'],
+      },
+    },
+    plugins: {
+      vue: vuePlugin,
+    },
     rules: {
+      ...vuePlugin.configs['vue3-recommended'].rules,
       'vue/multi-word-component-names': 'off',
       'vue/require-default-prop': 'off',
       'vue/no-v-html': 'warn',
@@ -91,14 +90,13 @@ export default [
       }],
     },
   },
-  
-  // Import plugin configuration
+  // Import plugin config
   {
     plugins: {
-      'import': importPlugin,
+      import: importPlugin,
     },
     rules: {
-      'import/no-unresolved': 'off', // TypeScript handles this
+      'import/no-unresolved': 'off',
       'import/named': 'error',
       'import/default': 'error',
       'import/export': 'error',
@@ -112,12 +110,10 @@ export default [
       }],
     },
   },
-  
-  // Project specific overrides
+  // Project-specific overrides
   {
     files: ['src/**/*.ts', 'src/**/*.vue'],
     rules: {
-      // Code style and formatting
       'no-console': ['warn', { allow: ['warn', 'error', 'info'] }],
       'no-debugger': 'warn',
       'prefer-const': 'error',
@@ -131,14 +127,10 @@ export default [
         'ignoreTemplateLiterals': true,
         'ignoreRegExpLiterals': true 
       }],
-      
-      // Error prevention
       'no-unused-expressions': 'warn',
       'no-undef': 'error',
       'no-use-before-define': 'error',
       'no-duplicate-imports': 'error',
-      
-      // Best practices
       'array-callback-return': 'error',
       'consistent-return': 'warn',
       'default-case': 'warn',
