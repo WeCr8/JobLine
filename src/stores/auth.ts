@@ -2,6 +2,7 @@ import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import { authService } from '../services/auth.service.ts';
 import type { User } from '../types';
+import { supabase } from '../lib/supabase';
 
 export const useAuthStore = defineStore('auth', () => {
   const user = ref<User | null>(null);
@@ -98,18 +99,18 @@ export const useAuthStore = defineStore('auth', () => {
         }
 
         user.value = {
-          id: result.data.user.id,
-          email: result.data.user.email!,
-          name: userData?.name || name,
-          role: userData?.role || 'operator',
-          department: userData?.department,
-          organization_id: userData?.organization_id,
+          id: data.user.id,
+          email: data.user.email!,
+          name: inviteData?.name || name,
+          role: inviteData?.role || 'operator',
+          department: inviteData?.department,
+          organization_id: inviteData?.organization_id,
           is_active: true,
           created_at: new Date().toISOString()
         };
       }
       
-      return { data: result.data, error: null };
+      return { data: data, error: null };
     } catch (err: any) {
       error.value = err.message;
       return { data: null, error: err.message };
