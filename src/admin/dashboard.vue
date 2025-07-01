@@ -153,7 +153,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { format } from 'date-fns';
-import { useAdminStore } from '../stores/admin.ts';
+import { useAdminStore } from '../stores/admin';
 import type { Organization } from '../types';
 import {
   CurrencyDollarIcon,

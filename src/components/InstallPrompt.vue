@@ -31,7 +31,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue';
-import { isIOS, isAndroid, isStandalone } from '../utils/platform.ts';
+import { isIOS, isAndroid, isStandalone } from '../utils/platform';
 
 const showInstallPrompt = ref(false);
 

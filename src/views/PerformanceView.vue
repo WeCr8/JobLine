@@ -224,8 +224,8 @@
 
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue';
-import { usePerformanceStore } from '../stores/performance.ts';
-import { useAuthStore } from '../stores/auth.ts';
+import { usePerformanceStore } from '../stores/performance';
+import { useAuthStore } from '../stores/auth';
 import PerformanceDashboard from '../components/PerformanceDashboard.vue';
 import LeaderboardWidget from '../components/LeaderboardWidget.vue';
 import {

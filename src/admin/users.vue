@@ -290,10 +290,10 @@
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted } from 'vue';
 import { format } from 'date-fns';
-import { useAdminStore } from '../stores/admin.ts';
+import { useAdminStore } from '../stores/admin';
+import { useAuthStore } from '../stores/auth';
 import type { User, UserRole } from '../types';
 import { ArrowPathIcon } from '@heroicons/vue/24/outline';
-import { useAuthStore } from '../stores/auth.ts';
 
 const adminStore = useAdminStore();
 const authStore = useAuthStore();

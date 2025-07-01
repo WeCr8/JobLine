@@ -106,7 +106,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue';
 import { format } from 'date-fns';
-import { useOptimizationStore } from '../stores/optimization.ts';
+import { useOptimizationStore } from '../stores/optimization';
 import type { VoiceNote } from '../types/optimization';
 import {
   MicrophoneIcon,

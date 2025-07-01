@@ -90,8 +90,8 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { format } from 'date-fns';
-import { useJobsStore } from '../stores/jobs.ts';
-import { integrationService } from '../services/integration.service.ts';
+import { useJobsStore } from '../stores/jobs';
+import { integrationService } from '../services/integration.service';
 import IntegrationJobScheduler from '../components/IntegrationJobScheduler.vue';
 import {
   ArrowPathIcon,

@@ -259,7 +259,7 @@
 <script setup lang="ts">
 import { ref, computed, reactive, onMounted } from 'vue';
 import { format } from 'date-fns';
-import { useIntegrationStore } from '../stores/integration.ts';
+import { useIntegrationStore } from '../stores/integration';
 import type { ImportType, ConnectionType } from '../types/integration';
 import {
   GlobeAltIcon,

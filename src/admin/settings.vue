@@ -163,7 +163,7 @@
 
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue';
-import { useAdminStore } from '../stores/admin.ts';
+import { useAdminStore } from '../stores/admin';
 import { ArrowPathIcon } from '@heroicons/vue/24/outline';
 
 const adminStore = useAdminStore();

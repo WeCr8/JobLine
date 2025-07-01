@@ -809,7 +809,7 @@ Performance analytics"
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted } from 'vue';
 import { format } from 'date-fns';
-import { useAdminStore } from '../stores/admin.ts';
+import { useAdminStore } from '../stores/admin';
 import type { SubscriptionPlan, Organization, User } from '../stores/admin';
 import {
   UserGroupIcon,

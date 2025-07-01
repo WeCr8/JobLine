@@ -297,7 +297,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import { useOptimizationStore } from '../stores/optimization.ts';
+import { useOptimizationStore } from '../stores/optimization';
 import {
   ClockIcon,
   CubeIcon,

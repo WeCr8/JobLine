@@ -310,7 +310,7 @@
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted } from 'vue';
 import { format } from 'date-fns';
-import { useAdminStore } from '../stores/admin.ts';
+import { useAdminStore } from '../stores/admin';
 import type { Organization } from '../types/admin';
 import { ArrowPathIcon } from '@heroicons/vue/24/outline';
 

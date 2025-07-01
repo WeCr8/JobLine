@@ -126,9 +126,9 @@
 <script setup lang="ts">
 import { ref, nextTick, watch, onMounted, onUnmounted } from 'vue';
 import { format } from 'date-fns';
-import { addSwipeGesture, addTapGesture } from '../utils/gesture.ts';
-import { createAccessibleFocusTrap, lockBodyScroll } from '../utils/accessibility.ts';
-import { isIOS, isMobile } from '../utils/platform.ts';
+import { addSwipeGesture, addTapGesture } from '../utils/gesture';
+import { createAccessibleFocusTrap, lockBodyScroll } from '../utils/accessibility';
+import { isIOS, isMobile } from '../utils/platform';
 import {
   ChatBubbleLeftRightIcon,
   PaperAirplaneIcon,

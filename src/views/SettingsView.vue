@@ -383,8 +383,8 @@
 
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted } from 'vue';
-import { useAuthStore } from '../stores/auth.ts';
-import { useSettingsStore } from '../stores/settings.ts';
+import { useAuthStore } from '../stores/auth';
+import { useSettingsStore } from '../stores/settings';
 import SettingsCard from '../components/SettingsCard.vue';
 import ToggleSwitch from '../components/ToggleSwitch.vue';
 import SecuritySettingsCard from '../components/SecuritySettingsCard.vue';

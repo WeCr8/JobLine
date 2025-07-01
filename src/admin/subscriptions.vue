@@ -228,7 +228,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { format } from 'date-fns';
-import { useAdminStore } from '../stores/admin.ts';
+import { useAdminStore } from '../stores/admin';
 import type { Subscription, Invoice } from '../types/admin';
 import { ArrowPathIcon, XMarkIcon, ExclamationTriangleIcon } from '@heroicons/vue/24/outline';
 

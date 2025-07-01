@@ -109,7 +109,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { format, subDays } from 'date-fns';
-import { useAdminStore } from '../stores/admin.ts';
+import { useAdminStore } from '../stores/admin';
 import { ArrowPathIcon } from '@heroicons/vue/24/outline';
 import type { User } from '../types/admin';
 
