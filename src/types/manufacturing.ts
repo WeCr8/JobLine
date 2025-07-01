@@ -312,3 +312,69 @@ export interface FixtureRequirement {
 }
 
 export type MachineCondition = 'in-setup' | 'running' | 'idle' | 'maintenance' | 'down';
+
+// Manufacturing domain models for AI expeditor
+
+export type OperationStatus = 'not_started' | 'in_progress' | 'completed' | 'blocked' | 'skipped'
+export type ResourceType = 'machine' | 'workcenter' | 'person' | 'tool'
+export type ConstraintType = 'material' | 'resource' | 'skill' | 'custom'
+
+export interface Part {
+  id: string
+  name: string
+  description?: string
+  partNumber?: string
+  revision?: string
+  jobId?: string
+  quantity: number
+  unit?: string
+  location?: string
+  customFields?: Record<string, any>
+}
+
+export interface Operation {
+  id: string
+  jobId: string
+  partId?: string
+  name: string
+  description?: string
+  status: OperationStatus
+  sequence: number
+  resourceId?: string
+  plannedStart?: string // ISO date
+  plannedEnd?: string // ISO date
+  actualStart?: string // ISO date
+  actualEnd?: string // ISO date
+  durationMinutes?: number
+  customFields?: Record<string, any>
+}
+
+export interface Resource {
+  id: string
+  name: string
+  type: ResourceType
+  available: boolean
+  capacity?: Capacity
+  skills?: string[]
+  customFields?: Record<string, any>
+}
+
+export interface Capacity {
+  resourceId: string
+  date: string // ISO date
+  availableMinutes: number
+  usedMinutes: number
+  customFields?: Record<string, any>
+}
+
+export interface Constraint {
+  id: string
+  type: ConstraintType
+  description?: string
+  affectedJobIds?: string[]
+  affectedPartIds?: string[]
+  affectedResourceIds?: string[]
+  startDate?: string // ISO date
+  endDate?: string // ISO date
+  customFields?: Record<string, any>
+}
