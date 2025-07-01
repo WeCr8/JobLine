@@ -1,11 +1,11 @@
 import { disableBodyScroll, enableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock';
-import createFocusTrap from 'focus-trap';
+import * as focusTrap from 'focus-trap';
 /**
  * Accessibility utilities for cross-platform compatibility
  */
 // Create a focus trap for modals and dialogs
 export const createAccessibleFocusTrap = (element) => {
-    const trap = createFocusTrap(element, {
+    const trap = focusTrap.default(element, {
         allowOutsideClick: true,
         escapeDeactivates: true,
         fallbackFocus: element
