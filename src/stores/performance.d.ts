@@ -49,7 +49,7 @@ export declare const usePerformanceStore: import("pinia").StoreDefinition<"perfo
         bonusEarned: number;
         streaks: {
             id: string;
-            type: "efficiency" | "quality" | "safety" | "attendance" | "innovation";
+            type: "quality" | "efficiency" | "safety" | "innovation" | "attendance";
             currentStreak: number;
             bestStreak: number;
             multiplier: number;
@@ -105,7 +105,7 @@ export declare const usePerformanceStore: import("pinia").StoreDefinition<"perfo
         bonusEarned: number;
         streaks: {
             id: string;
-            type: "efficiency" | "quality" | "safety" | "attendance" | "innovation";
+            type: "quality" | "efficiency" | "safety" | "innovation" | "attendance";
             currentStreak: number;
             bestStreak: number;
             multiplier: number;
@@ -152,7 +152,7 @@ export declare const usePerformanceStore: import("pinia").StoreDefinition<"perfo
         id: string;
         name: string;
         description: string;
-        type: "department" | "shift" | "machine" | "skill-level" | "cross-functional";
+        type: "shift" | "department" | "machine" | "skill-level" | "cross-functional";
         startDate: string;
         endDate: string;
         participants: string[];
@@ -174,20 +174,20 @@ export declare const usePerformanceStore: import("pinia").StoreDefinition<"perfo
             badge?: string | undefined;
             perks?: string[] | undefined;
         }[];
-        status: "upcoming" | "active" | "completed" | "cancelled";
+        status: "active" | "completed" | "cancelled" | "upcoming";
         leaderboard: {
             teamId: string;
             teamName: string;
             score: number;
             rank: number;
-            trend: "up" | "down" | "stable";
+            trend: "down" | "up" | "stable";
             members: string[];
         }[];
     }[], TeamChallenge[] | {
         id: string;
         name: string;
         description: string;
-        type: "department" | "shift" | "machine" | "skill-level" | "cross-functional";
+        type: "shift" | "department" | "machine" | "skill-level" | "cross-functional";
         startDate: string;
         endDate: string;
         participants: string[];
@@ -209,13 +209,13 @@ export declare const usePerformanceStore: import("pinia").StoreDefinition<"perfo
             badge?: string | undefined;
             perks?: string[] | undefined;
         }[];
-        status: "upcoming" | "active" | "completed" | "cancelled";
+        status: "active" | "completed" | "cancelled" | "upcoming";
         leaderboard: {
             teamId: string;
             teamName: string;
             score: number;
             rank: number;
-            trend: "up" | "down" | "stable";
+            trend: "down" | "up" | "stable";
             members: string[];
         }[];
     }[]>;
@@ -287,7 +287,7 @@ export declare const usePerformanceStore: import("pinia").StoreDefinition<"perfo
     bonusStructures: import("vue").Ref<{
         id: string;
         name: string;
-        type: "performance" | "innovation" | "streak" | "achievement" | "team" | "skill";
+        type: "innovation" | "streak" | "performance" | "achievement" | "team" | "skill";
         baseAmount: number;
         multipliers: {
             condition: string;
@@ -306,7 +306,7 @@ export declare const usePerformanceStore: import("pinia").StoreDefinition<"perfo
     }[], BonusStructure[] | {
         id: string;
         name: string;
-        type: "performance" | "innovation" | "streak" | "achievement" | "team" | "skill";
+        type: "innovation" | "streak" | "performance" | "achievement" | "team" | "skill";
         baseAmount: number;
         multipliers: {
             condition: string;
@@ -340,7 +340,7 @@ export declare const usePerformanceStore: import("pinia").StoreDefinition<"perfo
         attachments: string[];
         votes: {
             userId: string;
-            vote: "up" | "down";
+            vote: "down" | "up";
             comment?: string | undefined;
             timestamp: string;
         }[];
@@ -361,7 +361,7 @@ export declare const usePerformanceStore: import("pinia").StoreDefinition<"perfo
         attachments: string[];
         votes: {
             userId: string;
-            vote: "up" | "down";
+            vote: "down" | "up";
             comment?: string | undefined;
             timestamp: string;
         }[];
@@ -374,7 +374,7 @@ export declare const usePerformanceStore: import("pinia").StoreDefinition<"perfo
         score: number;
         rank: number;
         previousRank: number;
-        trend: "up" | "down" | "stable";
+        trend: "down" | "up" | "stable";
         achievements: number;
         streaks: number;
         bonusEarned: number;
@@ -388,7 +388,7 @@ export declare const usePerformanceStore: import("pinia").StoreDefinition<"perfo
         score: number;
         rank: number;
         previousRank: number;
-        trend: "up" | "down" | "stable";
+        trend: "down" | "up" | "stable";
         achievements: number;
         streaks: number;
         bonusEarned: number;
@@ -561,7 +561,7 @@ export declare const usePerformanceStore: import("pinia").StoreDefinition<"perfo
     totalBonusEarned: import("vue").ComputedRef<number>;
     activeStreaks: import("vue").ComputedRef<{
         id: string;
-        type: "efficiency" | "quality" | "safety" | "attendance" | "innovation";
+        type: "quality" | "efficiency" | "safety" | "innovation" | "attendance";
         currentStreak: number;
         bestStreak: number;
         multiplier: number;
@@ -590,7 +590,7 @@ export declare const usePerformanceStore: import("pinia").StoreDefinition<"perfo
         id: string;
         name: string;
         description: string;
-        type: "department" | "shift" | "machine" | "skill-level" | "cross-functional";
+        type: "shift" | "department" | "machine" | "skill-level" | "cross-functional";
         startDate: string;
         endDate: string;
         participants: string[];
@@ -612,13 +612,13 @@ export declare const usePerformanceStore: import("pinia").StoreDefinition<"perfo
             badge?: string | undefined;
             perks?: string[] | undefined;
         }[];
-        status: "upcoming" | "active" | "completed" | "cancelled";
+        status: "active" | "completed" | "cancelled" | "upcoming";
         leaderboard: {
             teamId: string;
             teamName: string;
             score: number;
             rank: number;
-            trend: "up" | "down" | "stable";
+            trend: "down" | "up" | "stable";
             members: string[];
         }[];
     }[]>;
@@ -626,7 +626,7 @@ export declare const usePerformanceStore: import("pinia").StoreDefinition<"perfo
         id: string;
         name: string;
         description: string;
-        type: "department" | "shift" | "machine" | "skill-level" | "cross-functional";
+        type: "shift" | "department" | "machine" | "skill-level" | "cross-functional";
         startDate: string;
         endDate: string;
         participants: string[];
@@ -648,13 +648,13 @@ export declare const usePerformanceStore: import("pinia").StoreDefinition<"perfo
             badge?: string | undefined;
             perks?: string[] | undefined;
         }[];
-        status: "upcoming" | "active" | "completed" | "cancelled";
+        status: "active" | "completed" | "cancelled" | "upcoming";
         leaderboard: {
             teamId: string;
             teamName: string;
             score: number;
             rank: number;
-            trend: "up" | "down" | "stable";
+            trend: "down" | "up" | "stable";
             members: string[];
         }[];
     }[]>;
@@ -688,7 +688,7 @@ export declare const usePerformanceStore: import("pinia").StoreDefinition<"perfo
         participationReward: number;
         isActive: boolean;
     } | undefined>;
-    performanceGrade: import("vue").ComputedRef<"F" | "A+" | "A" | "B+" | "B" | "C+" | "C" | "D">;
+    performanceGrade: import("vue").ComputedRef<"B" | "D" | "C" | "F" | "A+" | "A" | "B+" | "C+">;
     fetchUserMetrics: () => Promise<void>;
     fetchAchievements: () => Promise<void>;
     fetchTeamChallenges: () => Promise<void>;
@@ -699,7 +699,7 @@ export declare const usePerformanceStore: import("pinia").StoreDefinition<"perfo
     submitInnovation: (innovation: Omit<InnovationSubmission, 'id' | 'submittedDate' | 'status' | 'votes'>) => Promise<void>;
     joinChallenge: (challengeId: string, teamId: string) => Promise<void>;
     calculateBonus: (metrics: PerformanceMetrics, bonusStructure: BonusStructure) => number;
-}, "loading" | "achievements" | "leaderboard" | "userMetrics" | "teamChallenges" | "skillDevelopment" | "bonusStructures" | "innovations" | "seasonalEvents" | "mentorships" | "insights" | "companyPerformance">, Pick<{
+}, "loading" | "insights" | "achievements" | "leaderboard" | "userMetrics" | "teamChallenges" | "skillDevelopment" | "bonusStructures" | "innovations" | "seasonalEvents" | "mentorships" | "companyPerformance">, Pick<{
     userMetrics: import("vue").Ref<{
         id: string;
         userId: string;
@@ -749,7 +749,7 @@ export declare const usePerformanceStore: import("pinia").StoreDefinition<"perfo
         bonusEarned: number;
         streaks: {
             id: string;
-            type: "efficiency" | "quality" | "safety" | "attendance" | "innovation";
+            type: "quality" | "efficiency" | "safety" | "innovation" | "attendance";
             currentStreak: number;
             bestStreak: number;
             multiplier: number;
@@ -805,7 +805,7 @@ export declare const usePerformanceStore: import("pinia").StoreDefinition<"perfo
         bonusEarned: number;
         streaks: {
             id: string;
-            type: "efficiency" | "quality" | "safety" | "attendance" | "innovation";
+            type: "quality" | "efficiency" | "safety" | "innovation" | "attendance";
             currentStreak: number;
             bestStreak: number;
             multiplier: number;
@@ -852,7 +852,7 @@ export declare const usePerformanceStore: import("pinia").StoreDefinition<"perfo
         id: string;
         name: string;
         description: string;
-        type: "department" | "shift" | "machine" | "skill-level" | "cross-functional";
+        type: "shift" | "department" | "machine" | "skill-level" | "cross-functional";
         startDate: string;
         endDate: string;
         participants: string[];
@@ -874,20 +874,20 @@ export declare const usePerformanceStore: import("pinia").StoreDefinition<"perfo
             badge?: string | undefined;
             perks?: string[] | undefined;
         }[];
-        status: "upcoming" | "active" | "completed" | "cancelled";
+        status: "active" | "completed" | "cancelled" | "upcoming";
         leaderboard: {
             teamId: string;
             teamName: string;
             score: number;
             rank: number;
-            trend: "up" | "down" | "stable";
+            trend: "down" | "up" | "stable";
             members: string[];
         }[];
     }[], TeamChallenge[] | {
         id: string;
         name: string;
         description: string;
-        type: "department" | "shift" | "machine" | "skill-level" | "cross-functional";
+        type: "shift" | "department" | "machine" | "skill-level" | "cross-functional";
         startDate: string;
         endDate: string;
         participants: string[];
@@ -909,13 +909,13 @@ export declare const usePerformanceStore: import("pinia").StoreDefinition<"perfo
             badge?: string | undefined;
             perks?: string[] | undefined;
         }[];
-        status: "upcoming" | "active" | "completed" | "cancelled";
+        status: "active" | "completed" | "cancelled" | "upcoming";
         leaderboard: {
             teamId: string;
             teamName: string;
             score: number;
             rank: number;
-            trend: "up" | "down" | "stable";
+            trend: "down" | "up" | "stable";
             members: string[];
         }[];
     }[]>;
@@ -987,7 +987,7 @@ export declare const usePerformanceStore: import("pinia").StoreDefinition<"perfo
     bonusStructures: import("vue").Ref<{
         id: string;
         name: string;
-        type: "performance" | "innovation" | "streak" | "achievement" | "team" | "skill";
+        type: "innovation" | "streak" | "performance" | "achievement" | "team" | "skill";
         baseAmount: number;
         multipliers: {
             condition: string;
@@ -1006,7 +1006,7 @@ export declare const usePerformanceStore: import("pinia").StoreDefinition<"perfo
     }[], BonusStructure[] | {
         id: string;
         name: string;
-        type: "performance" | "innovation" | "streak" | "achievement" | "team" | "skill";
+        type: "innovation" | "streak" | "performance" | "achievement" | "team" | "skill";
         baseAmount: number;
         multipliers: {
             condition: string;
@@ -1040,7 +1040,7 @@ export declare const usePerformanceStore: import("pinia").StoreDefinition<"perfo
         attachments: string[];
         votes: {
             userId: string;
-            vote: "up" | "down";
+            vote: "down" | "up";
             comment?: string | undefined;
             timestamp: string;
         }[];
@@ -1061,7 +1061,7 @@ export declare const usePerformanceStore: import("pinia").StoreDefinition<"perfo
         attachments: string[];
         votes: {
             userId: string;
-            vote: "up" | "down";
+            vote: "down" | "up";
             comment?: string | undefined;
             timestamp: string;
         }[];
@@ -1074,7 +1074,7 @@ export declare const usePerformanceStore: import("pinia").StoreDefinition<"perfo
         score: number;
         rank: number;
         previousRank: number;
-        trend: "up" | "down" | "stable";
+        trend: "down" | "up" | "stable";
         achievements: number;
         streaks: number;
         bonusEarned: number;
@@ -1088,7 +1088,7 @@ export declare const usePerformanceStore: import("pinia").StoreDefinition<"perfo
         score: number;
         rank: number;
         previousRank: number;
-        trend: "up" | "down" | "stable";
+        trend: "down" | "up" | "stable";
         achievements: number;
         streaks: number;
         bonusEarned: number;
@@ -1261,7 +1261,7 @@ export declare const usePerformanceStore: import("pinia").StoreDefinition<"perfo
     totalBonusEarned: import("vue").ComputedRef<number>;
     activeStreaks: import("vue").ComputedRef<{
         id: string;
-        type: "efficiency" | "quality" | "safety" | "attendance" | "innovation";
+        type: "quality" | "efficiency" | "safety" | "innovation" | "attendance";
         currentStreak: number;
         bestStreak: number;
         multiplier: number;
@@ -1290,7 +1290,7 @@ export declare const usePerformanceStore: import("pinia").StoreDefinition<"perfo
         id: string;
         name: string;
         description: string;
-        type: "department" | "shift" | "machine" | "skill-level" | "cross-functional";
+        type: "shift" | "department" | "machine" | "skill-level" | "cross-functional";
         startDate: string;
         endDate: string;
         participants: string[];
@@ -1312,13 +1312,13 @@ export declare const usePerformanceStore: import("pinia").StoreDefinition<"perfo
             badge?: string | undefined;
             perks?: string[] | undefined;
         }[];
-        status: "upcoming" | "active" | "completed" | "cancelled";
+        status: "active" | "completed" | "cancelled" | "upcoming";
         leaderboard: {
             teamId: string;
             teamName: string;
             score: number;
             rank: number;
-            trend: "up" | "down" | "stable";
+            trend: "down" | "up" | "stable";
             members: string[];
         }[];
     }[]>;
@@ -1326,7 +1326,7 @@ export declare const usePerformanceStore: import("pinia").StoreDefinition<"perfo
         id: string;
         name: string;
         description: string;
-        type: "department" | "shift" | "machine" | "skill-level" | "cross-functional";
+        type: "shift" | "department" | "machine" | "skill-level" | "cross-functional";
         startDate: string;
         endDate: string;
         participants: string[];
@@ -1348,13 +1348,13 @@ export declare const usePerformanceStore: import("pinia").StoreDefinition<"perfo
             badge?: string | undefined;
             perks?: string[] | undefined;
         }[];
-        status: "upcoming" | "active" | "completed" | "cancelled";
+        status: "active" | "completed" | "cancelled" | "upcoming";
         leaderboard: {
             teamId: string;
             teamName: string;
             score: number;
             rank: number;
-            trend: "up" | "down" | "stable";
+            trend: "down" | "up" | "stable";
             members: string[];
         }[];
     }[]>;
@@ -1388,7 +1388,7 @@ export declare const usePerformanceStore: import("pinia").StoreDefinition<"perfo
         participationReward: number;
         isActive: boolean;
     } | undefined>;
-    performanceGrade: import("vue").ComputedRef<"F" | "A+" | "A" | "B+" | "B" | "C+" | "C" | "D">;
+    performanceGrade: import("vue").ComputedRef<"B" | "D" | "C" | "F" | "A+" | "A" | "B+" | "C+">;
     fetchUserMetrics: () => Promise<void>;
     fetchAchievements: () => Promise<void>;
     fetchTeamChallenges: () => Promise<void>;
@@ -1449,7 +1449,7 @@ export declare const usePerformanceStore: import("pinia").StoreDefinition<"perfo
         bonusEarned: number;
         streaks: {
             id: string;
-            type: "efficiency" | "quality" | "safety" | "attendance" | "innovation";
+            type: "quality" | "efficiency" | "safety" | "innovation" | "attendance";
             currentStreak: number;
             bestStreak: number;
             multiplier: number;
@@ -1505,7 +1505,7 @@ export declare const usePerformanceStore: import("pinia").StoreDefinition<"perfo
         bonusEarned: number;
         streaks: {
             id: string;
-            type: "efficiency" | "quality" | "safety" | "attendance" | "innovation";
+            type: "quality" | "efficiency" | "safety" | "innovation" | "attendance";
             currentStreak: number;
             bestStreak: number;
             multiplier: number;
@@ -1552,7 +1552,7 @@ export declare const usePerformanceStore: import("pinia").StoreDefinition<"perfo
         id: string;
         name: string;
         description: string;
-        type: "department" | "shift" | "machine" | "skill-level" | "cross-functional";
+        type: "shift" | "department" | "machine" | "skill-level" | "cross-functional";
         startDate: string;
         endDate: string;
         participants: string[];
@@ -1574,20 +1574,20 @@ export declare const usePerformanceStore: import("pinia").StoreDefinition<"perfo
             badge?: string | undefined;
             perks?: string[] | undefined;
         }[];
-        status: "upcoming" | "active" | "completed" | "cancelled";
+        status: "active" | "completed" | "cancelled" | "upcoming";
         leaderboard: {
             teamId: string;
             teamName: string;
             score: number;
             rank: number;
-            trend: "up" | "down" | "stable";
+            trend: "down" | "up" | "stable";
             members: string[];
         }[];
     }[], TeamChallenge[] | {
         id: string;
         name: string;
         description: string;
-        type: "department" | "shift" | "machine" | "skill-level" | "cross-functional";
+        type: "shift" | "department" | "machine" | "skill-level" | "cross-functional";
         startDate: string;
         endDate: string;
         participants: string[];
@@ -1609,13 +1609,13 @@ export declare const usePerformanceStore: import("pinia").StoreDefinition<"perfo
             badge?: string | undefined;
             perks?: string[] | undefined;
         }[];
-        status: "upcoming" | "active" | "completed" | "cancelled";
+        status: "active" | "completed" | "cancelled" | "upcoming";
         leaderboard: {
             teamId: string;
             teamName: string;
             score: number;
             rank: number;
-            trend: "up" | "down" | "stable";
+            trend: "down" | "up" | "stable";
             members: string[];
         }[];
     }[]>;
@@ -1687,7 +1687,7 @@ export declare const usePerformanceStore: import("pinia").StoreDefinition<"perfo
     bonusStructures: import("vue").Ref<{
         id: string;
         name: string;
-        type: "performance" | "innovation" | "streak" | "achievement" | "team" | "skill";
+        type: "innovation" | "streak" | "performance" | "achievement" | "team" | "skill";
         baseAmount: number;
         multipliers: {
             condition: string;
@@ -1706,7 +1706,7 @@ export declare const usePerformanceStore: import("pinia").StoreDefinition<"perfo
     }[], BonusStructure[] | {
         id: string;
         name: string;
-        type: "performance" | "innovation" | "streak" | "achievement" | "team" | "skill";
+        type: "innovation" | "streak" | "performance" | "achievement" | "team" | "skill";
         baseAmount: number;
         multipliers: {
             condition: string;
@@ -1740,7 +1740,7 @@ export declare const usePerformanceStore: import("pinia").StoreDefinition<"perfo
         attachments: string[];
         votes: {
             userId: string;
-            vote: "up" | "down";
+            vote: "down" | "up";
             comment?: string | undefined;
             timestamp: string;
         }[];
@@ -1761,7 +1761,7 @@ export declare const usePerformanceStore: import("pinia").StoreDefinition<"perfo
         attachments: string[];
         votes: {
             userId: string;
-            vote: "up" | "down";
+            vote: "down" | "up";
             comment?: string | undefined;
             timestamp: string;
         }[];
@@ -1774,7 +1774,7 @@ export declare const usePerformanceStore: import("pinia").StoreDefinition<"perfo
         score: number;
         rank: number;
         previousRank: number;
-        trend: "up" | "down" | "stable";
+        trend: "down" | "up" | "stable";
         achievements: number;
         streaks: number;
         bonusEarned: number;
@@ -1788,7 +1788,7 @@ export declare const usePerformanceStore: import("pinia").StoreDefinition<"perfo
         score: number;
         rank: number;
         previousRank: number;
-        trend: "up" | "down" | "stable";
+        trend: "down" | "up" | "stable";
         achievements: number;
         streaks: number;
         bonusEarned: number;
@@ -1961,7 +1961,7 @@ export declare const usePerformanceStore: import("pinia").StoreDefinition<"perfo
     totalBonusEarned: import("vue").ComputedRef<number>;
     activeStreaks: import("vue").ComputedRef<{
         id: string;
-        type: "efficiency" | "quality" | "safety" | "attendance" | "innovation";
+        type: "quality" | "efficiency" | "safety" | "innovation" | "attendance";
         currentStreak: number;
         bestStreak: number;
         multiplier: number;
@@ -1990,7 +1990,7 @@ export declare const usePerformanceStore: import("pinia").StoreDefinition<"perfo
         id: string;
         name: string;
         description: string;
-        type: "department" | "shift" | "machine" | "skill-level" | "cross-functional";
+        type: "shift" | "department" | "machine" | "skill-level" | "cross-functional";
         startDate: string;
         endDate: string;
         participants: string[];
@@ -2012,13 +2012,13 @@ export declare const usePerformanceStore: import("pinia").StoreDefinition<"perfo
             badge?: string | undefined;
             perks?: string[] | undefined;
         }[];
-        status: "upcoming" | "active" | "completed" | "cancelled";
+        status: "active" | "completed" | "cancelled" | "upcoming";
         leaderboard: {
             teamId: string;
             teamName: string;
             score: number;
             rank: number;
-            trend: "up" | "down" | "stable";
+            trend: "down" | "up" | "stable";
             members: string[];
         }[];
     }[]>;
@@ -2026,7 +2026,7 @@ export declare const usePerformanceStore: import("pinia").StoreDefinition<"perfo
         id: string;
         name: string;
         description: string;
-        type: "department" | "shift" | "machine" | "skill-level" | "cross-functional";
+        type: "shift" | "department" | "machine" | "skill-level" | "cross-functional";
         startDate: string;
         endDate: string;
         participants: string[];
@@ -2048,13 +2048,13 @@ export declare const usePerformanceStore: import("pinia").StoreDefinition<"perfo
             badge?: string | undefined;
             perks?: string[] | undefined;
         }[];
-        status: "upcoming" | "active" | "completed" | "cancelled";
+        status: "active" | "completed" | "cancelled" | "upcoming";
         leaderboard: {
             teamId: string;
             teamName: string;
             score: number;
             rank: number;
-            trend: "up" | "down" | "stable";
+            trend: "down" | "up" | "stable";
             members: string[];
         }[];
     }[]>;
@@ -2088,7 +2088,7 @@ export declare const usePerformanceStore: import("pinia").StoreDefinition<"perfo
         participationReward: number;
         isActive: boolean;
     } | undefined>;
-    performanceGrade: import("vue").ComputedRef<"F" | "A+" | "A" | "B+" | "B" | "C+" | "C" | "D">;
+    performanceGrade: import("vue").ComputedRef<"B" | "D" | "C" | "F" | "A+" | "A" | "B+" | "C+">;
     fetchUserMetrics: () => Promise<void>;
     fetchAchievements: () => Promise<void>;
     fetchTeamChallenges: () => Promise<void>;

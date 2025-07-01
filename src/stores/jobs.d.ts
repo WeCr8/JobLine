@@ -845,7 +845,7 @@ export declare const useJobsStore: import("pinia").StoreDefinition<"jobs", Pick<
         createdAt: string;
         updatedAt: string;
     } | undefined;
-}, "loading" | "error" | "jobs">, Pick<{
+}, "error" | "jobs" | "loading">, Pick<{
     jobs: import("vue").Ref<{
         id: string;
         jobNumber: string;

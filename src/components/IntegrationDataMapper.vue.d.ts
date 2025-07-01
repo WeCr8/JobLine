@@ -18,9 +18,9 @@ declare const _default: import("vue").DefineComponent<Props, {}, {}, {}, {}, imp
     onChange?: ((value: ImportMapping[]) => any) | undefined;
     "onUpdate:modelValue"?: ((value: ImportMapping[]) => any) | undefined;
 }>, {
-    description: string;
     title: string;
     disabled: boolean;
+    description: string;
     sourceFields: string[];
     targetFields: string[];
     sampleData: any[];

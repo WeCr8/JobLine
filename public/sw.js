@@ -1,3 +1,4 @@
+/// <reference lib="webworker" />
 // Service Worker for JobLine.ai PWA
 const CACHE_NAME = 'jobline-ai-v1.0.0';
 const STATIC_CACHE = 'jobline-static-v1';

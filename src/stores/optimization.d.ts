@@ -80,7 +80,7 @@ export declare const useOptimizationStore: import("pinia").StoreDefinition<"opti
     }[]>;
     productionTrends: import("vue").Ref<{
         id: string;
-        metric: "efficiency" | "quality" | "setup-time" | "cycle-time" | "throughput";
+        metric: "quality" | "efficiency" | "setup-time" | "cycle-time" | "throughput";
         period: "daily" | "weekly" | "monthly";
         data: {
             date: string;
@@ -93,7 +93,7 @@ export declare const useOptimizationStore: import("pinia").StoreDefinition<"opti
         insights: string[];
     }[], ProductionTrend[] | {
         id: string;
-        metric: "efficiency" | "quality" | "setup-time" | "cycle-time" | "throughput";
+        metric: "quality" | "efficiency" | "setup-time" | "cycle-time" | "throughput";
         period: "daily" | "weekly" | "monthly";
         data: {
             date: string;
@@ -341,7 +341,7 @@ export declare const useOptimizationStore: import("pinia").StoreDefinition<"opti
     }[]>;
     productionTrends: import("vue").Ref<{
         id: string;
-        metric: "efficiency" | "quality" | "setup-time" | "cycle-time" | "throughput";
+        metric: "quality" | "efficiency" | "setup-time" | "cycle-time" | "throughput";
         period: "daily" | "weekly" | "monthly";
         data: {
             date: string;
@@ -354,7 +354,7 @@ export declare const useOptimizationStore: import("pinia").StoreDefinition<"opti
         insights: string[];
     }[], ProductionTrend[] | {
         id: string;
-        metric: "efficiency" | "quality" | "setup-time" | "cycle-time" | "throughput";
+        metric: "quality" | "efficiency" | "setup-time" | "cycle-time" | "throughput";
         period: "daily" | "weekly" | "monthly";
         data: {
             date: string;
@@ -602,7 +602,7 @@ export declare const useOptimizationStore: import("pinia").StoreDefinition<"opti
     }[]>;
     productionTrends: import("vue").Ref<{
         id: string;
-        metric: "efficiency" | "quality" | "setup-time" | "cycle-time" | "throughput";
+        metric: "quality" | "efficiency" | "setup-time" | "cycle-time" | "throughput";
         period: "daily" | "weekly" | "monthly";
         data: {
             date: string;
@@ -615,7 +615,7 @@ export declare const useOptimizationStore: import("pinia").StoreDefinition<"opti
         insights: string[];
     }[], ProductionTrend[] | {
         id: string;
-        metric: "efficiency" | "quality" | "setup-time" | "cycle-time" | "throughput";
+        metric: "quality" | "efficiency" | "setup-time" | "cycle-time" | "throughput";
         period: "daily" | "weekly" | "monthly";
         data: {
             date: string;

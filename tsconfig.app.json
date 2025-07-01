@@ -4,14 +4,19 @@
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
     "incremental": true,
     "composite": true,
-    "noEmit": false,
+    "noEmit": true,
 
     /* Linting */
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    "allowImportingTsExtensions": false
+    "allowImportingTsExtensions": false,
+    "lib": ["ES2022", "DOM"],
+    "types": ["vite/client"],
+    "paths": {
+      "workbox-core": ["src/types/empty-module"]
+    }
   },
   "include": [
     "src/**/*.ts",
@@ -20,10 +25,7 @@
     "vite.config.ts"
   ],
   "exclude": [
-    "node_modules",
-    "dist",
-    "**/*.vue.js",
-    "**/*.vue.ts",
-    "../supabase/functions"
+    "../supabase/functions",
+    "node_modules/workbox-core"
   ]
 }

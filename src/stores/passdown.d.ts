@@ -96,7 +96,7 @@ export declare const usePassdownStore: import("pinia").StoreDefinition<"passdown
     }[]>;
     fetchNotes: () => Promise<void>;
     addNote: (note: Omit<PassdownNote, 'id' | 'createdAt' | 'updatedAt'>) => Promise<PassdownNote | null>;
-}, "loading" | "error" | "notes">, Pick<{
+}, "error" | "notes" | "loading">, Pick<{
     notes: import("vue").Ref<{
         id: string;
         workOrder: string;

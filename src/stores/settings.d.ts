@@ -108,7 +108,7 @@ export declare const useSettingsStore: import("pinia").StoreDefinition<"settings
     updatePassword: (currentPassword: string, newPassword: string) => Promise<boolean>;
     regenerateApiKey: () => Promise<string | null>;
     deleteAccount: () => Promise<boolean>;
-}, "loading" | "error" | "userSettings">, Pick<{
+}, "error" | "loading" | "userSettings">, Pick<{
     userSettings: import("vue").Ref<{
         profile: {
             name: string;

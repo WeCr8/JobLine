@@ -103,7 +103,7 @@ export declare const useOrganizationStore: import("pinia").StoreDefinition<"orga
     cancelInvite: (inviteId: string) => Promise<boolean>;
     updateUser: (userId: string, updates: Partial<User>) => Promise<boolean>;
     addDepartment: (department: any) => Promise<any>;
-}, "loading" | "error" | "users" | "departments" | "invites" | "organization">, Pick<{
+}, "error" | "users" | "departments" | "invites" | "loading" | "organization">, Pick<{
     organization: import("vue").Ref<{
         id: string;
         name: string;

@@ -255,7 +255,7 @@ export declare const useAdminStore: import("pinia").StoreDefinition<"admin", Pic
     cancelSubscription: (subscriptionId: string) => Promise<void>;
     saveSystemSettings: (settings: SystemSettings) => Promise<void>;
     triggerManualBackup: () => Promise<void>;
-}, "loading" | "error" | "users" | "organizations" | "subscriptionPlans" | "activeSubscriptions" | "systemLogs" | "analytics" | "systemSettings">, Pick<{
+}, "error" | "users" | "loading" | "organizations" | "subscriptionPlans" | "activeSubscriptions" | "systemLogs" | "analytics" | "systemSettings">, Pick<{
     subscriptionPlans: import("vue").Ref<{
         id: string;
         name: string;

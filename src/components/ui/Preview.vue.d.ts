@@ -30,8 +30,8 @@ declare const _default: __VLS_WithSlots<import("vue").DefineComponent<Props, {},
     "onUpdate:device"?: ((deviceId: string) => any) | undefined;
     onRetry?: (() => any) | undefined;
 }>, {
-    loading: boolean;
     error: boolean;
+    loading: boolean;
     title: string;
     states: State[];
     initialState: string;

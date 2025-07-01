@@ -23,8 +23,8 @@ declare const _default: __VLS_WithSlots<import("vue").DefineComponent<Props, {},
 }, string, import("vue").PublicProps, Readonly<Props> & Readonly<{
     onRetry?: (() => any) | undefined;
 }>, {
-    loading: boolean;
     error: boolean;
+    loading: boolean;
     code: string;
     props: Prop[];
     states: {

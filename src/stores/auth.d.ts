@@ -60,7 +60,7 @@ export declare const useAuthStore: import("pinia").StoreDefinition<"auth", Pick<
     logout: () => Promise<{
         error: any;
     }>;
-}, "user" | "loading" | "error">, Pick<{
+}, "error" | "user" | "loading">, Pick<{
     user: import("vue").Ref<{
         id: string;
         email: string;

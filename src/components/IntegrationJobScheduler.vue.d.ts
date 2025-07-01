@@ -17,12 +17,12 @@ declare const _default: import("vue").DefineComponent<Props, {}, {}, {}, {}, imp
     "onAuto-schedule"?: (() => any) | undefined;
     "onOptimization-complete"?: ((results: any[]) => any) | undefined;
 }>, {
-    loading: boolean;
-    description: string;
-    title: string;
     jobs: Job[];
     machines: any[];
     departments: any[];
+    loading: boolean;
+    title: string;
+    description: string;
     operators: any[];
 }, {}, {}, {}, string, import("vue").ComponentProvideOptions, false, {}, any>;
 export default _default;

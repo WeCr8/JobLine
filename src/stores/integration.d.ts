@@ -4,7 +4,7 @@ export declare const useIntegrationStore: import("pinia").StoreDefinition<"integ
         id: string;
         name: string;
         type: ConnectionType;
-        status: "error" | "active" | "inactive" | "testing";
+        status: "active" | "inactive" | "error" | "testing";
         config: {
             spreadsheetId?: string | undefined;
             sheetName?: string | undefined;
@@ -45,7 +45,7 @@ export declare const useIntegrationStore: import("pinia").StoreDefinition<"integ
         mapping: {
             sourceField: string;
             targetField: string;
-            transform?: "number" | "trim" | "uppercase" | "lowercase" | "date" | undefined;
+            transform?: "number" | "uppercase" | "lowercase" | "trim" | "date" | undefined;
             required: boolean;
             complianceFlag?: boolean | undefined;
         }[];
@@ -55,7 +55,7 @@ export declare const useIntegrationStore: import("pinia").StoreDefinition<"integ
         id: string;
         name: string;
         type: ConnectionType;
-        status: "error" | "active" | "inactive" | "testing";
+        status: "active" | "inactive" | "error" | "testing";
         config: {
             spreadsheetId?: string | undefined;
             sheetName?: string | undefined;
@@ -96,7 +96,7 @@ export declare const useIntegrationStore: import("pinia").StoreDefinition<"integ
         mapping: {
             sourceField: string;
             targetField: string;
-            transform?: "number" | "trim" | "uppercase" | "lowercase" | "date" | undefined;
+            transform?: "number" | "uppercase" | "lowercase" | "trim" | "date" | undefined;
             required: boolean;
             complianceFlag?: boolean | undefined;
         }[];
@@ -107,11 +107,11 @@ export declare const useIntegrationStore: import("pinia").StoreDefinition<"integ
         id: string;
         connectionId: string;
         type: ImportType;
-        status: "completed" | "pending" | "running" | "failed";
+        status: "pending" | "running" | "completed" | "failed";
         mapping: {
             sourceField: string;
             targetField: string;
-            transform?: "number" | "trim" | "uppercase" | "lowercase" | "date" | undefined;
+            transform?: "number" | "uppercase" | "lowercase" | "trim" | "date" | undefined;
             required: boolean;
             complianceFlag?: boolean | undefined;
         }[];
@@ -131,11 +131,11 @@ export declare const useIntegrationStore: import("pinia").StoreDefinition<"integ
         id: string;
         connectionId: string;
         type: ImportType;
-        status: "completed" | "pending" | "running" | "failed";
+        status: "pending" | "running" | "completed" | "failed";
         mapping: {
             sourceField: string;
             targetField: string;
-            transform?: "number" | "trim" | "uppercase" | "lowercase" | "date" | undefined;
+            transform?: "number" | "uppercase" | "lowercase" | "trim" | "date" | undefined;
             required: boolean;
             complianceFlag?: boolean | undefined;
         }[];
@@ -194,7 +194,7 @@ export declare const useIntegrationStore: import("pinia").StoreDefinition<"integ
         id: string;
         name: string;
         type: ConnectionType;
-        status: "error" | "active" | "inactive" | "testing";
+        status: "active" | "inactive" | "error" | "testing";
         config: {
             spreadsheetId?: string | undefined;
             sheetName?: string | undefined;
@@ -235,7 +235,7 @@ export declare const useIntegrationStore: import("pinia").StoreDefinition<"integ
         mapping: {
             sourceField: string;
             targetField: string;
-            transform?: "number" | "trim" | "uppercase" | "lowercase" | "date" | undefined;
+            transform?: "number" | "uppercase" | "lowercase" | "trim" | "date" | undefined;
             required: boolean;
             complianceFlag?: boolean | undefined;
         }[];
@@ -247,11 +247,11 @@ export declare const useIntegrationStore: import("pinia").StoreDefinition<"integ
         id: string;
         connectionId: string;
         type: ImportType;
-        status: "completed" | "pending" | "running" | "failed";
+        status: "pending" | "running" | "completed" | "failed";
         mapping: {
             sourceField: string;
             targetField: string;
-            transform?: "number" | "trim" | "uppercase" | "lowercase" | "date" | undefined;
+            transform?: "number" | "uppercase" | "lowercase" | "trim" | "date" | undefined;
             required: boolean;
             complianceFlag?: boolean | undefined;
         }[];
@@ -289,12 +289,12 @@ export declare const useIntegrationStore: import("pinia").StoreDefinition<"integ
     checkCompliance: (jobId: string, userId: string, action: string) => Promise<ComplianceCheck>;
     scheduleAutomaticSync: (connectionId: string) => Promise<boolean>;
     optimizeJobSchedule: (departmentId?: string) => Promise<boolean>;
-}, "loading" | "error" | "connections" | "importJobs" | "exportFlags" | "complianceChecks">, Pick<{
+}, "error" | "loading" | "connections" | "importJobs" | "exportFlags" | "complianceChecks">, Pick<{
     connections: import("vue").Ref<{
         id: string;
         name: string;
         type: ConnectionType;
-        status: "error" | "active" | "inactive" | "testing";
+        status: "active" | "inactive" | "error" | "testing";
         config: {
             spreadsheetId?: string | undefined;
             sheetName?: string | undefined;
@@ -335,7 +335,7 @@ export declare const useIntegrationStore: import("pinia").StoreDefinition<"integ
         mapping: {
             sourceField: string;
             targetField: string;
-            transform?: "number" | "trim" | "uppercase" | "lowercase" | "date" | undefined;
+            transform?: "number" | "uppercase" | "lowercase" | "trim" | "date" | undefined;
             required: boolean;
             complianceFlag?: boolean | undefined;
         }[];
@@ -345,7 +345,7 @@ export declare const useIntegrationStore: import("pinia").StoreDefinition<"integ
         id: string;
         name: string;
         type: ConnectionType;
-        status: "error" | "active" | "inactive" | "testing";
+        status: "active" | "inactive" | "error" | "testing";
         config: {
             spreadsheetId?: string | undefined;
             sheetName?: string | undefined;
@@ -386,7 +386,7 @@ export declare const useIntegrationStore: import("pinia").StoreDefinition<"integ
         mapping: {
             sourceField: string;
             targetField: string;
-            transform?: "number" | "trim" | "uppercase" | "lowercase" | "date" | undefined;
+            transform?: "number" | "uppercase" | "lowercase" | "trim" | "date" | undefined;
             required: boolean;
             complianceFlag?: boolean | undefined;
         }[];
@@ -397,11 +397,11 @@ export declare const useIntegrationStore: import("pinia").StoreDefinition<"integ
         id: string;
         connectionId: string;
         type: ImportType;
-        status: "completed" | "pending" | "running" | "failed";
+        status: "pending" | "running" | "completed" | "failed";
         mapping: {
             sourceField: string;
             targetField: string;
-            transform?: "number" | "trim" | "uppercase" | "lowercase" | "date" | undefined;
+            transform?: "number" | "uppercase" | "lowercase" | "trim" | "date" | undefined;
             required: boolean;
             complianceFlag?: boolean | undefined;
         }[];
@@ -421,11 +421,11 @@ export declare const useIntegrationStore: import("pinia").StoreDefinition<"integ
         id: string;
         connectionId: string;
         type: ImportType;
-        status: "completed" | "pending" | "running" | "failed";
+        status: "pending" | "running" | "completed" | "failed";
         mapping: {
             sourceField: string;
             targetField: string;
-            transform?: "number" | "trim" | "uppercase" | "lowercase" | "date" | undefined;
+            transform?: "number" | "uppercase" | "lowercase" | "trim" | "date" | undefined;
             required: boolean;
             complianceFlag?: boolean | undefined;
         }[];
@@ -484,7 +484,7 @@ export declare const useIntegrationStore: import("pinia").StoreDefinition<"integ
         id: string;
         name: string;
         type: ConnectionType;
-        status: "error" | "active" | "inactive" | "testing";
+        status: "active" | "inactive" | "error" | "testing";
         config: {
             spreadsheetId?: string | undefined;
             sheetName?: string | undefined;
@@ -525,7 +525,7 @@ export declare const useIntegrationStore: import("pinia").StoreDefinition<"integ
         mapping: {
             sourceField: string;
             targetField: string;
-            transform?: "number" | "trim" | "uppercase" | "lowercase" | "date" | undefined;
+            transform?: "number" | "uppercase" | "lowercase" | "trim" | "date" | undefined;
             required: boolean;
             complianceFlag?: boolean | undefined;
         }[];
@@ -537,11 +537,11 @@ export declare const useIntegrationStore: import("pinia").StoreDefinition<"integ
         id: string;
         connectionId: string;
         type: ImportType;
-        status: "completed" | "pending" | "running" | "failed";
+        status: "pending" | "running" | "completed" | "failed";
         mapping: {
             sourceField: string;
             targetField: string;
-            transform?: "number" | "trim" | "uppercase" | "lowercase" | "date" | undefined;
+            transform?: "number" | "uppercase" | "lowercase" | "trim" | "date" | undefined;
             required: boolean;
             complianceFlag?: boolean | undefined;
         }[];
@@ -584,7 +584,7 @@ export declare const useIntegrationStore: import("pinia").StoreDefinition<"integ
         id: string;
         name: string;
         type: ConnectionType;
-        status: "error" | "active" | "inactive" | "testing";
+        status: "active" | "inactive" | "error" | "testing";
         config: {
             spreadsheetId?: string | undefined;
             sheetName?: string | undefined;
@@ -625,7 +625,7 @@ export declare const useIntegrationStore: import("pinia").StoreDefinition<"integ
         mapping: {
             sourceField: string;
             targetField: string;
-            transform?: "number" | "trim" | "uppercase" | "lowercase" | "date" | undefined;
+            transform?: "number" | "uppercase" | "lowercase" | "trim" | "date" | undefined;
             required: boolean;
             complianceFlag?: boolean | undefined;
         }[];
@@ -635,7 +635,7 @@ export declare const useIntegrationStore: import("pinia").StoreDefinition<"integ
         id: string;
         name: string;
         type: ConnectionType;
-        status: "error" | "active" | "inactive" | "testing";
+        status: "active" | "inactive" | "error" | "testing";
         config: {
             spreadsheetId?: string | undefined;
             sheetName?: string | undefined;
@@ -676,7 +676,7 @@ export declare const useIntegrationStore: import("pinia").StoreDefinition<"integ
         mapping: {
             sourceField: string;
             targetField: string;
-            transform?: "number" | "trim" | "uppercase" | "lowercase" | "date" | undefined;
+            transform?: "number" | "uppercase" | "lowercase" | "trim" | "date" | undefined;
             required: boolean;
             complianceFlag?: boolean | undefined;
         }[];
@@ -687,11 +687,11 @@ export declare const useIntegrationStore: import("pinia").StoreDefinition<"integ
         id: string;
         connectionId: string;
         type: ImportType;
-        status: "completed" | "pending" | "running" | "failed";
+        status: "pending" | "running" | "completed" | "failed";
         mapping: {
             sourceField: string;
             targetField: string;
-            transform?: "number" | "trim" | "uppercase" | "lowercase" | "date" | undefined;
+            transform?: "number" | "uppercase" | "lowercase" | "trim" | "date" | undefined;
             required: boolean;
             complianceFlag?: boolean | undefined;
         }[];
@@ -711,11 +711,11 @@ export declare const useIntegrationStore: import("pinia").StoreDefinition<"integ
         id: string;
         connectionId: string;
         type: ImportType;
-        status: "completed" | "pending" | "running" | "failed";
+        status: "pending" | "running" | "completed" | "failed";
         mapping: {
             sourceField: string;
             targetField: string;
-            transform?: "number" | "trim" | "uppercase" | "lowercase" | "date" | undefined;
+            transform?: "number" | "uppercase" | "lowercase" | "trim" | "date" | undefined;
             required: boolean;
             complianceFlag?: boolean | undefined;
         }[];
@@ -774,7 +774,7 @@ export declare const useIntegrationStore: import("pinia").StoreDefinition<"integ
         id: string;
         name: string;
         type: ConnectionType;
-        status: "error" | "active" | "inactive" | "testing";
+        status: "active" | "inactive" | "error" | "testing";
         config: {
             spreadsheetId?: string | undefined;
             sheetName?: string | undefined;
@@ -815,7 +815,7 @@ export declare const useIntegrationStore: import("pinia").StoreDefinition<"integ
         mapping: {
             sourceField: string;
             targetField: string;
-            transform?: "number" | "trim" | "uppercase" | "lowercase" | "date" | undefined;
+            transform?: "number" | "uppercase" | "lowercase" | "trim" | "date" | undefined;
             required: boolean;
             complianceFlag?: boolean | undefined;
         }[];
@@ -827,11 +827,11 @@ export declare const useIntegrationStore: import("pinia").StoreDefinition<"integ
         id: string;
         connectionId: string;
         type: ImportType;
-        status: "completed" | "pending" | "running" | "failed";
+        status: "pending" | "running" | "completed" | "failed";
         mapping: {
             sourceField: string;
             targetField: string;
-            transform?: "number" | "trim" | "uppercase" | "lowercase" | "date" | undefined;
+            transform?: "number" | "uppercase" | "lowercase" | "trim" | "date" | undefined;
             required: boolean;
             complianceFlag?: boolean | undefined;
         }[];

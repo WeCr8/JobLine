@@ -57,7 +57,7 @@ export declare const useChatStore: import("pinia").StoreDefinition<"chat", Pick<
     isProcessingImage: import("vue").Ref<boolean, boolean>;
     integrations: import("vue").Ref<{
         id: string;
-        type: "email" | "teams" | "webhook" | "slack" | "discord";
+        type: "webhook" | "email" | "slack" | "teams" | "discord";
         name: string;
         enabled: boolean;
         config: {
@@ -82,7 +82,7 @@ export declare const useChatStore: import("pinia").StoreDefinition<"chat", Pick<
         updatedAt: string;
     }[], IntegrationConfig[] | {
         id: string;
-        type: "email" | "teams" | "webhook" | "slack" | "discord";
+        type: "webhook" | "email" | "slack" | "teams" | "discord";
         name: string;
         enabled: boolean;
         config: {
@@ -175,7 +175,7 @@ export declare const useChatStore: import("pinia").StoreDefinition<"chat", Pick<
     isProcessingImage: import("vue").Ref<boolean, boolean>;
     integrations: import("vue").Ref<{
         id: string;
-        type: "email" | "teams" | "webhook" | "slack" | "discord";
+        type: "webhook" | "email" | "slack" | "teams" | "discord";
         name: string;
         enabled: boolean;
         config: {
@@ -200,7 +200,7 @@ export declare const useChatStore: import("pinia").StoreDefinition<"chat", Pick<
         updatedAt: string;
     }[], IntegrationConfig[] | {
         id: string;
-        type: "email" | "teams" | "webhook" | "slack" | "discord";
+        type: "webhook" | "email" | "slack" | "teams" | "discord";
         name: string;
         enabled: boolean;
         config: {
@@ -293,7 +293,7 @@ export declare const useChatStore: import("pinia").StoreDefinition<"chat", Pick<
     isProcessingImage: import("vue").Ref<boolean, boolean>;
     integrations: import("vue").Ref<{
         id: string;
-        type: "email" | "teams" | "webhook" | "slack" | "discord";
+        type: "webhook" | "email" | "slack" | "teams" | "discord";
         name: string;
         enabled: boolean;
         config: {
@@ -318,7 +318,7 @@ export declare const useChatStore: import("pinia").StoreDefinition<"chat", Pick<
         updatedAt: string;
     }[], IntegrationConfig[] | {
         id: string;
-        type: "email" | "teams" | "webhook" | "slack" | "discord";
+        type: "webhook" | "email" | "slack" | "teams" | "discord";
         name: string;
         enabled: boolean;
         config: {

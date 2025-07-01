@@ -20,8 +20,8 @@ declare const _default: import("vue").DefineComponent<Props, {}, {}, {}, {}, imp
     "onUpload-error"?: ((error: string) => any) | undefined;
     "onUpload-cancel"?: (() => any) | undefined;
 }>, {
-    description: string;
     disabled: boolean;
+    description: string;
     acceptedFormats: string[];
     maxFileSize: number;
     defaultConnectionId: string;

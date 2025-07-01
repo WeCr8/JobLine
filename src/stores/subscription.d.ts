@@ -75,7 +75,7 @@ export declare const useSubscriptionStore: import("pinia").StoreDefinition<"subs
     fetchOrders: () => Promise<void>;
     createCheckoutSession: (product: Product) => Promise<void>;
     cancelSubscription: () => Promise<void>;
-}, "loading" | "error" | "subscription" | "orders">, Pick<{
+}, "error" | "loading" | "subscription" | "orders">, Pick<{
     subscription: import("vue").Ref<{
         customer_id: string;
         subscription_id: string | null;

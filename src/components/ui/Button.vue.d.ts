@@ -18,8 +18,8 @@ declare const _default: __VLS_WithSlots<import("vue").DefineComponent<Props, {},
 }, string, import("vue").PublicProps, Readonly<Props> & Readonly<{
     onClick?: ((event: MouseEvent) => any) | undefined;
 }>, {
-    loading: boolean;
     type: "reset" | "submit" | "button";
+    loading: boolean;
     disabled: boolean;
     size: "xs" | "sm" | "md" | "lg" | "xl";
     variant: "warning" | "success" | "primary" | "secondary" | "ghost" | "danger" | "info";

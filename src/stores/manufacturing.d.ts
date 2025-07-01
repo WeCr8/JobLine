@@ -18,7 +18,7 @@ export declare const useManufacturingStore: import("pinia").StoreDefinition<"man
             value: number;
             target: number;
             unit: string;
-            trend: "up" | "down" | "stable";
+            trend: "down" | "up" | "stable";
         }[];
         integrations: string[];
     }[], ManufacturingDepartment[] | {
@@ -39,7 +39,7 @@ export declare const useManufacturingStore: import("pinia").StoreDefinition<"man
             value: number;
             target: number;
             unit: string;
-            trend: "up" | "down" | "stable";
+            trend: "down" | "up" | "stable";
         }[];
         integrations: string[];
     }[]>;
@@ -48,7 +48,7 @@ export declare const useManufacturingStore: import("pinia").StoreDefinition<"man
         name: string;
         type: string;
         department: string;
-        status: "down" | "running" | "maintenance" | "idle";
+        status: "running" | "maintenance" | "idle" | "down";
         capabilities: string[];
         specifications: Record<string, string>;
         currentJob?: string | undefined;
@@ -68,7 +68,7 @@ export declare const useManufacturingStore: import("pinia").StoreDefinition<"man
         name: string;
         type: string;
         department: string;
-        status: "down" | "running" | "maintenance" | "idle";
+        status: "running" | "maintenance" | "idle" | "down";
         capabilities: string[];
         specifications: Record<string, string>;
         currentJob?: string | undefined;
@@ -334,7 +334,7 @@ export declare const useManufacturingStore: import("pinia").StoreDefinition<"man
         id: string;
         poNumber: string;
         supplier: string;
-        status: "cancelled" | "draft" | "sent" | "acknowledged" | "partial" | "complete";
+        status: "draft" | "sent" | "acknowledged" | "partial" | "complete" | "cancelled";
         orderDate: string;
         requestedDate: string;
         promisedDate?: string | undefined;
@@ -349,7 +349,7 @@ export declare const useManufacturingStore: import("pinia").StoreDefinition<"man
             requestedDate: string;
             promisedDate?: string | undefined;
             receivedQuantity: number;
-            status: "cancelled" | "pending" | "partial" | "complete";
+            status: "pending" | "partial" | "complete" | "cancelled";
         }[];
         totalValue: number;
         buyer: string;
@@ -359,7 +359,7 @@ export declare const useManufacturingStore: import("pinia").StoreDefinition<"man
         id: string;
         poNumber: string;
         supplier: string;
-        status: "cancelled" | "draft" | "sent" | "acknowledged" | "partial" | "complete";
+        status: "draft" | "sent" | "acknowledged" | "partial" | "complete" | "cancelled";
         orderDate: string;
         requestedDate: string;
         promisedDate?: string | undefined;
@@ -374,7 +374,7 @@ export declare const useManufacturingStore: import("pinia").StoreDefinition<"man
             requestedDate: string;
             promisedDate?: string | undefined;
             receivedQuantity: number;
-            status: "cancelled" | "pending" | "partial" | "complete";
+            status: "pending" | "partial" | "complete" | "cancelled";
         }[];
         totalValue: number;
         buyer: string;
@@ -549,7 +549,7 @@ export declare const useManufacturingStore: import("pinia").StoreDefinition<"man
                 value: number;
                 target: number;
                 unit: string;
-                trend: "up" | "down" | "stable";
+                trend: "down" | "up" | "stable";
             }[];
             integrations: string[];
         }[];
@@ -571,7 +571,7 @@ export declare const useManufacturingStore: import("pinia").StoreDefinition<"man
                 value: number;
                 target: number;
                 unit: string;
-                trend: "up" | "down" | "stable";
+                trend: "down" | "up" | "stable";
             }[];
             integrations: string[];
         }[];
@@ -582,7 +582,7 @@ export declare const useManufacturingStore: import("pinia").StoreDefinition<"man
         name: string;
         type: string;
         department: string;
-        status: "down" | "running" | "maintenance" | "idle";
+        status: "running" | "maintenance" | "idle" | "down";
         capabilities: string[];
         specifications: Record<string, string>;
         currentJob?: string | undefined;
@@ -603,7 +603,7 @@ export declare const useManufacturingStore: import("pinia").StoreDefinition<"man
         name: string;
         type: string;
         department: string;
-        status: "down" | "running" | "maintenance" | "idle";
+        status: "running" | "maintenance" | "idle" | "down";
         capabilities: string[];
         specifications: Record<string, string>;
         currentJob?: string | undefined;
@@ -626,7 +626,7 @@ export declare const useManufacturingStore: import("pinia").StoreDefinition<"man
     fetchWorkCenters: () => Promise<void>;
     fetchProcesses: () => Promise<void>;
     fetchCapabilities: () => Promise<void>;
-}, "loading" | "machines" | "departments" | "capabilities" | "processes" | "workCenters" | "digitalTwinCompliance" | "toolDataIntegrity" | "materialInventory" | "purchaseOrders" | "shippingReceiving" | "programmingTasks">, Pick<{
+}, "machines" | "departments" | "loading" | "capabilities" | "processes" | "workCenters" | "digitalTwinCompliance" | "toolDataIntegrity" | "materialInventory" | "purchaseOrders" | "shippingReceiving" | "programmingTasks">, Pick<{
     departments: import("vue").Ref<{
         id: string;
         name: string;
@@ -645,7 +645,7 @@ export declare const useManufacturingStore: import("pinia").StoreDefinition<"man
             value: number;
             target: number;
             unit: string;
-            trend: "up" | "down" | "stable";
+            trend: "down" | "up" | "stable";
         }[];
         integrations: string[];
     }[], ManufacturingDepartment[] | {
@@ -666,7 +666,7 @@ export declare const useManufacturingStore: import("pinia").StoreDefinition<"man
             value: number;
             target: number;
             unit: string;
-            trend: "up" | "down" | "stable";
+            trend: "down" | "up" | "stable";
         }[];
         integrations: string[];
     }[]>;
@@ -675,7 +675,7 @@ export declare const useManufacturingStore: import("pinia").StoreDefinition<"man
         name: string;
         type: string;
         department: string;
-        status: "down" | "running" | "maintenance" | "idle";
+        status: "running" | "maintenance" | "idle" | "down";
         capabilities: string[];
         specifications: Record<string, string>;
         currentJob?: string | undefined;
@@ -695,7 +695,7 @@ export declare const useManufacturingStore: import("pinia").StoreDefinition<"man
         name: string;
         type: string;
         department: string;
-        status: "down" | "running" | "maintenance" | "idle";
+        status: "running" | "maintenance" | "idle" | "down";
         capabilities: string[];
         specifications: Record<string, string>;
         currentJob?: string | undefined;
@@ -961,7 +961,7 @@ export declare const useManufacturingStore: import("pinia").StoreDefinition<"man
         id: string;
         poNumber: string;
         supplier: string;
-        status: "cancelled" | "draft" | "sent" | "acknowledged" | "partial" | "complete";
+        status: "draft" | "sent" | "acknowledged" | "partial" | "complete" | "cancelled";
         orderDate: string;
         requestedDate: string;
         promisedDate?: string | undefined;
@@ -976,7 +976,7 @@ export declare const useManufacturingStore: import("pinia").StoreDefinition<"man
             requestedDate: string;
             promisedDate?: string | undefined;
             receivedQuantity: number;
-            status: "cancelled" | "pending" | "partial" | "complete";
+            status: "pending" | "partial" | "complete" | "cancelled";
         }[];
         totalValue: number;
         buyer: string;
@@ -986,7 +986,7 @@ export declare const useManufacturingStore: import("pinia").StoreDefinition<"man
         id: string;
         poNumber: string;
         supplier: string;
-        status: "cancelled" | "draft" | "sent" | "acknowledged" | "partial" | "complete";
+        status: "draft" | "sent" | "acknowledged" | "partial" | "complete" | "cancelled";
         orderDate: string;
         requestedDate: string;
         promisedDate?: string | undefined;
@@ -1001,7 +1001,7 @@ export declare const useManufacturingStore: import("pinia").StoreDefinition<"man
             requestedDate: string;
             promisedDate?: string | undefined;
             receivedQuantity: number;
-            status: "cancelled" | "pending" | "partial" | "complete";
+            status: "pending" | "partial" | "complete" | "cancelled";
         }[];
         totalValue: number;
         buyer: string;
@@ -1176,7 +1176,7 @@ export declare const useManufacturingStore: import("pinia").StoreDefinition<"man
                 value: number;
                 target: number;
                 unit: string;
-                trend: "up" | "down" | "stable";
+                trend: "down" | "up" | "stable";
             }[];
             integrations: string[];
         }[];
@@ -1198,7 +1198,7 @@ export declare const useManufacturingStore: import("pinia").StoreDefinition<"man
                 value: number;
                 target: number;
                 unit: string;
-                trend: "up" | "down" | "stable";
+                trend: "down" | "up" | "stable";
             }[];
             integrations: string[];
         }[];
@@ -1209,7 +1209,7 @@ export declare const useManufacturingStore: import("pinia").StoreDefinition<"man
         name: string;
         type: string;
         department: string;
-        status: "down" | "running" | "maintenance" | "idle";
+        status: "running" | "maintenance" | "idle" | "down";
         capabilities: string[];
         specifications: Record<string, string>;
         currentJob?: string | undefined;
@@ -1230,7 +1230,7 @@ export declare const useManufacturingStore: import("pinia").StoreDefinition<"man
         name: string;
         type: string;
         department: string;
-        status: "down" | "running" | "maintenance" | "idle";
+        status: "running" | "maintenance" | "idle" | "down";
         capabilities: string[];
         specifications: Record<string, string>;
         currentJob?: string | undefined;
@@ -1272,7 +1272,7 @@ export declare const useManufacturingStore: import("pinia").StoreDefinition<"man
             value: number;
             target: number;
             unit: string;
-            trend: "up" | "down" | "stable";
+            trend: "down" | "up" | "stable";
         }[];
         integrations: string[];
     }[], ManufacturingDepartment[] | {
@@ -1293,7 +1293,7 @@ export declare const useManufacturingStore: import("pinia").StoreDefinition<"man
             value: number;
             target: number;
             unit: string;
-            trend: "up" | "down" | "stable";
+            trend: "down" | "up" | "stable";
         }[];
         integrations: string[];
     }[]>;
@@ -1302,7 +1302,7 @@ export declare const useManufacturingStore: import("pinia").StoreDefinition<"man
         name: string;
         type: string;
         department: string;
-        status: "down" | "running" | "maintenance" | "idle";
+        status: "running" | "maintenance" | "idle" | "down";
         capabilities: string[];
         specifications: Record<string, string>;
         currentJob?: string | undefined;
@@ -1322,7 +1322,7 @@ export declare const useManufacturingStore: import("pinia").StoreDefinition<"man
         name: string;
         type: string;
         department: string;
-        status: "down" | "running" | "maintenance" | "idle";
+        status: "running" | "maintenance" | "idle" | "down";
         capabilities: string[];
         specifications: Record<string, string>;
         currentJob?: string | undefined;
@@ -1588,7 +1588,7 @@ export declare const useManufacturingStore: import("pinia").StoreDefinition<"man
         id: string;
         poNumber: string;
         supplier: string;
-        status: "cancelled" | "draft" | "sent" | "acknowledged" | "partial" | "complete";
+        status: "draft" | "sent" | "acknowledged" | "partial" | "complete" | "cancelled";
         orderDate: string;
         requestedDate: string;
         promisedDate?: string | undefined;
@@ -1603,7 +1603,7 @@ export declare const useManufacturingStore: import("pinia").StoreDefinition<"man
             requestedDate: string;
             promisedDate?: string | undefined;
             receivedQuantity: number;
-            status: "cancelled" | "pending" | "partial" | "complete";
+            status: "pending" | "partial" | "complete" | "cancelled";
         }[];
         totalValue: number;
         buyer: string;
@@ -1613,7 +1613,7 @@ export declare const useManufacturingStore: import("pinia").StoreDefinition<"man
         id: string;
         poNumber: string;
         supplier: string;
-        status: "cancelled" | "draft" | "sent" | "acknowledged" | "partial" | "complete";
+        status: "draft" | "sent" | "acknowledged" | "partial" | "complete" | "cancelled";
         orderDate: string;
         requestedDate: string;
         promisedDate?: string | undefined;
@@ -1628,7 +1628,7 @@ export declare const useManufacturingStore: import("pinia").StoreDefinition<"man
             requestedDate: string;
             promisedDate?: string | undefined;
             receivedQuantity: number;
-            status: "cancelled" | "pending" | "partial" | "complete";
+            status: "pending" | "partial" | "complete" | "cancelled";
         }[];
         totalValue: number;
         buyer: string;
@@ -1803,7 +1803,7 @@ export declare const useManufacturingStore: import("pinia").StoreDefinition<"man
                 value: number;
                 target: number;
                 unit: string;
-                trend: "up" | "down" | "stable";
+                trend: "down" | "up" | "stable";
             }[];
             integrations: string[];
         }[];
@@ -1825,7 +1825,7 @@ export declare const useManufacturingStore: import("pinia").StoreDefinition<"man
                 value: number;
                 target: number;
                 unit: string;
-                trend: "up" | "down" | "stable";
+                trend: "down" | "up" | "stable";
             }[];
             integrations: string[];
         }[];
@@ -1836,7 +1836,7 @@ export declare const useManufacturingStore: import("pinia").StoreDefinition<"man
         name: string;
         type: string;
         department: string;
-        status: "down" | "running" | "maintenance" | "idle";
+        status: "running" | "maintenance" | "idle" | "down";
         capabilities: string[];
         specifications: Record<string, string>;
         currentJob?: string | undefined;
@@ -1857,7 +1857,7 @@ export declare const useManufacturingStore: import("pinia").StoreDefinition<"man
         name: string;
         type: string;
         department: string;
-        status: "down" | "running" | "maintenance" | "idle";
+        status: "running" | "maintenance" | "idle" | "down";
         capabilities: string[];
         specifications: Record<string, string>;
         currentJob?: string | undefined;
