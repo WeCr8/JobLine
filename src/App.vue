@@ -10,12 +10,12 @@
 
 <script setup lang="ts">
 import { onMounted } from 'vue';
-import { useAuthStore } from './stores/auth';
+import { useAuthStore } from './stores/auth.ts';
 import AppLayout from './components/AppLayout.vue';
 import FloatingChatButton from './components/FloatingChatButton.vue';
 import OfflineIndicator from './components/OfflineIndicator.vue';
 import InstallPrompt from './components/InstallPrompt.vue';
-import { getPlatformClass } from './utils/platform';
+import { getPlatformClass } from './utils/platform.ts';
 
 const authStore = useAuthStore();
 

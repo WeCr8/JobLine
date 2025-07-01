@@ -128,7 +128,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { useAuthStore } from '../stores/auth';
+import { useAuthStore } from '../stores/auth.ts';
 import { ExclamationTriangleIcon } from '@heroicons/vue/24/outline';
 
 const router = useRouter();

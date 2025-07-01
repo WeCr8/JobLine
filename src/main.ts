@@ -1,10 +1,10 @@
 import { createApp } from 'vue';
 import { createPinia } from 'pinia';
-import router from './router';
+import router from './router/index.ts';
 import App from './App.vue';
 import './style.css';
-import { isIOS, isAndroid, getPlatformClass } from './utils/platform';
-import { addConnectivityListeners } from './utils/offline';
+import { isIOS, isAndroid, getPlatformClass } from './utils/platform.ts';
+import { addConnectivityListeners } from './utils/offline.ts';
 
 const app = createApp(App);
 const pinia = createPinia();

@@ -311,6 +311,40 @@
           </div>
         </div>
       </SettingsCard>
+
+      <SettingsCard title="Chat Provider Integration">
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Chat Provider</label>
+            <select v-model="chatProviderSettings.provider" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500">
+              <option value="dummy">Dummy (Echo Bot)</option>
+              <option value="openai">OpenAI (ChatGPT)</option>
+              <option value="custom">Custom API</option>
+            </select>
+            <p class="text-xs text-gray-500 mt-1">Choose your chat provider. Dummy is for testing only.</p>
+          </div>
+          <div v-if="chatProviderSettings.provider === 'openai'">
+            <label class="block text-sm font-medium text-gray-700 mb-2">OpenAI API Key</label>
+            <input v-model="chatProviderSettings.apiKey" type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500" placeholder="sk-..." />
+            <p class="text-xs text-gray-500 mt-1">Find your API key at <a href='https://platform.openai.com/account/api-keys' target='_blank' class='text-primary-600 underline'>OpenAI Dashboard</a>.</p>
+          </div>
+          <div v-if="chatProviderSettings.provider === 'custom'">
+            <label class="block text-sm font-medium text-gray-700 mb-2">API Endpoint</label>
+            <input v-model="chatProviderSettings.endpoint" type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500" placeholder="https://api.example.com/chat" />
+            <label class="block text-sm font-medium text-gray-700 mb-2 mt-4">API Key</label>
+            <input v-model="chatProviderSettings.apiKey" type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500" placeholder="Your API Key" />
+            <p class="text-xs text-gray-500 mt-1">Enter your custom chat API endpoint and key.</p>
+          </div>
+          <div class="flex items-center space-x-3">
+            <button @click="testChatProvider" :disabled="testingChatProvider" class="bg-primary-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-primary-700 disabled:opacity-50 transition-colors duration-200">
+              {{ testingChatProvider ? 'Testing...' : 'Test Connection' }}
+            </button>
+            <span v-if="chatProviderTestResult" :class="chatProviderTestResult === 'success' ? 'text-green-600' : 'text-red-600'">
+              {{ chatProviderTestResult === 'success' ? 'Success!' : 'Failed to connect' }}
+            </span>
+          </div>
+        </div>
+      </SettingsCard>
     </div>
 
     <!-- Privacy & Security Tab -->
@@ -554,6 +588,15 @@ const privacySettings = reactive({
   marketingEnabled: false
 });
 
+// Chat Provider Integration state
+const chatProviderSettings = reactive({
+  provider: 'dummy',
+  apiKey: '',
+  endpoint: ''
+});
+const testingChatProvider = ref(false);
+const chatProviderTestResult = ref('');
+
 // Computed properties
 const canUpdatePassword = computed(() => {
   return (
@@ -718,6 +761,28 @@ const deleteAccount = async () => {
     alert('Failed to delete account');
   } finally {
     showDeleteAccountModal.value = false;
+  }
+};
+
+const testChatProvider = async () => {
+  testingChatProvider.value = true;
+  chatProviderTestResult.value = '';
+  try {
+    // Simulate a test connection (replace with real API call as needed)
+    await new Promise(resolve => setTimeout(resolve, 800));
+    if (chatProviderSettings.provider === 'dummy') {
+      chatProviderTestResult.value = 'success';
+    } else if (chatProviderSettings.provider === 'openai' && chatProviderSettings.apiKey.startsWith('sk-')) {
+      chatProviderTestResult.value = 'success';
+    } else if (chatProviderSettings.provider === 'custom' && chatProviderSettings.endpoint && chatProviderSettings.apiKey) {
+      chatProviderTestResult.value = 'success';
+    } else {
+      chatProviderTestResult.value = 'error';
+    }
+  } catch (e) {
+    chatProviderTestResult.value = 'error';
+  } finally {
+    testingChatProvider.value = false;
   }
 };
 
