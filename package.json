@@ -54,4 +54,5 @@
   },
   "overrides": {
   "@types/hammerjs": "2.0.40"
+  }
 }
