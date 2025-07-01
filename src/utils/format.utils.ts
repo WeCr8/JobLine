@@ -47,19 +47,6 @@ export const formatNumber = (num: number): string => {
 };
 
 /**
- * Format a currency value
- * @param amount Amount in cents
- * @param currency Currency code (default: 'USD')
- */
-export const formatCurrency = (amount: number, currency: string = 'USD'): string => {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency,
-    minimumFractionDigits: 2
-  }).format(amount / 100);
-};
-
-/**
  * Format a percentage value
  * @param value Percentage value (0-100)
  * @param decimals Number of decimal places (default: 0)
@@ -67,3 +54,53 @@ export const formatCurrency = (amount: number, currency: string = 'USD'): string
 export const formatPercentage = (value: number, decimals: number = 0): string => {
   return `${value.toFixed(decimals)}%`;
 };
+
+// Slugify
+export function slugify(str: string): string {
+  return str
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/\p{Diacritic}/gu, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+}
+
+// camelCase
+export function camelCase(str: string): string {
+  return str
+    .replace(/[-_\s]+(.)?/g, (_, c) => (c ? c.toUpperCase() : ''))
+    .replace(/^(.)/, (m) => m.toLowerCase())
+}
+
+// kebab-case
+export function kebabCase(str: string): string {
+  return str
+    .replace(/([a-z])([A-Z])/g, '$1-$2')
+    .replace(/[_\s]+/g, '-')
+    .toLowerCase()
+}
+
+// Number formatting
+export function formatCurrency(value: number, currency = 'USD', locale = 'en-US'): string {
+  return new Intl.NumberFormat(locale, { style: 'currency', currency }).format(value)
+}
+export function formatPercent(value: number, locale = 'en-US', digits = 2): string {
+  return new Intl.NumberFormat(locale, { style: 'percent', minimumFractionDigits: digits, maximumFractionDigits: digits }).format(value)
+}
+export function formatCompactNumber(value: number, locale = 'en-US'): string {
+  return new Intl.NumberFormat(locale, { notation: 'compact' }).format(value)
+}
+
+// Masking utilities
+export function maskPhone(phone: string): string {
+  return phone.replace(/(\d{3})\d{3}(\d{4})/, '$1***$2')
+}
+export function maskEmail(email: string): string {
+  const [user, domain] = email.split('@')
+  if (!user || !domain) return email
+  return user[0] + '***' + user.slice(-1) + '@' + domain
+}
+export function maskId(id: string, visible = 4): string {
+  if (id.length <= visible) return id
+  return '*'.repeat(id.length - visible) + id.slice(-visible)
+}
