@@ -606,6 +606,53 @@
       </div>
     </div>
 
+    <!-- Flagged Issues Tab -->
+    <div v-if="activeTab === 'flags'" class="space-y-6">
+      <div class="flex items-center justify-between">
+        <h3 class="text-lg font-semibold text-gray-900">Flagged Data/Consistency Issues</h3>
+        <button @click="adminStore.fetchFlaggedIssues" class="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors duration-200">
+          <ArrowPathIcon class="w-4 h-4 inline mr-1" />
+          Refresh
+        </button>
+      </div>
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Severity</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Resource</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Detected</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Notes</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              <tr v-for="flag in adminStore.flaggedIssues" :key="flag.id">
+                <td class="px-6 py-4 whitespace-nowrap">{{ flag.type }}</td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <span :class="flag.severity === 'error' ? 'text-red-600 font-bold' : flag.severity === 'warning' ? 'text-yellow-600' : 'text-gray-700'">
+                    {{ flag.severity }}
+                  </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">{{ flag.resource_type }}<br /><span class="text-xs text-gray-500">{{ flag.resource_id }}</span></td>
+                <td class="px-6 py-4 whitespace-nowrap">{{ formatDate(flag.detected_at) }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-xs text-gray-700">{{ flag.notes }}</td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <!-- Future: Add resolve, view context, etc. -->
+                  <button class="text-primary-600 hover:underline text-xs">View</button>
+                </td>
+              </tr>
+              <tr v-if="adminStore.flaggedIssues.length === 0">
+                <td colspan="6" class="px-6 py-4 text-center text-gray-500">No flagged issues found.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
     <!-- Add Organization Modal -->
     <div v-if="showAddOrgModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div class="bg-white rounded-lg p-6 w-full max-w-md mx-4">
@@ -845,7 +892,8 @@ const tabs = [
   { id: 'backups', name: 'Backups', icon: CurrencyDollarIcon },
   { id: 'plans', name: 'Subscription Plans', icon: CreditCardIcon },
   { id: 'settings', name: 'System Settings', icon: Cog6ToothIcon },
-  { id: 'logs', name: 'System Logs', icon: DocumentTextIcon }
+  { id: 'logs', name: 'System Logs', icon: DocumentTextIcon },
+  { id: 'flags', name: 'Flagged Issues', icon: BriefcaseIcon },
 ];
 
 const newOrg = reactive({

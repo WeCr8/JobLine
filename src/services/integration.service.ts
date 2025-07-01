@@ -10,6 +10,7 @@ import type {
 import axios from 'axios';
 import { storeOfflineData, getOfflineData, registerBackgroundSync } from '../utils/offline';
 import { validateJob, validateOperation, validatePart } from '../utils/validate.utils';
+import { logConsistencyFlag } from './api.service';
 
 export const integrationService = {
   /**
@@ -706,6 +707,15 @@ export const integrationService = {
           };
           const jobErrors = validateJob(validationJob);
           if (jobErrors.length) {
+            await logConsistencyFlag({
+              type: 'validation',
+              severity: 'error',
+              resourceType: 'job',
+              resourceId: validationJob.id,
+              context: { errors: jobErrors, record: mappedRecord },
+              detectedBy: 'integrationService.processImportData',
+              notes: 'Job validation failed during import.'
+            });
             throw new Error('Job validation failed: ' + jobErrors.join('; '));
           }
         } else if (importType === 'routing-operations') {
@@ -727,6 +737,15 @@ export const integrationService = {
           };
           const opErrors = validateOperation(validationOp);
           if (opErrors.length) {
+            await logConsistencyFlag({
+              type: 'validation',
+              severity: 'error',
+              resourceType: 'operation',
+              resourceId: validationOp.id,
+              context: { errors: opErrors, record: mappedRecord },
+              detectedBy: 'integrationService.processImportData',
+              notes: 'Operation validation failed during import.'
+            });
             throw new Error('Operation validation failed: ' + opErrors.join('; '));
           }
         }
@@ -758,6 +777,15 @@ export const integrationService = {
             .upsert(mappedRecord);
           
           if (error) {
+            await logConsistencyFlag({
+              type: 'referential',
+              severity: 'error',
+              resourceType: tableName,
+              resourceId: mappedRecord.id,
+              context: { error, record: mappedRecord },
+              detectedBy: 'integrationService.processImportData',
+              notes: 'Database error during import (possible referential integrity issue).'
+            });
             throw error;
           }
         }

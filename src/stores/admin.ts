@@ -52,6 +52,7 @@ export const useAdminStore = defineStore('admin', () => {
   });
   const loading = ref(false);
   const error = ref<string | null>(null);
+  const flaggedIssues = ref<any[]>([]);
 
   // Fetch subscription plans
   const fetchSubscriptionPlans = async () => {
@@ -235,6 +236,20 @@ export const useAdminStore = defineStore('admin', () => {
     } catch (err: any) {
       error.value = err.message;
       console.error('Error fetching system logs:', err);
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  // Fetch flagged consistency/data issues
+  const fetchFlaggedIssues = async () => {
+    loading.value = true;
+    error.value = null;
+    try {
+      flaggedIssues.value = await adminService.fetchConsistencyFlags();
+    } catch (err: any) {
+      error.value = err.message;
+      console.error('Error fetching flagged issues:', err);
     } finally {
       loading.value = false;
     }
@@ -424,6 +439,7 @@ export const useAdminStore = defineStore('admin', () => {
     totalRevenue,
     platformAdmins,
     organizationAdmins,
+    flaggedIssues,
     fetchSubscriptionPlans,
     fetchActiveSubscriptions,
     fetchUsers,
@@ -431,6 +447,7 @@ export const useAdminStore = defineStore('admin', () => {
     fetchAnalytics,
     fetchSystemSettings,
     fetchSystemLogs,
+    fetchFlaggedIssues,
     saveSubscriptionPlan,
     updateUser,
     saveOrganization,

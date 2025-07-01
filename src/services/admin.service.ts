@@ -393,5 +393,23 @@ export const adminService = {
       console.error('Error triggering manual backup:', err);
       return false;
     }
+  },
+
+  /**
+   * Fetch flagged consistency/data issues
+   */
+  async fetchConsistencyFlags(limit: number = 100): Promise<any[]> {
+    try {
+      const { data, error } = await supabase
+        .from('consistency_flags')
+        .select('*')
+        .order('detected_at', { ascending: false })
+        .limit(limit);
+      if (error) throw error;
+      return data || [];
+    } catch (err) {
+      console.error('Error fetching consistency flags:', err);
+      return [];
+    }
   }
 };
