@@ -822,7 +822,6 @@ import {
   DocumentTextIcon,
   CreditCardIcon,
   BriefcaseIcon,
-  CogIcon,
 } from '@heroicons/vue/24/outline';
 
 const adminStore = useAdminStore();
