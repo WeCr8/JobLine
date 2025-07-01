@@ -1,6 +1,7 @@
 import { supabase } from './api.service';
 import type { JobStatus, QualityCheck } from '../types';
-import type { Job } from '../types/index';
+import type { Job as CanonicalJob } from '../types/index';
+import type { Job as ValidationJob } from '../types/job';
 import { validateJob } from '../utils/validate.utils';
 import { canAccess } from '../utils/security.utils';
 import { logAudit, logConsistencyFlag } from './api.service';
@@ -9,7 +10,7 @@ export const jobsService = {
   /**
    * Fetch all jobs
    */
-  async fetchJobs(): Promise<Job[]> {
+  async fetchJobs(): Promise<CanonicalJob[]> {
     try {
       const { data, error } = await supabase
         .from('jobs')
@@ -28,18 +29,33 @@ export const jobsService = {
       // Process the data to match the expected Job type (from src/types/index.ts)
       return (data || []).map(job => ({
         id: job.id,
-        name: job.name || job.job_number || '',
+        jobNumber: job.job_number,
+        partNumber: job.part_number,
+        partName: job.part_name,
+        customer: job.customer,
+        quantity: job.quantity,
+        completedQuantity: job.completed_quantity,
         status: job.status,
+        priority: job.priority,
         dueDate: job.due_date,
         startDate: job.start_date,
-        completedDate: job.completed_date,
-        priority: job.priority,
-        assignedTo: job.operator_id,
-        organizationId: job.organization_id || '',
-        itemIds: job.item_ids,
-        lastUpdated: job.updated_at || new Date().toISOString(),
-        customFields: job.custom_fields,
-      }));
+        estimatedHours: job.estimated_hours,
+        actualHours: job.actual_hours,
+        operator: job.operator_id,
+        machine: job.machine_id,
+        operation: job.operation || '',
+        notes: job.notes || '',
+        operations: job.operations || [],
+        dncPrograms: [], // Would need to fetch separately
+        history: job.history || [],
+        qualityRequirements: job.quality_requirements || [],
+        tooling: [], // Would need to fetch separately
+        materials: job.materials || [],
+        drawings: job.drawings || [],
+        aiRecommendation: job.ai_recommendation || undefined,
+        createdAt: job.created_at,
+        updatedAt: job.updated_at
+      } as CanonicalJob));
     } catch (err) {
       console.error('Error fetching jobs:', err);
       return [];
@@ -49,7 +65,7 @@ export const jobsService = {
   /**
    * Get a job by ID
    */
-  async getJobById(jobId: string): Promise<Job | null> {
+  async getJobById(jobId: string): Promise<CanonicalJob | null> {
     try {
       const { data, error } = await supabase
         .from('jobs')
@@ -70,18 +86,33 @@ export const jobsService = {
       
       return {
         id: data.id,
-        name: data.name || data.job_number || '',
+        jobNumber: data.job_number,
+        partNumber: data.part_number,
+        partName: data.part_name,
+        customer: data.customer,
+        quantity: data.quantity,
+        completedQuantity: data.completed_quantity,
         status: data.status,
+        priority: data.priority,
         dueDate: data.due_date,
         startDate: data.start_date,
-        completedDate: data.completed_date,
-        priority: data.priority,
-        assignedTo: data.operator_id,
-        organizationId: data.organization_id || '',
-        itemIds: data.item_ids,
-        lastUpdated: data.updated_at || new Date().toISOString(),
-        customFields: data.custom_fields,
-      };
+        estimatedHours: data.estimated_hours,
+        actualHours: data.actual_hours,
+        operator: data.operator_id,
+        machine: data.machine_id,
+        operation: data.operation || '',
+        notes: data.notes || '',
+        operations: data.operations || [],
+        dncPrograms: [], // Would need to fetch separately
+        history: data.history || [],
+        qualityRequirements: data.quality_requirements || [],
+        tooling: [], // Would need to fetch separately
+        materials: data.materials || [],
+        drawings: data.drawings || [],
+        aiRecommendation: data.ai_recommendation || undefined,
+        createdAt: data.created_at,
+        updatedAt: data.updated_at
+      } as CanonicalJob;
     } catch (err) {
       console.error('Error fetching job by ID:', err);
       return null;
@@ -104,7 +135,7 @@ export const jobsService = {
       if (!canAccess(user, 'job:update', job)) {
         throw new Error('Permission denied: job:update');
       }
-      const validationJob = mapDbJobToValidationJob({ ...job, status });
+      const validationJob: ValidationJob = mapDbJobToValidationJob({ ...job, status });
       const errors = validateJob(validationJob);
       if (errors.length) {
         await logConsistencyFlag({
@@ -171,7 +202,7 @@ export const jobsService = {
       // Ensure completed quantity doesn't exceed total quantity
       const validQuantity = Math.min(completedQuantity, job.quantity);
       // Validate with updated completedQuantity
-      const validationJob = mapDbJobToValidationJob({ ...job, completedQuantity: validQuantity });
+      const validationJob: ValidationJob = mapDbJobToValidationJob({ ...job, completedQuantity: validQuantity });
       const errors = validateJob(validationJob);
       if (errors.length) {
         await logConsistencyFlag({
@@ -274,7 +305,7 @@ export const jobsService = {
 };
 
 // Helper to map DB job to minimal Job for validation only
-function mapDbJobToValidationJob(job: any): import('../types/index').Job {
+function mapDbJobToValidationJob(job: any): ValidationJob {
   return {
     id: job.id,
     name: job.name || job.jobNumber || '',

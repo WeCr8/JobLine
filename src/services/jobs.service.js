@@ -1,4 +1,7 @@
 import { supabase } from './api.service';
+import { validateJob } from '../utils/validate.utils';
+import { canAccess } from '../utils/security.utils';
+import { logAudit, logConsistencyFlag } from './api.service';
 export const jobsService = {
     /**
      * Fetch all jobs
@@ -18,7 +21,7 @@ export const jobsService = {
                 .order('created_at', { ascending: false });
             if (error)
                 throw error;
-            // Process the data to match the expected Job type
+            // Process the data to match the expected Job type (from src/types/index.ts)
             return (data || []).map(job => ({
                 id: job.id,
                 jobNumber: job.job_number,
@@ -33,8 +36,8 @@ export const jobsService = {
                 startDate: job.start_date,
                 estimatedHours: job.estimated_hours,
                 actualHours: job.actual_hours,
-                operator: job.operator_id, // Would need to join with users table for name
-                machine: job.machine_id, // Would need to join with machines table for name
+                operator: job.operator_id,
+                machine: job.machine_id,
                 operation: job.operation || '',
                 notes: job.notes || '',
                 operations: job.operations || [],
@@ -44,6 +47,7 @@ export const jobsService = {
                 tooling: [], // Would need to fetch separately
                 materials: job.materials || [],
                 drawings: job.drawings || [],
+                aiRecommendation: job.ai_recommendation || undefined,
                 createdAt: job.created_at,
                 updatedAt: job.updated_at
             }));
@@ -74,13 +78,6 @@ export const jobsService = {
                 throw error;
             if (!data)
                 return null;
-            // Fetch DNC programs for this job
-            const { data: dncPrograms, error: dncError } = await supabase
-                .from('dnc_programs')
-                .select('*')
-                .eq('operation_id', data.operations.map((op) => op.id));
-            if (dncError)
-                console.error('Error fetching DNC programs:', dncError);
             return {
                 id: data.id,
                 jobNumber: data.job_number,
@@ -95,17 +92,18 @@ export const jobsService = {
                 startDate: data.start_date,
                 estimatedHours: data.estimated_hours,
                 actualHours: data.actual_hours,
-                operator: data.operator_id, // Would need to join with users table for name
-                machine: data.machine_id, // Would need to join with machines table for name
+                operator: data.operator_id,
+                machine: data.machine_id,
                 operation: data.operation || '',
                 notes: data.notes || '',
                 operations: data.operations || [],
-                dncPrograms: dncPrograms || [],
+                dncPrograms: [], // Would need to fetch separately
                 history: data.history || [],
                 qualityRequirements: data.quality_requirements || [],
                 tooling: [], // Would need to fetch separately
                 materials: data.materials || [],
                 drawings: data.drawings || [],
+                aiRecommendation: data.ai_recommendation || undefined,
                 createdAt: data.created_at,
                 updatedAt: data.updated_at
             };
@@ -118,8 +116,34 @@ export const jobsService = {
     /**
      * Update job status
      */
-    async updateJobStatus(jobId, status, notes) {
+    async updateJobStatus(user, jobId, status, notes) {
         try {
+            // Fetch job for validation
+            const { data: job, error: fetchError } = await supabase
+                .from('jobs')
+                .select('*')
+                .eq('id', jobId)
+                .single();
+            if (fetchError)
+                throw fetchError;
+            // Permission check
+            if (!canAccess(user, 'job:update', job)) {
+                throw new Error('Permission denied: job:update');
+            }
+            const validationJob = mapDbJobToValidationJob({ ...job, status });
+            const errors = validateJob(validationJob);
+            if (errors.length) {
+                await logConsistencyFlag({
+                    type: 'validation',
+                    severity: 'error',
+                    resourceType: 'job',
+                    resourceId: jobId,
+                    context: { errors, job, attemptedStatus: status },
+                    detectedBy: 'jobsService.updateJobStatus',
+                    notes: 'Job validation failed during status update.'
+                });
+                throw new Error('Job validation failed: ' + errors.join('; '));
+            }
             const { error } = await supabase
                 .from('jobs')
                 .update({
@@ -130,6 +154,16 @@ export const jobsService = {
                 .eq('id', jobId);
             if (error)
                 throw error;
+            // Audit log
+            await logAudit({
+                userId: user?.id || null,
+                action: 'job.updateStatus',
+                resourceType: 'job',
+                resourceId: jobId,
+                before: job,
+                after: { ...job, status, notes },
+                reason: notes
+            });
             return true;
         }
         catch (err) {
@@ -140,18 +174,45 @@ export const jobsService = {
     /**
      * Update job progress (completed quantity)
      */
-    async updateJobProgress(jobId, completedQuantity) {
+    async updateJobProgress(user, jobId, completedQuantity) {
         try {
             const { data: job, error: fetchError } = await supabase
                 .from('jobs')
-                .select('quantity')
+                .select('*')
                 .eq('id', jobId)
                 .single();
             if (fetchError)
                 throw fetchError;
+            // Permission check
+            if (!canAccess(user, 'job:update', job)) {
+                await logConsistencyFlag({
+                    type: 'permission',
+                    severity: 'error',
+                    resourceType: 'job',
+                    resourceId: jobId,
+                    context: { user, job, attemptedCompletedQuantity: completedQuantity },
+                    detectedBy: 'jobsService.updateJobProgress',
+                    notes: 'Permission denied: job:update during progress update.'
+                });
+                return false;
+            }
             // Ensure completed quantity doesn't exceed total quantity
             const validQuantity = Math.min(completedQuantity, job.quantity);
-            // Update the job
+            // Validate with updated completedQuantity
+            const validationJob = mapDbJobToValidationJob({ ...job, completedQuantity: validQuantity });
+            const errors = validateJob(validationJob);
+            if (errors.length) {
+                await logConsistencyFlag({
+                    type: 'validation',
+                    severity: 'error',
+                    resourceType: 'job',
+                    resourceId: jobId,
+                    context: { errors, job, attemptedCompletedQuantity: validQuantity },
+                    detectedBy: 'jobsService.updateJobProgress',
+                    notes: 'Job validation failed during progress update.'
+                });
+                return false;
+            }
             const { error } = await supabase
                 .from('jobs')
                 .update({
@@ -162,6 +223,16 @@ export const jobsService = {
                 .eq('id', jobId);
             if (error)
                 throw error;
+            // Audit log
+            await logAudit({
+                userId: user?.id || null,
+                action: 'job.updateProgress',
+                resourceType: 'job',
+                resourceId: jobId,
+                before: job,
+                after: { ...job, completed_quantity: validQuantity, status: validQuantity === job.quantity ? 'completed' : job.status },
+                reason: 'Job progress updated.'
+            });
             return true;
         }
         catch (err) {
@@ -229,3 +300,21 @@ export const jobsService = {
         }
     }
 };
+// Helper to map DB job to minimal Job for validation only
+function mapDbJobToValidationJob(job) {
+    return {
+        id: job.id,
+        name: job.name || job.jobNumber || '',
+        status: job.status,
+        dueDate: job.due_date || job.dueDate,
+        startDate: job.start_date || job.startDate,
+        completedDate: job.completed_date || job.completedDate,
+        priority: job.priority,
+        assignedTo: job.operator_id || job.assignedTo,
+        organizationId: job.organization_id || job.organizationId || '',
+        itemIds: job.itemIds,
+        lastUpdated: job.updated_at || job.lastUpdated || new Date().toISOString(),
+        customFields: job.customFields,
+        description: job.description,
+    };
+}

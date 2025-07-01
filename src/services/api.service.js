@@ -26,3 +26,35 @@ export const handleApiError = (error) => {
     }
     throw new ApiError(error.message || 'An unexpected error occurred', 500);
 };
+// Audit logging utility
+export async function logAudit({ userId, action, resourceType, resourceId, before, after, reason, ip, userAgent }) {
+    const { error } = await supabase.from('audit_logs').insert({
+        user_id: userId,
+        action,
+        resource_type: resourceType,
+        resource_id: resourceId,
+        before: before ? JSON.stringify(before) : null,
+        after: after ? JSON.stringify(after) : null,
+        reason,
+        ip,
+        user_agent: userAgent
+    });
+    if (error) {
+        console.error('[AuditLog] Failed to insert audit log:', error);
+    }
+}
+// Consistency flagging utility
+export async function logConsistencyFlag({ type, severity, resourceType, resourceId, context, detectedBy, notes }) {
+    const { error } = await supabase.from('consistency_flags').insert({
+        type,
+        severity,
+        resource_type: resourceType,
+        resource_id: resourceId,
+        context: context ? JSON.stringify(context) : null,
+        detected_by: detectedBy,
+        notes
+    });
+    if (error) {
+        console.error('[ConsistencyFlag] Failed to insert flag:', error);
+    }
+}

@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import { adminService } from '../services/admin.service';
+import { useAuthStore } from './auth';
 export const useAdminStore = defineStore('admin', () => {
     const subscriptionPlans = ref([]);
     const activeSubscriptions = ref([]);
@@ -38,6 +39,8 @@ export const useAdminStore = defineStore('admin', () => {
     });
     const loading = ref(false);
     const error = ref(null);
+    const flaggedIssues = ref([]);
+    const authStore = useAuthStore();
     // Fetch subscription plans
     const fetchSubscriptionPlans = async () => {
         loading.value = true;
@@ -225,12 +228,27 @@ export const useAdminStore = defineStore('admin', () => {
             loading.value = false;
         }
     };
+    // Fetch flagged consistency/data issues
+    const fetchFlaggedIssues = async () => {
+        loading.value = true;
+        error.value = null;
+        try {
+            flaggedIssues.value = await adminService.fetchConsistencyFlags();
+        }
+        catch (err) {
+            error.value = err.message;
+            console.error('Error fetching flagged issues:', err);
+        }
+        finally {
+            loading.value = false;
+        }
+    };
     // Create or update subscription plan
     const saveSubscriptionPlan = async (plan) => {
         loading.value = true;
         error.value = null;
         try {
-            const savedPlan = await adminService.saveSubscriptionPlan(plan);
+            const savedPlan = await adminService.saveSubscriptionPlan(authStore.user, plan);
             if (!savedPlan) {
                 throw new Error('Failed to save subscription plan');
             }
@@ -261,7 +279,7 @@ export const useAdminStore = defineStore('admin', () => {
         error.value = null;
         try {
             user.role = user.role;
-            const success = await adminService.updateUser(user);
+            const success = await adminService.updateUser(authStore.user, user);
             if (!success) {
                 throw new Error('Failed to update user');
             }
@@ -285,7 +303,7 @@ export const useAdminStore = defineStore('admin', () => {
         loading.value = true;
         error.value = null;
         try {
-            const savedOrg = await adminService.saveOrganization(organization);
+            const savedOrg = await adminService.saveOrganization(authStore.user, organization);
             if (!savedOrg) {
                 throw new Error('Failed to save organization');
             }
@@ -373,6 +391,23 @@ export const useAdminStore = defineStore('admin', () => {
             loading.value = false;
         }
     };
+    // Resolve a flagged issue
+    const resolveFlag = async (flagId) => {
+        loading.value = true;
+        error.value = null;
+        try {
+            const { error: updateError } = await adminService.resolveFlag(flagId);
+            if (updateError)
+                throw updateError;
+        }
+        catch (err) {
+            error.value = err.message;
+            console.error('Error resolving flagged issue:', err);
+        }
+        finally {
+            loading.value = false;
+        }
+    };
     // Computed properties
     const totalUsers = computed(() => users.value.length);
     const activeUsers = computed(() => users.value.filter(u => u.is_active).length);
@@ -400,6 +435,7 @@ export const useAdminStore = defineStore('admin', () => {
         totalRevenue,
         platformAdmins,
         organizationAdmins,
+        flaggedIssues,
         fetchSubscriptionPlans,
         fetchActiveSubscriptions,
         fetchUsers,
@@ -407,11 +443,13 @@ export const useAdminStore = defineStore('admin', () => {
         fetchAnalytics,
         fetchSystemSettings,
         fetchSystemLogs,
+        fetchFlaggedIssues,
         saveSubscriptionPlan,
         updateUser,
         saveOrganization,
         cancelSubscription,
         saveSystemSettings,
-        triggerManualBackup
+        triggerManualBackup,
+        resolveFlag
     };
 });

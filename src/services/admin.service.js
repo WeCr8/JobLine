@@ -1,4 +1,6 @@
 import { supabase } from './api.service';
+import { canAccess } from '../utils/security.utils';
+import { logConsistencyFlag, logAudit } from './api.service';
 export const adminService = {
     /**
      * Fetch all subscription plans
@@ -154,8 +156,20 @@ export const adminService = {
     /**
      * Save subscription plan
      */
-    async saveSubscriptionPlan(plan) {
+    async saveSubscriptionPlan(user, plan) {
         try {
+            if (!canAccess(user, 'subscriptionPlan:save', plan)) {
+                await logConsistencyFlag({
+                    type: 'permission',
+                    severity: 'error',
+                    resourceType: 'subscriptionPlan',
+                    resourceId: plan.id,
+                    context: { user, plan },
+                    detectedBy: 'adminService.saveSubscriptionPlan',
+                    notes: 'Permission denied: subscriptionPlan:save.'
+                });
+                return null;
+            }
             if (plan.id) {
                 // Update existing plan
                 const { error } = await supabase
@@ -173,6 +187,16 @@ export const adminService = {
                     .eq('id', plan.id);
                 if (error)
                     throw error;
+                // Audit log
+                await logAudit({
+                    userId: user?.id || null,
+                    action: 'subscriptionPlan.update',
+                    resourceType: 'subscriptionPlan',
+                    resourceId: plan.id,
+                    before: null, // Optionally fetch before state
+                    after: plan,
+                    reason: 'Subscription plan updated.'
+                });
                 return plan;
             }
             else {
@@ -194,6 +218,16 @@ export const adminService = {
                     throw error;
                 if (!data)
                     return null;
+                // Audit log
+                await logAudit({
+                    userId: user?.id || null,
+                    action: 'subscriptionPlan.create',
+                    resourceType: 'subscriptionPlan',
+                    resourceId: data.id,
+                    before: null,
+                    after: data,
+                    reason: 'Subscription plan created.'
+                });
                 return {
                     id: data.id,
                     name: data.name,
@@ -217,20 +251,43 @@ export const adminService = {
     /**
      * Update user
      */
-    async updateUser(user) {
+    async updateUser(user, targetUser) {
         try {
+            // Permission check
+            if (!await canAccess(user, 'user:update', targetUser)) {
+                await logConsistencyFlag({
+                    type: 'permission',
+                    severity: 'error',
+                    resourceType: 'user',
+                    resourceId: targetUser.id,
+                    context: { user, targetUser },
+                    detectedBy: 'adminService.updateUser',
+                    notes: 'Permission denied: user:update.'
+                });
+                return false;
+            }
             const { error } = await supabase
                 .from('users')
                 .update({
-                name: user.name,
-                role: user.role,
-                department: user.department,
-                is_active: user.is_active,
+                name: targetUser.name,
+                role: targetUser.role,
+                department: targetUser.department,
+                is_active: targetUser.is_active,
                 updated_at: new Date().toISOString()
             })
-                .eq('id', user.id);
+                .eq('id', targetUser.id);
             if (error)
                 throw error;
+            // Audit log
+            await logAudit({
+                userId: user?.id || null,
+                action: 'user.update',
+                resourceType: 'user',
+                resourceId: targetUser.id,
+                before: null, // Optionally fetch before state
+                after: targetUser,
+                reason: 'User updated.'
+            });
             return true;
         }
         catch (err) {
@@ -241,8 +298,20 @@ export const adminService = {
     /**
      * Save organization
      */
-    async saveOrganization(organization) {
+    async saveOrganization(user, organization) {
         try {
+            if (!await canAccess(user, 'organization:save', organization)) {
+                await logConsistencyFlag({
+                    type: 'permission',
+                    severity: 'error',
+                    resourceType: 'organization',
+                    resourceId: organization.id,
+                    context: { user, organization },
+                    detectedBy: 'adminService.saveOrganization',
+                    notes: 'Permission denied: organization:save.'
+                });
+                return null;
+            }
             if (organization.id) {
                 // Update existing organization
                 const { error } = await supabase
@@ -263,6 +332,16 @@ export const adminService = {
                     .eq('id', organization.id);
                 if (error)
                     throw error;
+                // Audit log
+                await logAudit({
+                    userId: user?.id || null,
+                    action: 'organization.update',
+                    resourceType: 'organization',
+                    resourceId: organization.id,
+                    before: null, // Optionally fetch before state
+                    after: organization,
+                    reason: 'Organization updated.'
+                });
                 return organization;
             }
             else {
@@ -287,6 +366,16 @@ export const adminService = {
                     throw error;
                 if (!data)
                     return null;
+                // Audit log
+                await logAudit({
+                    userId: user?.id || null,
+                    action: 'organization.create',
+                    resourceType: 'organization',
+                    resourceId: data.id,
+                    before: null,
+                    after: data,
+                    reason: 'Organization created.'
+                });
                 return {
                     id: data.id,
                     name: data.name,
@@ -371,6 +460,45 @@ export const adminService = {
         catch (err) {
             console.error('Error triggering manual backup:', err);
             return false;
+        }
+    },
+    /**
+     * Fetch flagged consistency/data issues
+     */
+    async fetchConsistencyFlags(limit = 100) {
+        try {
+            const { data, error } = await supabase
+                .from('consistency_flags')
+                .select('*')
+                .order('detected_at', { ascending: false })
+                .limit(limit);
+            if (error)
+                throw error;
+            return data || [];
+        }
+        catch (err) {
+            console.error('Error fetching consistency flags:', err);
+            return [];
+        }
+    },
+    /**
+     * Resolve a flagged consistency/data issue
+     */
+    async resolveFlag(flagId, userId) {
+        try {
+            const { error } = await supabase
+                .from('consistency_flags')
+                .update({
+                resolved: true,
+                resolved_at: new Date().toISOString(),
+                resolved_by: userId || null
+            })
+                .eq('id', flagId);
+            return { error };
+        }
+        catch (err) {
+            console.error('Error resolving flagged issue:', err);
+            return { error: err };
         }
     }
 };

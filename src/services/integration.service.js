@@ -1,6 +1,8 @@
 import { supabase } from './api.service';
 import axios from 'axios';
 import { storeOfflineData, getOfflineData, registerBackgroundSync } from '../utils/offline';
+import { validateJob, validateOperation } from '../utils/validate.utils';
+import { logConsistencyFlag } from './api.service';
 export const integrationService = {
     /**
      * Fetch all connections
@@ -605,6 +607,69 @@ export const integrationService = {
                         }
                     }
                 }
+                // Validate mapped record based on importType
+                if (importType === 'job-data') {
+                    // Map to minimal Job for validation
+                    const validationJob = {
+                        id: mappedRecord.id || mappedRecord.job_number || '',
+                        name: mappedRecord.name || mappedRecord.job_number || '',
+                        status: mappedRecord.status,
+                        dueDate: mappedRecord.due_date || mappedRecord.dueDate,
+                        startDate: mappedRecord.start_date || mappedRecord.startDate,
+                        completedDate: mappedRecord.completed_date || mappedRecord.completedDate,
+                        priority: mappedRecord.priority,
+                        assignedTo: mappedRecord.operator_id || mappedRecord.assignedTo,
+                        organizationId: mappedRecord.organization_id || '',
+                        itemIds: mappedRecord.itemIds,
+                        lastUpdated: mappedRecord.updated_at || new Date().toISOString(),
+                        customFields: mappedRecord.customFields,
+                        description: mappedRecord.description,
+                    };
+                    const jobErrors = validateJob(validationJob);
+                    if (jobErrors.length) {
+                        await logConsistencyFlag({
+                            type: 'validation',
+                            severity: 'error',
+                            resourceType: 'job',
+                            resourceId: validationJob.id,
+                            context: { errors: jobErrors, record: mappedRecord },
+                            detectedBy: 'integrationService.processImportData',
+                            notes: 'Job validation failed during import.'
+                        });
+                        throw new Error('Job validation failed: ' + jobErrors.join('; '));
+                    }
+                }
+                else if (importType === 'routing-operations') {
+                    const validationOp = {
+                        id: mappedRecord.id || mappedRecord.operation_id || '',
+                        jobId: mappedRecord.job_id || mappedRecord.jobId || '',
+                        name: mappedRecord.name || mappedRecord.operation_name || '',
+                        status: mappedRecord.status,
+                        sequence: mappedRecord.sequence || mappedRecord.operation_number || 0,
+                        plannedStart: mappedRecord.planned_start,
+                        plannedEnd: mappedRecord.planned_end,
+                        actualStart: mappedRecord.actual_start,
+                        actualEnd: mappedRecord.actual_end,
+                        resourceId: mappedRecord.resource_id,
+                        description: mappedRecord.description,
+                        durationMinutes: mappedRecord.duration_minutes,
+                        partId: mappedRecord.part_id,
+                        customFields: mappedRecord.customFields,
+                    };
+                    const opErrors = validateOperation(validationOp);
+                    if (opErrors.length) {
+                        await logConsistencyFlag({
+                            type: 'validation',
+                            severity: 'error',
+                            resourceType: 'operation',
+                            resourceId: validationOp.id,
+                            context: { errors: opErrors, record: mappedRecord },
+                            detectedBy: 'integrationService.processImportData',
+                            notes: 'Operation validation failed during import.'
+                        });
+                        throw new Error('Operation validation failed: ' + opErrors.join('; '));
+                    }
+                }
                 // Insert the record into the appropriate table
                 let tableName = '';
                 switch (importType) {
@@ -629,6 +694,15 @@ export const integrationService = {
                         .from(tableName)
                         .upsert(mappedRecord);
                     if (error) {
+                        await logConsistencyFlag({
+                            type: 'referential',
+                            severity: 'error',
+                            resourceType: tableName,
+                            resourceId: mappedRecord.id,
+                            context: { error, record: mappedRecord },
+                            detectedBy: 'integrationService.processImportData',
+                            notes: 'Database error during import (possible referential integrity issue).'
+                        });
                         throw error;
                     }
                 }

@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import { organizationService } from '../services/organization.service';
+import { useAuthStore } from './auth';
 export const useOrganizationStore = defineStore('organization', () => {
     const organization = ref(null);
     const users = ref([]);
@@ -8,6 +9,7 @@ export const useOrganizationStore = defineStore('organization', () => {
     const departments = ref([]);
     const loading = ref(false);
     const error = ref(null);
+    const authStore = useAuthStore();
     // Fetch current user's organization
     const fetchOrganization = async () => {
         loading.value = true;
@@ -83,7 +85,7 @@ export const useOrganizationStore = defineStore('organization', () => {
         loading.value = true;
         error.value = null;
         try {
-            const success = await organizationService.updateOrganization(organization.value.id, updates);
+            const success = await organizationService.updateOrganization(authStore.user, organization.value.id, updates);
             if (success && organization.value) {
                 organization.value = { ...organization.value, ...updates };
             }
@@ -105,7 +107,7 @@ export const useOrganizationStore = defineStore('organization', () => {
         loading.value = true;
         error.value = null;
         try {
-            const invite = await organizationService.inviteUser(organization.value.id, email, role, department);
+            const invite = await organizationService.inviteUser(authStore.user, organization.value.id, email, role, department);
             if (invite) {
                 invites.value.push(invite);
             }
@@ -125,7 +127,7 @@ export const useOrganizationStore = defineStore('organization', () => {
         loading.value = true;
         error.value = null;
         try {
-            const success = await organizationService.cancelInvite(inviteId);
+            const success = await organizationService.cancelInvite(authStore.user, inviteId);
             if (success) {
                 invites.value = invites.value.filter(invite => invite.id !== inviteId);
             }
@@ -145,7 +147,7 @@ export const useOrganizationStore = defineStore('organization', () => {
         loading.value = true;
         error.value = null;
         try {
-            const success = await organizationService.updateUser(userId, updates);
+            const success = await organizationService.updateUser(authStore.user, userId, updates);
             if (success) {
                 const index = users.value.findIndex(u => u.id === userId);
                 if (index !== -1) {
@@ -168,7 +170,7 @@ export const useOrganizationStore = defineStore('organization', () => {
         loading.value = true;
         error.value = null;
         try {
-            const newDept = await organizationService.addDepartment(department);
+            const newDept = await organizationService.addDepartment(authStore.user, department);
             if (newDept) {
                 departments.value.push(newDept);
             }

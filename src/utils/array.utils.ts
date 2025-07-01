@@ -18,9 +18,9 @@ export function deepMerge<T extends object, U extends object>(target: T, source:
       isPlainObject(source[key]) &&
       isPlainObject((output as any)[key])
     ) {
-      output[key] = deepMerge((output as any)[key], source[key]) as (T & U)[Extract<keyof U, string>];
+      output[key] = deepMerge((output as any)[key], source[key] as any) as any;
     } else if (isPlainObject(source[key])) {
-      output[key] = deepMerge({}, source[key]) as (T & U)[Extract<keyof U, string>];
+      output[key] = deepMerge({}, source[key] as any) as any;
     } else {
       output[key] = source[key] as any
     }

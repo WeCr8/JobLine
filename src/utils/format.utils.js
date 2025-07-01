@@ -42,18 +42,6 @@ export const formatNumber = (num) => {
     return num.toLocaleString();
 };
 /**
- * Format a currency value
- * @param amount Amount in cents
- * @param currency Currency code (default: 'USD')
- */
-export const formatCurrency = (amount, currency = 'USD') => {
-    return new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency,
-        minimumFractionDigits: 2
-    }).format(amount / 100);
-};
-/**
  * Format a percentage value
  * @param value Percentage value (0-100)
  * @param decimals Number of decimal places (default: 0)
@@ -61,3 +49,50 @@ export const formatCurrency = (amount, currency = 'USD') => {
 export const formatPercentage = (value, decimals = 0) => {
     return `${value.toFixed(decimals)}%`;
 };
+// Slugify
+export function slugify(str) {
+    return str
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/\p{Diacritic}/gu, '')
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '');
+}
+// camelCase
+export function camelCase(str) {
+    return str
+        .replace(/[-_\s]+(.)?/g, (_, c) => (c ? c.toUpperCase() : ''))
+        .replace(/^(.)/, (m) => m.toLowerCase());
+}
+// kebab-case
+export function kebabCase(str) {
+    return str
+        .replace(/([a-z])([A-Z])/g, '$1-$2')
+        .replace(/[_\s]+/g, '-')
+        .toLowerCase();
+}
+// Number formatting
+export function formatCurrency(value, currency = 'USD', locale = 'en-US') {
+    return new Intl.NumberFormat(locale, { style: 'currency', currency }).format(value);
+}
+export function formatPercent(value, locale = 'en-US', digits = 2) {
+    return new Intl.NumberFormat(locale, { style: 'percent', minimumFractionDigits: digits, maximumFractionDigits: digits }).format(value);
+}
+export function formatCompactNumber(value, locale = 'en-US') {
+    return new Intl.NumberFormat(locale, { notation: 'compact' }).format(value);
+}
+// Masking utilities
+export function maskPhone(phone) {
+    return phone.replace(/(\d{3})\d{3}(\d{4})/, '$1***$2');
+}
+export function maskEmail(email) {
+    const [user, domain] = email.split('@');
+    if (!user || !domain)
+        return email;
+    return user[0] + '***' + user.slice(-1) + '@' + domain;
+}
+export function maskId(id, visible = 4) {
+    if (id.length <= visible)
+        return id;
+    return '*'.repeat(id.length - visible) + id.slice(-visible);
+}
