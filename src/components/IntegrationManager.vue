@@ -200,7 +200,7 @@
 
 <script setup lang="ts">
 import { ref, reactive } from 'vue';
-import { useChatStore } from '../stores/chat';
+import { useChatStore } from '../stores/chat.ts';
 import type { IntegrationConfig, IntegrationTrigger } from '../types/chat';
 import {
   ChatBubbleLeftRightIcon,

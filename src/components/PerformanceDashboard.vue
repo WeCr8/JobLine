@@ -410,8 +410,8 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { format } from 'date-fns';
-import { usePerformanceStore } from '../stores/performance';
-import { useAuthStore } from '../stores/auth';
+import { usePerformanceStore } from '../stores/performance.ts';
+import { useAuthStore } from '../stores/auth.ts';
 import {
   TrophyIcon,
   FireIcon,

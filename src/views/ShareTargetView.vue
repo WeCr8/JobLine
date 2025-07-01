@@ -122,8 +122,8 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { useJobsStore } from '../stores/jobs';
-import { useChatStore } from '../stores/chat';
+import { useJobsStore } from '../stores/jobs.ts';
+import { useChatStore } from '../stores/chat.ts';
 import { integrationService } from '../services/integration.service';
 import {
   DocumentIcon,

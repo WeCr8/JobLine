@@ -495,8 +495,8 @@
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted } from 'vue';
 import { format } from 'date-fns';
-import { useIntegrationStore } from '../stores/integration';
-import { useJobsStore } from '../stores/jobs';
+import { useIntegrationStore } from '../stores/integration.ts';
+import { useJobsStore } from '../stores/jobs.ts';
 import IntegrationConnectionCard from '../components/IntegrationConnectionCard.vue';
 import IntegrationFileUploader from '../components/IntegrationFileUploader.vue';
 import IntegrationDataMapper from '../components/IntegrationDataMapper.vue';

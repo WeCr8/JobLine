@@ -265,7 +265,7 @@
 
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted } from 'vue';
-import { useAuthStore } from '../stores/auth';
+import { useAuthStore } from '../stores/auth.ts';
 import { settingsService } from '../services/settings.service';
 import ApiKeyDisplay from '../components/ApiKeyDisplay.vue';
 import ToggleSwitch from '../components/ToggleSwitch.vue';

@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import { supabase } from '../services/api.service';
+import { supabase } from '../services/api.service.ts';
 import type { 
   ManufacturingDepartment, 
   Machine, 
@@ -14,8 +14,8 @@ import type {
   ShippingReceiving,
   ProgrammingTask
 } from '../types/manufacturing';
-import { demoService } from '../services/demo.service';
-import { useAuthStore } from './auth';
+import { demoService } from '../services/demo.service.ts';
+import { useAuthStore } from './auth.ts';
 
 export const useManufacturingStore = defineStore('manufacturing', () => {
   const departments = ref<ManufacturingDepartment[]>([]);
