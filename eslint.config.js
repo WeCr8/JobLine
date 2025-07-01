@@ -18,6 +18,15 @@ const compat = new FlatCompat({
 });
 
 export default [
+  {
+    ignores: [
+      'node_modules/',
+      'dist/',
+      'public/',
+      '*.config.js',
+      '*.d.ts',
+    ],
+  },
   // Base JS configuration
   ...compat.config({ extends: ['eslint:recommended'] }),
   
@@ -144,18 +153,5 @@ export default [
       'prefer-promise-reject-errors': 'warn',
       'require-await': 'warn',
     },
-  },
-  
-  // Ignore patterns
-  {
-    ignores: [
-      'node_modules/**',
-      'dist/**',
-      'public/**',
-      '*.config.js',
-      'vite.config.ts',
-      'postcss.config.js',
-      'tailwind.config.js',
-    ],
   },
 ];
