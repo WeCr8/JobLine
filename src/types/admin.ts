@@ -152,4 +152,7 @@ export interface SystemLog {
   level: 'INFO' | 'WARN' | 'ERROR' | 'DEBUG';
   timestamp: string;
   message: string;
+  id?: string;
+  userId?: string;
+  ipAddress?: string;
 }
