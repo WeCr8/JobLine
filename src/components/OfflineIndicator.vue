@@ -15,7 +15,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue';
 import { WifiIcon } from '@heroicons/vue/24/outline';
-import { addConnectivityListeners } from '../utils/offline';
+import { addConnectivityListeners } from '../utils/offline.ts';
 
 const isOnline = ref(navigator.onLine);
 

@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import { subscriptionService } from '../services/subscription.service';
-import { products } from '../stripe-config';
+import { subscriptionService } from '../services/subscription.service.ts';
+import { products } from '../stripe-config.ts';
 import type { Product } from '../stripe-config';
 
 interface Subscription {

@@ -375,14 +375,14 @@ export const usePerformanceStore = defineStore('performance', () => {
     }
   ];
 
-  const fetchUserMetrics = async (userId: string, period: string = 'monthly') => {
+  const fetchUserMetrics = async () => {
     loading.value = true;
     await new Promise(resolve => setTimeout(resolve, 800));
     userMetrics.value = mockUserMetrics;
     loading.value = false;
   };
 
-  const fetchAchievements = async (userId?: string) => {
+  const fetchAchievements = async () => {
     loading.value = true;
     await new Promise(resolve => setTimeout(resolve, 600));
     achievements.value = mockAchievements;
@@ -403,7 +403,7 @@ export const usePerformanceStore = defineStore('performance', () => {
     loading.value = false;
   };
 
-  const fetchLeaderboard = async (period: string = 'monthly', department?: string) => {
+  const fetchLeaderboard = async () => {
     loading.value = true;
     await new Promise(resolve => setTimeout(resolve, 700));
     leaderboard.value = mockLeaderboard;
@@ -417,7 +417,7 @@ export const usePerformanceStore = defineStore('performance', () => {
     loading.value = false;
   };
 
-  const fetchInsights = async (userId: string) => {
+  const fetchInsights = async () => {
     loading.value = true;
     await new Promise(resolve => setTimeout(resolve, 500));
     insights.value = mockInsights;

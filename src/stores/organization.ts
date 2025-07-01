@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import { organizationService } from '../services/organization.service';
-import type { Organization, OrganizationUser, Invite, User } from '../types';
+import type { Organization, Invite, User } from '../types';
 
 export const useOrganizationStore = defineStore('organization', () => {
   const organization = ref<Organization | null>(null);

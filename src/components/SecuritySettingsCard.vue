@@ -4,11 +4,11 @@
       <SettingsToggle
         label="Two-Factor Authentication"
         description="Add an extra layer of security to your account"
-        :model-value="twoFactorEnabled"
+        :model-value="props.twoFactorEnabled"
         @update:model-value="$emit('update:twoFactorEnabled', $event)"
       />
       
-      <div v-if="twoFactorEnabled" class="p-4 bg-gray-50 rounded-lg">
+      <div v-if="props.twoFactorEnabled" class="p-4 bg-gray-50 rounded-lg">
         <h5 class="text-sm font-medium text-gray-900 mb-2">Setup Two-Factor Authentication</h5>
         <div class="flex items-center justify-center mb-4">
           <div class="w-32 h-32 bg-gray-200 rounded-lg flex items-center justify-center">
@@ -43,7 +43,7 @@
         </div>
         <div>
           <select
-            :value="sessionTimeout"
+            :value="props.sessionTimeout"
             @input="$emit('update:sessionTimeout', ($event.target as HTMLSelectElement).value)"
             class="px-3 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
           >
@@ -67,6 +67,8 @@ import SettingsSection from './SettingsSection.vue';
 import SettingsToggle from './SettingsToggle.vue';
 
 const verificationCode = ref('');
+
+const props = defineProps<{ twoFactorEnabled: boolean; sessionTimeout: string }>();
 
 defineEmits<{
   'update:twoFactorEnabled': [value: boolean];

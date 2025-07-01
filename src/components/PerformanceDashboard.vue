@@ -527,11 +527,11 @@ const joinTeam = async (challengeId: string, teamId: string) => {
 
 onMounted(() => {
   if (authStore.user) {
-    performanceStore.fetchUserMetrics(authStore.user.id);
-    performanceStore.fetchAchievements(authStore.user.id);
+    performanceStore.fetchUserMetrics();
+    performanceStore.fetchAchievements();
     performanceStore.fetchTeamChallenges();
     performanceStore.fetchSeasonalEvents();
-    performanceStore.fetchInsights(authStore.user.id);
+    performanceStore.fetchInsights();
     userMetrics.value = performanceStore.userMetrics;
   }
 });

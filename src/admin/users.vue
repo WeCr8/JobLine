@@ -246,7 +246,7 @@
             <label class="block text-sm font-medium text-gray-700 mb-2">Organization</label>
             <select
               v-model="editingUser.organization_id"
-              :required="editingUser.role !== 'admin'"
+              :required="true"
               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
             >
               <option value="">None (Platform Admin)</option>

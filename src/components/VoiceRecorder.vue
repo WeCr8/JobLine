@@ -160,8 +160,7 @@ const startRecording = async () => {
     };
 
     mediaRecorder.onstop = async () => {
-      const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
-      await processRecording(audioBlob);
+      await processRecording();
       
       // Stop all tracks to release microphone
       stream.getTracks().forEach(track => track.stop());
@@ -192,11 +191,11 @@ const stopRecording = () => {
   }
 };
 
-const processRecording = async (audioBlob: Blob) => {
+const processRecording = async () => {
   isTranscribing.value = true;
   
   try {
-    const transcription = await optimizationStore.transcribeAudio(audioBlob);
+    const transcription = await optimizationStore.transcribeAudio();
     currentTranscription.value = transcription;
     transcriptionConfidence.value = 0.85 + Math.random() * 0.15; // Mock confidence
   } catch (error) {

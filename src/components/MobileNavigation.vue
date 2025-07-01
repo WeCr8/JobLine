@@ -122,11 +122,11 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { useAuthStore } from '../stores/auth';
-import { useChatStore } from '../stores/chat';
-import { usePerformanceStore } from '../stores/performance';
-import { createAccessibleFocusTrap } from '../utils/accessibility';
-import { addTapGesture } from '../utils/gesture';
+import { useAuthStore } from '../stores/auth.ts';
+import { useChatStore } from '../stores/chat.ts';
+import { usePerformanceStore } from '../stores/performance.ts';
+import { createAccessibleFocusTrap } from '../utils/accessibility.ts';
+import { addTapGesture } from '../utils/gesture.ts';
 import {
   HomeIcon,
   BriefcaseIcon,
@@ -210,7 +210,7 @@ onMounted(() => {
   
   // Load user performance data
   if (authStore.user) {
-    performanceStore.fetchUserMetrics(authStore.user.id);
+    performanceStore.fetchUserMetrics();
   }
 });
 

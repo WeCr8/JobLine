@@ -182,10 +182,10 @@ const getTrendColor = (trend: string) => {
 };
 
 const updateLeaderboard = () => {
-  performanceStore.fetchLeaderboard(selectedPeriod.value, selectedDepartment.value);
+  performanceStore.fetchLeaderboard();
 };
 
 onMounted(() => {
-  performanceStore.fetchLeaderboard(selectedPeriod.value, selectedDepartment.value);
+  performanceStore.fetchLeaderboard();
 });
 </script>

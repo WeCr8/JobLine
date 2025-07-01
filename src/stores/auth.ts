@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import { authService } from '../services/auth.service';
+import { authService } from '../services/auth.service.ts';
 import type { User } from '../types';
 
 export const useAuthStore = defineStore('auth', () => {
@@ -135,7 +135,7 @@ export const useAuthStore = defineStore('auth', () => {
           user.value = {
             id: session.user.id,
             email: session.user.email!,
-            name: session.user.user_metadata?.name || 'User',
+            name: (session.user as any).user_metadata?.name || 'User',
             role: 'operator',
             department: 'Manufacturing',
             is_active: true,
@@ -161,7 +161,7 @@ export const useAuthStore = defineStore('auth', () => {
           user.value = {
             id: session.user.id,
             email: session.user.email!,
-            name: session.user.user_metadata?.name || 'User',
+            name: (session.user as any).user_metadata?.name || 'User',
             role: 'operator',
             department: 'Manufacturing',
             is_active: true,

@@ -296,13 +296,13 @@ const submitInnovation = async () => {
 
 onMounted(() => {
   if (authStore.user) {
-    performanceStore.fetchUserMetrics(authStore.user.id);
-    performanceStore.fetchAchievements(authStore.user.id);
+    performanceStore.fetchUserMetrics();
+    performanceStore.fetchAchievements();
     performanceStore.fetchTeamChallenges();
     performanceStore.fetchBonusStructures();
     performanceStore.fetchLeaderboard();
     performanceStore.fetchSeasonalEvents();
-    performanceStore.fetchInsights(authStore.user.id);
+    performanceStore.fetchInsights();
   }
 });
 </script>

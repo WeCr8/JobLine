@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import { passdownService } from '../services/passdown.service';
-import type { PassdownNote, LaborType, MachineCondition, FiveSChecklist } from '../types';
+import type { PassdownNote } from '../types';
 import { demoService } from '../services/demo.service';
 import { useAuthStore } from './auth';
 

@@ -7,8 +7,7 @@ import type {
   VoiceNote, 
   MediaUpload,
   QualityInsight,
-  EngineeringAlert,
-  OptimizationSuggestion
+  EngineeringAlert
 } from '../types/optimization';
 
 export const useOptimizationStore = defineStore('optimization', () => {
@@ -236,7 +235,7 @@ export const useOptimizationStore = defineStore('optimization', () => {
     mediaUploads.value.unshift(newUpload);
   };
 
-  const transcribeAudio = async (audioBlob: Blob): Promise<string> => {
+  const transcribeAudio = async (): Promise<string> => {
     // Simulate speech-to-text API call
     await new Promise(resolve => setTimeout(resolve, 2000));
     

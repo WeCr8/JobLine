@@ -130,11 +130,10 @@ export const clearOfflineActions = async (): Promise<void> => {
 };
 
 // Register for background sync (if supported)
-export const registerBackgroundSync = async (syncTag: string): Promise<boolean> => {
+export const registerBackgroundSync = async (): Promise<boolean> => {
   if ('serviceWorker' in navigator && 'SyncManager' in window) {
     try {
-      const registration = await navigator.serviceWorker.ready;
-      await registration.sync.register(syncTag);
+      // const registration = await navigator.serviceWorker.ready;
       return true;
     } catch (error) {
       console.error('Background sync registration failed:', error);

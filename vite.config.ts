@@ -192,7 +192,8 @@ export default defineConfig({
           ui: ['@headlessui/vue', '@heroicons/vue'],
           database: ['@supabase/supabase-js']
         }
-      }
+      },
+      external: ['body-scroll-lock', 'focus-trap', 'hammerjs']
     }
   },
   optimizeDeps: {

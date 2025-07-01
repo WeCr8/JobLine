@@ -1,9 +1,9 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import { jobsService } from '../services/jobs.service';
-import type { Job, JobStatus, Priority, JobOperation, DNCProgram, QualityRequirement, MaterialRequirement, Drawing, JobHistoryEntry } from '../types';
-import { demoService } from '../services/demo.service';
-import { useAuthStore } from './auth';
+import { jobsService } from '../services/jobs.service.ts';
+import type { Job, JobStatus, JobHistoryEntry } from '../types';
+import { demoService } from '../services/demo.service.ts';
+import { useAuthStore } from './auth.ts';
 
 export const useJobsStore = defineStore('jobs', () => {
   const jobs = ref<Job[]>([]);

@@ -1,4 +1,4 @@
-import { supabase } from './api.service';
+import { supabase } from './api.service.ts';
 import type { Job, JobStatus, QualityCheck } from '../types';
 
 export const jobsService = {

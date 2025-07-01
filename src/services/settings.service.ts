@@ -482,7 +482,7 @@ export const settingsService = {
   /**
    * Update password
    */
-  async updatePassword(currentPassword: string, newPassword: string): Promise<boolean> {
+  async updatePassword(_currentPassword: string, newPassword: string): Promise<boolean> {
     try {
       // Check for demo mode
       if (import.meta.env.VITE_DEMO_MODE === 'true') {

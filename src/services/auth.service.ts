@@ -1,6 +1,6 @@
-import { supabase } from './api.service';
+import { supabase } from './api.service.ts';
 import type { User } from '../types';
-import { demoService } from './demo.service';
+import { demoService } from './demo.service.ts';
 
 // Demo accounts for testing
 const demoAccounts: Record<string, User> = {

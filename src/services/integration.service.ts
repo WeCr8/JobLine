@@ -253,16 +253,16 @@ export const integrationService = {
           success = await this.testRestApiConnection(connection.config);
           break;
         case 'google-sheets':
-          success = await this.testGoogleSheetsConnection(connection.config);
+          success = await this.testGoogleSheetsConnection();
           break;
         case 'sql-odbc':
-          success = await this.testSqlConnection(connection.config);
+          success = await this.testSqlConnection();
           break;
         case 'sap-bapi':
-          success = await this.testSapConnection(connection.config);
+          success = await this.testSapConnection();
           break;
         case 'sftp':
-          success = await this.testSftpConnection(connection.config);
+          success = await this.testSftpConnection();
           break;
         case 'webhook':
           // Webhooks are passive, so we'll just assume success
@@ -339,7 +339,7 @@ export const integrationService = {
   /**
    * Test Google Sheets connection
    */
-  async testGoogleSheetsConnection(config: any): Promise<boolean> {
+  async testGoogleSheetsConnection(): Promise<boolean> {
     // In a real implementation, this would use the Google Sheets API
     // For now, we'll simulate success
     return true;
@@ -348,7 +348,7 @@ export const integrationService = {
   /**
    * Test SQL connection
    */
-  async testSqlConnection(config: any): Promise<boolean> {
+  async testSqlConnection(): Promise<boolean> {
     // In a real implementation, this would use a SQL client
     // For now, we'll simulate success
     return true;
@@ -357,7 +357,7 @@ export const integrationService = {
   /**
    * Test SAP connection
    */
-  async testSapConnection(config: any): Promise<boolean> {
+  async testSapConnection(): Promise<boolean> {
     // In a real implementation, this would use SAP client libraries
     // For now, we'll simulate success
     return true;
@@ -366,7 +366,7 @@ export const integrationService = {
   /**
    * Test SFTP connection
    */
-  async testSftpConnection(config: any): Promise<boolean> {
+  async testSftpConnection(): Promise<boolean> {
     // In a real implementation, this would use an SFTP client
     // For now, we'll simulate success
     return true;
@@ -616,7 +616,7 @@ export const integrationService = {
   /**
    * Import data from Google Sheets
    */
-  async importFromGoogleSheets(config: any, importType: ImportType): Promise<any[]> {
+  async importFromGoogleSheets(_config: any, importType: ImportType): Promise<any[]> {
     // In a real implementation, this would use the Google Sheets API
     // For now, we'll return mock data
     return this.getMockData(importType, 50);
@@ -625,7 +625,7 @@ export const integrationService = {
   /**
    * Import data from SQL
    */
-  async importFromSql(config: any, importType: ImportType): Promise<any[]> {
+  async importFromSql(_config: any, importType: ImportType): Promise<any[]> {
     // In a real implementation, this would use a SQL client
     // For now, we'll return mock data
     return this.getMockData(importType, 75);
@@ -634,7 +634,7 @@ export const integrationService = {
   /**
    * Import data from SAP
    */
-  async importFromSap(config: any, importType: ImportType): Promise<any[]> {
+  async importFromSap(_config: any, importType: ImportType): Promise<any[]> {
     // In a real implementation, this would use SAP client libraries
     // For now, we'll return mock data
     return this.getMockData(importType, 100);
@@ -643,7 +643,7 @@ export const integrationService = {
   /**
    * Import data from SFTP
    */
-  async importFromSftp(config: any, importType: ImportType): Promise<any[]> {
+  async importFromSftp(_config: any, importType: ImportType): Promise<any[]> {
     // In a real implementation, this would use an SFTP client
     // For now, we'll return mock data
     return this.getMockData(importType, 25);
@@ -1104,7 +1104,7 @@ export const integrationService = {
         });
         
         // Register for background sync
-        await registerBackgroundSync(`sync-connection-${connectionId}`);
+        await registerBackgroundSync();
         
         return true;
       } else {
@@ -1254,10 +1254,6 @@ export const integrationService = {
       
       if (operatorError) throw operatorError;
       
-      // Get operator's skills and department
-      const skills = operator.skills || [];
-      const department = operator.department;
-      
       // Get all pending jobs
       const { data: jobs, error: jobsError } = await supabase
         .from('jobs')
@@ -1272,7 +1268,7 @@ export const integrationService = {
       const { data: machines, error: machinesError } = await supabase
         .from('machines')
         .select('*')
-        .eq('department_id', department)
+        .eq('department_id', operator.department)
         .eq('status', 'idle');
       
       if (machinesError) throw machinesError;
