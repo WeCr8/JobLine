@@ -173,10 +173,10 @@
 
 <script setup lang="ts">
 import { onMounted } from 'vue';
-import { useAuthStore } from '../stores/auth.ts';
-import { useSubscriptionStore } from '../stores/subscription.ts';
-import { products } from '../stripe-config.ts';
-import type { Product } from '../stripe-config.ts';
+import { useAuthStore } from '../stores/auth';
+import { useSubscriptionStore } from '../stores/subscription';
+import { products } from '../stripe-config';
+import type { Product } from '../stripe-config';
 import {
   CheckIcon,
   CheckCircleIcon,
