@@ -272,8 +272,8 @@
 
 <script setup lang="ts">
 import { ref, reactive } from 'vue';
-import { useAuthStore } from '../stores/auth.ts';
-import { usePassdownStore } from '../stores/passdown.ts';
+import { useAuthStore } from '../stores/auth';
+import { usePassdownStore } from '../stores/passdown';
 import type { LaborType, MachineCondition, FiveSChecklist } from '../types';
 
 const authStore = useAuthStore();

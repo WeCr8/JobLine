@@ -118,7 +118,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { format } from 'date-fns';
-import { useChatStore } from '../stores/chat.ts';
+import { useChatStore } from '../stores/chat';
 import ChatInterface from '../components/ChatInterface.vue';
 import IntegrationManager from '../components/IntegrationManager.vue';
 import {

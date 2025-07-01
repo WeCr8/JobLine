@@ -155,7 +155,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
-import { useJobsStore } from '../stores/jobs.ts';
+import { useJobsStore } from '../stores/jobs';
 import type { JobStatus, Job } from '../types';
 import JobCard from '../components/JobCard.vue';
 import JobDetailsModal from '../components/JobDetailsModal.vue';

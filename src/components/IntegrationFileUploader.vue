@@ -143,7 +143,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
-import { integrationService } from '../services/integration.service.ts';
+import { integrationService } from '../services/integration.service';
 import type { ConnectionConfig, ImportType } from '../types/integration';
 import {
   DocumentArrowUpIcon,

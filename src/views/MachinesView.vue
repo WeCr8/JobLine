@@ -332,7 +332,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { format } from 'date-fns';
-import { useManufacturingStore } from '../stores/manufacturing.ts';
+import { useManufacturingStore } from '../stores/manufacturing';
 import {
   ChevronUpIcon,
   ChevronDownIcon,

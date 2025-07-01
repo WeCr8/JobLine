@@ -246,7 +246,7 @@
 <script setup lang="ts">
 import { ref, nextTick, watch } from 'vue';
 import { format } from 'date-fns';
-import { useChatStore } from '../stores/chat.ts';
+import { useChatStore } from '../stores/chat';
 import {
   ChatBubbleLeftRightIcon,
   PaperAirplaneIcon,

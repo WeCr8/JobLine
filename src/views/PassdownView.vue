@@ -180,7 +180,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { format } from 'date-fns';
-import { usePassdownStore } from '../stores/passdown.ts';
+import { usePassdownStore } from '../stores/passdown';
 import PassdownForm from '../components/PassdownForm.vue';
 import ChartWidget from '../components/ChartWidget.vue';
 import type { ChartData } from '../types';

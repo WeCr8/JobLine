@@ -153,7 +153,7 @@
 import { computed } from 'vue';
 import { format } from 'date-fns';
 import type { Job } from '../types';
-import { useAuthStore } from '../stores/auth.ts';
+import { useAuthStore } from '../stores/auth';
 
 interface Props {
   job: Job;
