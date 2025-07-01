@@ -2,6 +2,7 @@ import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import { organizationService } from '../services/organization.service';
 import type { Organization, Invite, User } from '../types';
+import { useAuthStore } from './auth';
 
 export const useOrganizationStore = defineStore('organization', () => {
   const organization = ref<Organization | null>(null);
@@ -10,6 +11,8 @@ export const useOrganizationStore = defineStore('organization', () => {
   const departments = ref<any[]>([]);
   const loading = ref(false);
   const error = ref<string | null>(null);
+
+  const authStore = useAuthStore();
 
   // Fetch current user's organization
   const fetchOrganization = async () => {
@@ -87,7 +90,7 @@ export const useOrganizationStore = defineStore('organization', () => {
     error.value = null;
 
     try {
-      const success = await organizationService.updateOrganization(organization.value.id, updates);
+      const success = await organizationService.updateOrganization(authStore.user, organization.value.id, updates);
       
       if (success && organization.value) {
         organization.value = { ...organization.value, ...updates };
@@ -111,7 +114,7 @@ export const useOrganizationStore = defineStore('organization', () => {
     error.value = null;
 
     try {
-      const invite = await organizationService.inviteUser(organization.value.id, email, role, department);
+      const invite = await organizationService.inviteUser(authStore.user, organization.value.id, email, role, department);
       
       if (invite) {
         invites.value.push(invite);
@@ -133,7 +136,7 @@ export const useOrganizationStore = defineStore('organization', () => {
     error.value = null;
 
     try {
-      const success = await organizationService.cancelInvite(inviteId);
+      const success = await organizationService.cancelInvite(authStore.user, inviteId);
       
       if (success) {
         invites.value = invites.value.filter(invite => invite.id !== inviteId);
@@ -155,7 +158,7 @@ export const useOrganizationStore = defineStore('organization', () => {
     error.value = null;
 
     try {
-      const success = await organizationService.updateUser(userId, updates);
+      const success = await organizationService.updateUser(authStore.user, userId, updates);
       
       if (success) {
         const index = users.value.findIndex(u => u.id === userId);
@@ -180,7 +183,7 @@ export const useOrganizationStore = defineStore('organization', () => {
     error.value = null;
 
     try {
-      const newDept = await organizationService.addDepartment(department);
+      const newDept = await organizationService.addDepartment(authStore.user, department);
       
       if (newDept) {
         departments.value.push(newDept);

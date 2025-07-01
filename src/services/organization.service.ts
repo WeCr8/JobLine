@@ -1,7 +1,7 @@
 import { supabase } from './api.service';
 import type { Organization, User, Invite } from '../types';
 import { canAccess } from '../utils/security.utils';
-import { logAudit } from './api.service';
+import { logAudit, logConsistencyFlag } from './api.service';
 
 export const organizationService = {
   /**
@@ -114,13 +114,21 @@ export const organizationService = {
   /**
    * Invite a user to the organization
    */
-  async inviteUser(organizationId: string, email: string, role: string, department?: string): Promise<Invite | null> {
+  async inviteUser(user: any, organizationId: string, email: string, role: string, department?: string): Promise<Invite | null> {
     try {
-      // Get current user for created_by
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) throw new Error('User not authenticated');
-      
+      // Permission check
+      if (!canAccess(user, 'organization:invite', { organizationId })) {
+        await logConsistencyFlag({
+          type: 'permission',
+          severity: 'error',
+          resourceType: 'organization',
+          resourceId: organizationId,
+          context: { user, email, role, department },
+          detectedBy: 'organizationService.inviteUser',
+          notes: 'Permission denied: organization:invite.'
+        });
+        return null;
+      }
       const { data, error } = await supabase
         .from('invites')
         .insert({
@@ -133,11 +141,18 @@ export const organizationService = {
         })
         .select()
         .single();
-      
       if (error) throw error;
-      
       if (!data) return null;
-      
+      // Audit log
+      await logAudit({
+        userId: user?.id || null,
+        action: 'organization.inviteUser',
+        resourceType: 'organization',
+        resourceId: organizationId,
+        before: null,
+        after: { invite: data },
+        reason: `Invited user ${email} as ${role}`
+      });
       return {
         id: data.id,
         organizationId: data.organization_id,
@@ -158,15 +173,42 @@ export const organizationService = {
   /**
    * Cancel an invite
    */
-  async cancelInvite(inviteId: string): Promise<boolean> {
+  async cancelInvite(user: any, inviteId: string): Promise<boolean> {
     try {
+      // Fetch invite for permission check
+      const { data: invite, error: fetchError } = await supabase
+        .from('invites')
+        .select('*')
+        .eq('id', inviteId)
+        .single();
+      if (fetchError) throw fetchError;
+      if (!canAccess(user, 'organization:cancelInvite', invite)) {
+        await logConsistencyFlag({
+          type: 'permission',
+          severity: 'error',
+          resourceType: 'invite',
+          resourceId: inviteId,
+          context: { user, invite },
+          detectedBy: 'organizationService.cancelInvite',
+          notes: 'Permission denied: organization:cancelInvite.'
+        });
+        return false;
+      }
       const { error } = await supabase
         .from('invites')
         .delete()
         .eq('id', inviteId);
-      
       if (error) throw error;
-      
+      // Audit log
+      await logAudit({
+        userId: user?.id || null,
+        action: 'organization.cancelInvite',
+        resourceType: 'invite',
+        resourceId: inviteId,
+        before: invite,
+        after: null,
+        reason: 'Invite cancelled.'
+      });
       return true;
     } catch (err) {
       console.error('Error cancelling invite:', err);
@@ -177,8 +219,27 @@ export const organizationService = {
   /**
    * Update a user
    */
-  async updateUser(userId: string, updates: Partial<User>): Promise<boolean> {
+  async updateUser(user: any, userId: string, updates: Partial<User>): Promise<boolean> {
     try {
+      // Fetch target user for permission check and before state
+      const { data: targetUser, error: fetchError } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', userId)
+        .single();
+      if (fetchError) throw fetchError;
+      if (!canAccess(user, 'user:update', targetUser)) {
+        await logConsistencyFlag({
+          type: 'permission',
+          severity: 'error',
+          resourceType: 'user',
+          resourceId: userId,
+          context: { user, targetUser, updates },
+          detectedBy: 'organizationService.updateUser',
+          notes: 'Permission denied: user:update.'
+        });
+        return false;
+      }
       const { error } = await supabase
         .from('users')
         .update({
@@ -189,9 +250,17 @@ export const organizationService = {
           updated_at: new Date().toISOString()
         })
         .eq('id', userId);
-      
       if (error) throw error;
-      
+      // Audit log
+      await logAudit({
+        userId: user?.id || null,
+        action: 'user.update',
+        resourceType: 'user',
+        resourceId: userId,
+        before: targetUser,
+        after: { ...targetUser, ...updates },
+        reason: 'User updated.'
+      });
       return true;
     } catch (err) {
       console.error('Error updating user:', err);
@@ -269,8 +338,34 @@ export const organizationService = {
   /**
    * Add a department
    */
-  async addDepartment(department: any): Promise<any | null> {
+  async addDepartment(user: any, department: any): Promise<any | null> {
     try {
+      // Permission check
+      if (!canAccess(user, 'department:add', department)) {
+        await logConsistencyFlag({
+          type: 'permission',
+          severity: 'error',
+          resourceType: 'department',
+          resourceId: department.id,
+          context: { user, department },
+          detectedBy: 'organizationService.addDepartment',
+          notes: 'Permission denied: department:add.'
+        });
+        return null;
+      }
+      // Validation (simple example: require name)
+      if (!department.name || typeof department.name !== 'string') {
+        await logConsistencyFlag({
+          type: 'validation',
+          severity: 'error',
+          resourceType: 'department',
+          resourceId: department.id,
+          context: { user, department },
+          detectedBy: 'organizationService.addDepartment',
+          notes: 'Department validation failed: name is required.'
+        });
+        return null;
+      }
       const { data, error } = await supabase
         .from('departments')
         .insert({
@@ -282,9 +377,17 @@ export const organizationService = {
         })
         .select()
         .single();
-      
       if (error) throw error;
-      
+      // Audit log
+      await logAudit({
+        userId: user?.id || null,
+        action: 'department.add',
+        resourceType: 'department',
+        resourceId: department.id,
+        before: null,
+        after: data,
+        reason: 'Department added.'
+      });
       return data;
     } catch (err) {
       console.error('Error adding department:', err);

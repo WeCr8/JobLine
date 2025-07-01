@@ -1,6 +1,6 @@
 import { supabase } from './api.service';
 import type { JobStatus, QualityCheck } from '../types';
-import type { Job } from '../types/job';
+import type { Job } from '../types/index';
 import { validateJob } from '../utils/validate.utils';
 import { canAccess } from '../utils/security.utils';
 import { logAudit, logConsistencyFlag } from './api.service';
@@ -25,34 +25,20 @@ export const jobsService = {
       
       if (error) throw error;
       
-      // Process the data to match the expected Job type
+      // Process the data to match the expected Job type (from src/types/index.ts)
       return (data || []).map(job => ({
         id: job.id,
-        jobNumber: job.job_number,
-        partNumber: job.part_number,
-        partName: job.part_name,
-        customer: job.customer,
-        quantity: job.quantity,
-        completedQuantity: job.completed_quantity,
+        name: job.name || job.job_number || '',
         status: job.status,
-        priority: job.priority,
         dueDate: job.due_date,
         startDate: job.start_date,
-        estimatedHours: job.estimated_hours,
-        actualHours: job.actual_hours,
-        operator: job.operator_id, // Would need to join with users table for name
-        machine: job.machine_id, // Would need to join with machines table for name
-        operation: job.operation || '',
-        notes: job.notes || '',
-        operations: job.operations || [],
-        dncPrograms: [], // Would need to fetch separately
-        history: job.history || [],
-        qualityRequirements: job.quality_requirements || [],
-        tooling: [], // Would need to fetch separately
-        materials: job.materials || [],
-        drawings: job.drawings || [],
-        createdAt: job.created_at,
-        updatedAt: job.updated_at
+        completedDate: job.completed_date,
+        priority: job.priority,
+        assignedTo: job.operator_id,
+        organizationId: job.organization_id || '',
+        itemIds: job.item_ids,
+        lastUpdated: job.updated_at || new Date().toISOString(),
+        customFields: job.custom_fields,
       }));
     } catch (err) {
       console.error('Error fetching jobs:', err);
@@ -82,41 +68,19 @@ export const jobsService = {
       
       if (!data) return null;
       
-      // Fetch DNC programs for this job
-      const { data: dncPrograms, error: dncError } = await supabase
-        .from('dnc_programs')
-        .select('*')
-        .eq('operation_id', data.operations.map((op: any) => op.id));
-      
-      if (dncError) console.error('Error fetching DNC programs:', dncError);
-      
       return {
         id: data.id,
-        jobNumber: data.job_number,
-        partNumber: data.part_number,
-        partName: data.part_name,
-        customer: data.customer,
-        quantity: data.quantity,
-        completedQuantity: data.completed_quantity,
+        name: data.name || data.job_number || '',
         status: data.status,
-        priority: data.priority,
         dueDate: data.due_date,
         startDate: data.start_date,
-        estimatedHours: data.estimated_hours,
-        actualHours: data.actual_hours,
-        operator: data.operator_id, // Would need to join with users table for name
-        machine: data.machine_id, // Would need to join with machines table for name
-        operation: data.operation || '',
-        notes: data.notes || '',
-        operations: data.operations || [],
-        dncPrograms: dncPrograms || [],
-        history: data.history || [],
-        qualityRequirements: data.quality_requirements || [],
-        tooling: [], // Would need to fetch separately
-        materials: data.materials || [],
-        drawings: data.drawings || [],
-        createdAt: data.created_at,
-        updatedAt: data.updated_at
+        completedDate: data.completed_date,
+        priority: data.priority,
+        assignedTo: data.operator_id,
+        organizationId: data.organization_id || '',
+        itemIds: data.item_ids,
+        lastUpdated: data.updated_at || new Date().toISOString(),
+        customFields: data.custom_fields,
       };
     } catch (err) {
       console.error('Error fetching job by ID:', err);
@@ -183,7 +147,7 @@ export const jobsService = {
   /**
    * Update job progress (completed quantity)
    */
-  async updateJobProgress(jobId: string, completedQuantity: number): Promise<boolean> {
+  async updateJobProgress(user: any, jobId: string, completedQuantity: number): Promise<boolean> {
     try {
       const { data: job, error: fetchError } = await supabase
         .from('jobs')
@@ -191,13 +155,35 @@ export const jobsService = {
         .eq('id', jobId)
         .single();
       if (fetchError) throw fetchError;
+      // Permission check
+      if (!canAccess(user, 'job:update', job)) {
+        await logConsistencyFlag({
+          type: 'permission',
+          severity: 'error',
+          resourceType: 'job',
+          resourceId: jobId,
+          context: { user, job, attemptedCompletedQuantity: completedQuantity },
+          detectedBy: 'jobsService.updateJobProgress',
+          notes: 'Permission denied: job:update during progress update.'
+        });
+        return false;
+      }
       // Ensure completed quantity doesn't exceed total quantity
       const validQuantity = Math.min(completedQuantity, job.quantity);
       // Validate with updated completedQuantity
       const validationJob = mapDbJobToValidationJob({ ...job, completedQuantity: validQuantity });
       const errors = validateJob(validationJob);
       if (errors.length) {
-        throw new Error('Job validation failed: ' + errors.join('; '));
+        await logConsistencyFlag({
+          type: 'validation',
+          severity: 'error',
+          resourceType: 'job',
+          resourceId: jobId,
+          context: { errors, job, attemptedCompletedQuantity: validQuantity },
+          detectedBy: 'jobsService.updateJobProgress',
+          notes: 'Job validation failed during progress update.'
+        });
+        return false;
       }
       const { error } = await supabase
         .from('jobs')
@@ -208,6 +194,16 @@ export const jobsService = {
         })
         .eq('id', jobId);
       if (error) throw error;
+      // Audit log
+      await logAudit({
+        userId: user?.id || null,
+        action: 'job.updateProgress',
+        resourceType: 'job',
+        resourceId: jobId,
+        before: job,
+        after: { ...job, completed_quantity: validQuantity, status: validQuantity === job.quantity ? 'completed' : job.status },
+        reason: 'Job progress updated.'
+      });
       return true;
     } catch (err) {
       console.error('Error updating job progress:', err);
@@ -278,7 +274,7 @@ export const jobsService = {
 };
 
 // Helper to map DB job to minimal Job for validation only
-function mapDbJobToValidationJob(job: any): import('../types/job').Job {
+function mapDbJobToValidationJob(job: any): import('../types/index').Job {
   return {
     id: job.id,
     name: job.name || job.jobNumber || '',

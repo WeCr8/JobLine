@@ -6,6 +6,8 @@ import type {
   SystemSettings,
   SystemLog
 } from '../types/admin';
+import { canAccess } from '../utils/security.utils';
+import { logConsistencyFlag, logAudit } from './api.service';
 
 export const adminService = {
   /**
@@ -168,8 +170,20 @@ export const adminService = {
   /**
    * Save subscription plan
    */
-  async saveSubscriptionPlan(plan: SubscriptionPlan): Promise<SubscriptionPlan | null> {
+  async saveSubscriptionPlan(user: any, plan: SubscriptionPlan): Promise<SubscriptionPlan | null> {
     try {
+      if (!canAccess(user, 'subscriptionPlan:save', plan)) {
+        await logConsistencyFlag({
+          type: 'permission',
+          severity: 'error',
+          resourceType: 'subscriptionPlan',
+          resourceId: plan.id,
+          context: { user, plan },
+          detectedBy: 'adminService.saveSubscriptionPlan',
+          notes: 'Permission denied: subscriptionPlan:save.'
+        });
+        return null;
+      }
       if (plan.id) {
         // Update existing plan
         const { error } = await supabase
@@ -185,9 +199,17 @@ export const adminService = {
             updated_at: new Date().toISOString()
           })
           .eq('id', plan.id);
-
         if (error) throw error;
-
+        // Audit log
+        await logAudit({
+          userId: user?.id || null,
+          action: 'subscriptionPlan.update',
+          resourceType: 'subscriptionPlan',
+          resourceId: plan.id,
+          before: null, // Optionally fetch before state
+          after: plan,
+          reason: 'Subscription plan updated.'
+        });
         return plan;
       } else {
         // Create new plan
@@ -204,11 +226,18 @@ export const adminService = {
           })
           .select()
           .single();
-
         if (error) throw error;
-
         if (!data) return null;
-
+        // Audit log
+        await logAudit({
+          userId: user?.id || null,
+          action: 'subscriptionPlan.create',
+          resourceType: 'subscriptionPlan',
+          resourceId: data.id,
+          before: null,
+          after: data,
+          reason: 'Subscription plan created.'
+        });
         return {
           id: data.id,
           name: data.name,
@@ -232,21 +261,42 @@ export const adminService = {
   /**
    * Update user
    */
-  async updateUser(user: User): Promise<boolean> {
+  async updateUser(user: any, targetUser: User): Promise<boolean> {
     try {
+      // Permission check
+      if (!await canAccess(user, 'user:update', targetUser)) {
+        await logConsistencyFlag({
+          type: 'permission',
+          severity: 'error',
+          resourceType: 'user',
+          resourceId: targetUser.id,
+          context: { user, targetUser },
+          detectedBy: 'adminService.updateUser',
+          notes: 'Permission denied: user:update.'
+        });
+        return false;
+      }
       const { error } = await supabase
         .from('users')
         .update({
-          name: user.name,
-          role: user.role,
-          department: user.department,
-          is_active: user.is_active,
+          name: targetUser.name,
+          role: targetUser.role,
+          department: targetUser.department,
+          is_active: targetUser.is_active,
           updated_at: new Date().toISOString()
         })
-        .eq('id', user.id);
-
+        .eq('id', targetUser.id);
       if (error) throw error;
-
+      // Audit log
+      await logAudit({
+        userId: user?.id || null,
+        action: 'user.update',
+        resourceType: 'user',
+        resourceId: targetUser.id,
+        before: null, // Optionally fetch before state
+        after: targetUser,
+        reason: 'User updated.'
+      });
       return true;
     } catch (err) {
       console.error('Error updating user:', err);
@@ -257,8 +307,20 @@ export const adminService = {
   /**
    * Save organization
    */
-  async saveOrganization(organization: Organization): Promise<Organization | null> {
+  async saveOrganization(user: any, organization: Organization): Promise<Organization | null> {
     try {
+      if (!await canAccess(user, 'organization:save', organization)) {
+        await logConsistencyFlag({
+          type: 'permission',
+          severity: 'error',
+          resourceType: 'organization',
+          resourceId: organization.id,
+          context: { user, organization },
+          detectedBy: 'adminService.saveOrganization',
+          notes: 'Permission denied: organization:save.'
+        });
+        return null;
+      }
       if (organization.id) {
         // Update existing organization
         const { error } = await supabase
@@ -277,9 +339,17 @@ export const adminService = {
             updated_at: new Date().toISOString()
           })
           .eq('id', organization.id);
-
         if (error) throw error;
-
+        // Audit log
+        await logAudit({
+          userId: user?.id || null,
+          action: 'organization.update',
+          resourceType: 'organization',
+          resourceId: organization.id,
+          before: null, // Optionally fetch before state
+          after: organization,
+          reason: 'Organization updated.'
+        });
         return organization;
       } else {
         // Create new organization
@@ -299,11 +369,18 @@ export const adminService = {
           })
           .select()
           .single();
-
         if (error) throw error;
-
         if (!data) return null;
-
+        // Audit log
+        await logAudit({
+          userId: user?.id || null,
+          action: 'organization.create',
+          resourceType: 'organization',
+          resourceId: data.id,
+          before: null,
+          after: data,
+          reason: 'Organization created.'
+        });
         return {
           id: data.id,
           name: data.name,

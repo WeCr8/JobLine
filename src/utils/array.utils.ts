@@ -9,14 +9,18 @@ export function deepClone<T>(obj: T): T {
 // Deep merge (simple recursive merge)
 export function deepMerge<T extends object, U extends object>(target: T, source: U): T & U {
   const output = { ...target } as T & U
+  function isPlainObject(obj: any): obj is object {
+    return obj !== null && typeof obj === 'object' && !Array.isArray(obj);
+  }
   for (const key in source) {
     if (
       Object.prototype.hasOwnProperty.call(source, key) &&
-      typeof source[key] === 'object' &&
-      source[key] !== null &&
-      !Array.isArray(source[key])
+      isPlainObject(source[key]) &&
+      isPlainObject((output as any)[key])
     ) {
-      output[key] = deepMerge((output as any)[key] || {}, source[key])
+      output[key] = deepMerge((output as any)[key], source[key]) as (T & U)[Extract<keyof U, string>];
+    } else if (isPlainObject(source[key])) {
+      output[key] = deepMerge({}, source[key]) as (T & U)[Extract<keyof U, string>];
     } else {
       output[key] = source[key] as any
     }

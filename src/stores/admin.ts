@@ -11,6 +11,7 @@ import type {
 } from '../types/admin';
 import type { User } from '../types';
 import type { UserRole } from '../types/index';
+import { useAuthStore } from './auth';
 
 export type { Organization, SubscriptionPlan, SystemSettings, SystemLog, Analytics };
 export type { User, Subscription, Invoice } from '../types/admin';
@@ -53,6 +54,7 @@ export const useAdminStore = defineStore('admin', () => {
   const loading = ref(false);
   const error = ref<string | null>(null);
   const flaggedIssues = ref<any[]>([]);
+  const authStore = useAuthStore();
 
   // Fetch subscription plans
   const fetchSubscriptionPlans = async () => {
@@ -261,7 +263,7 @@ export const useAdminStore = defineStore('admin', () => {
     error.value = null;
 
     try {
-      const savedPlan = await adminService.saveSubscriptionPlan(plan);
+      const savedPlan = await adminService.saveSubscriptionPlan(authStore.user, plan);
       
       if (!savedPlan) {
         throw new Error('Failed to save subscription plan');
@@ -293,7 +295,7 @@ export const useAdminStore = defineStore('admin', () => {
 
     try {
       user.role = user.role as UserRole;
-      const success = await adminService.updateUser(user);
+      const success = await adminService.updateUser(authStore.user, user);
       
       if (!success) {
         throw new Error('Failed to update user');
@@ -319,7 +321,7 @@ export const useAdminStore = defineStore('admin', () => {
     error.value = null;
 
     try {
-      const savedOrg = await adminService.saveOrganization(organization);
+      const savedOrg = await adminService.saveOrganization(authStore.user, organization);
       
       if (!savedOrg) {
         throw new Error('Failed to save organization');

@@ -18,15 +18,16 @@ export function onIdle(timeout: number, callback: () => void): () => void {
     if (timer) clearTimeout(timer)
     timer = window.setTimeout(callback, timeout)
   }
-  ['mousemove', 'keydown', 'mousedown', 'touchstart'].forEach(evt => {
-    window.addEventListener(evt, reset)
-  })
+  const events = ['mousemove', 'keydown', 'mousedown', 'touchstart'];
+  for (const evt of events) {
+    window.addEventListener(evt, reset);
+  }
   reset()
   return () => {
     if (timer) clearTimeout(timer)
-    ['mousemove', 'keydown', 'mousedown', 'touchstart'].forEach(evt => {
-      window.removeEventListener(evt, reset)
-    })
+    for (const evt of events) {
+      window.removeEventListener(evt, reset);
+    }
   }
 }
 

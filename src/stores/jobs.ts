@@ -65,7 +65,7 @@ export const useJobsStore = defineStore('jobs', () => {
         return true;
       } else {
         // Use real API
-        const success = await jobsService.updateJobStatus(jobId, status, notes);
+        const success = await jobsService.updateJobStatus(authStore.user, jobId, status, notes);
         
         if (success) {
           const job = jobs.value.find(j => j.id === jobId);
@@ -137,7 +137,7 @@ export const useJobsStore = defineStore('jobs', () => {
         return true;
       } else {
         // Use real API
-        const success = await jobsService.updateJobProgress(jobId, completedQuantity);
+        const success = await jobsService.updateJobProgress(authStore.user, jobId, completedQuantity);
         
         if (success) {
           const job = jobs.value.find(j => j.id === jobId);
