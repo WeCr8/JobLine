@@ -51,5 +51,7 @@
     "vite": "^5.2.8",
     "vite-plugin-pwa": "^0.18.0",
     "vue-tsc": "^2.3.0"
-  }
+  },
+  "overrides": {
+  "@types/hammerjs": "2.0.40"
 }
