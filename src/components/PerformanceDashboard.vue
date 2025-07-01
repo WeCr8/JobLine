@@ -410,8 +410,8 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { format } from 'date-fns';
-import { usePerformanceStore } from '../stores/performance';
-import { useAuthStore } from '../stores/auth';
+import { usePerformanceStore } from '../stores/performance.ts';
+import { useAuthStore } from '../stores/auth.ts';
 import {
   TrophyIcon,
   FireIcon,
@@ -422,8 +422,7 @@ import {
   ChevronDownIcon,
   MinusIcon,
   LightBulbIcon,
-  ShieldCheckIcon,
-  ClockIcon
+  ShieldCheckIcon
 } from '@heroicons/vue/24/outline';
 
 const performanceStore = usePerformanceStore();
@@ -528,11 +527,11 @@ const joinTeam = async (challengeId: string, teamId: string) => {
 
 onMounted(() => {
   if (authStore.user) {
-    performanceStore.fetchUserMetrics(authStore.user.id);
-    performanceStore.fetchAchievements(authStore.user.id);
+    performanceStore.fetchUserMetrics();
+    performanceStore.fetchAchievements();
     performanceStore.fetchTeamChallenges();
     performanceStore.fetchSeasonalEvents();
-    performanceStore.fetchInsights(authStore.user.id);
+    performanceStore.fetchInsights();
     userMetrics.value = performanceStore.userMetrics;
   }
 });

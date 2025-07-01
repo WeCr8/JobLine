@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import { useAuthStore } from '../stores/auth';
+import { useAuthStore } from '../stores/auth.ts';
 
 const router = createRouter({
   history: createWebHistory(),
@@ -64,8 +64,20 @@ const router = createRouter({
     {
       path: '/integration',
       name: 'Integration',
-      component: () => import('../views/IntegrationView.vue'),
+      component: () => import('../views/IntegrationDashboardView.vue'),
       meta: { requiresAuth: true, requiresRole: ['admin', 'manager', 'organization_admin'] }
+    },
+    {
+      path: '/integration/settings',
+      name: 'IntegrationSettings',
+      component: () => import('../views/IntegrationSettingsView.vue'),
+      meta: { requiresAuth: true, requiresRole: ['admin', 'manager', 'organization_admin'] }
+    },
+    {
+      path: '/integration/scheduler',
+      name: 'IntegrationScheduler',
+      component: () => import('../views/IntegrationSchedulerView.vue'),
+      meta: { requiresAuth: true, requiresRole: ['admin', 'manager', 'organization_admin', 'supervisor'] }
     },
     {
       path: '/optimization',
@@ -78,6 +90,17 @@ const router = createRouter({
       name: 'Performance',
       component: () => import('../views/PerformanceView.vue'),
       meta: { requiresAuth: true }
+    },
+    {
+      path: '/settings',
+      name: 'Settings',
+      component: () => import('../views/SettingsView.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/components',
+      name: 'ComponentLibrary',
+      component: () => import('../views/ComponentLibrary.vue')
     },
     {
       path: '/admin',
@@ -112,6 +135,10 @@ const router = createRouter({
         {
           path: 'logs',
           component: () => import('../admin/logs.vue')
+        },
+        {
+          path: 'integrations',
+          component: () => import('../admin/integrations.vue')
         },
         {
           path: '',
@@ -186,11 +213,24 @@ const router = createRouter({
           redirect: '/team/dashboard'
         }
       ]
+    },
+    // Share target route for PWA
+    {
+      path: '/share-target',
+      name: 'ShareTarget',
+      component: () => import('../views/ShareTargetView.vue'),
+      meta: { requiresAuth: true }
+    },
+    // Catch-all route for 404
+    {
+      path: '/:pathMatch(.*)*',
+      name: 'NotFound',
+      component: () => import('../views/NotFoundView.vue')
     }
   ]
 });
 
-router.beforeEach((to, from, next) => {
+router.beforeEach((to, _from, next) => {
   const authStore = useAuthStore();
   
   if (to.meta.requiresAuth && !authStore.isAuthenticated) {

@@ -106,14 +106,14 @@
             </button>
             <button
               type="button"
-              @click="loginAsDemo('org-admin@example.com')"
+              @click="loginAsDemo('demo-org-admin@wecr8.info')"
               class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 transition-colors duration-200"
             >
               Org Admin
             </button>
             <button
               type="button"
-              @click="loginAsDemo('operator@example.com')"
+              @click="loginAsDemo('demo-operator@wecr8.info')"
               class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 transition-colors duration-200"
             >
               Operator
@@ -128,7 +128,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { useAuthStore } from '../stores/auth';
+import { useAuthStore } from '../stores/auth.ts';
 import { ExclamationTriangleIcon } from '@heroicons/vue/24/outline';
 
 const router = useRouter();
@@ -138,16 +138,20 @@ const email = ref('');
 const password = ref('');
 
 const handleLogin = async () => {
-  const { error } = await authStore.signIn(email.value, password.value);
-  if (!error) {
-    // Redirect based on user role
-    if (authStore.isPlatformAdmin) {
-      router.push('/admin/dashboard');
-    } else if (authStore.isOrgAdmin) {
-      router.push('/org/dashboard');
-    } else {
-      router.push('/dashboard');
+  try {
+    const { error } = await authStore.signIn(email.value, password.value);
+    if (!error) {
+      // Redirect based on user role
+      if (authStore.isPlatformAdmin) {
+        router.push('/admin/dashboard');
+      } else if (authStore.isOrgAdmin) {
+        router.push('/org/dashboard');
+      } else {
+        router.push('/dashboard');
+      }
     }
+  } catch (err) {
+    console.error('Login error:', err);
   }
 };
 

@@ -194,8 +194,8 @@ Performance analytics"
 
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue';
-import { useAdminStore } from '../stores/admin';
-import type { SubscriptionPlan } from '../stores/admin';
+import { useAdminStore } from '../stores/admin.ts';
+import type { SubscriptionPlan } from '../types/admin';
 import { ArrowPathIcon } from '@heroicons/vue/24/outline';
 
 const adminStore = useAdminStore();

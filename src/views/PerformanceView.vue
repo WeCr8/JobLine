@@ -224,8 +224,8 @@
 
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue';
-import { usePerformanceStore } from '../stores/performance';
-import { useAuthStore } from '../stores/auth';
+import { usePerformanceStore } from '../stores/performance.ts';
+import { useAuthStore } from '../stores/auth.ts';
 import PerformanceDashboard from '../components/PerformanceDashboard.vue';
 import LeaderboardWidget from '../components/LeaderboardWidget.vue';
 import {
@@ -296,13 +296,13 @@ const submitInnovation = async () => {
 
 onMounted(() => {
   if (authStore.user) {
-    performanceStore.fetchUserMetrics(authStore.user.id);
-    performanceStore.fetchAchievements(authStore.user.id);
+    performanceStore.fetchUserMetrics();
+    performanceStore.fetchAchievements();
     performanceStore.fetchTeamChallenges();
     performanceStore.fetchBonusStructures();
     performanceStore.fetchLeaderboard();
     performanceStore.fetchSeasonalEvents();
-    performanceStore.fetchInsights(authStore.user.id);
+    performanceStore.fetchInsights();
   }
 });
 </script>

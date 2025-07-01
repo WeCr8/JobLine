@@ -119,8 +119,8 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import { usePerformanceStore } from '../stores/performance';
-import { useAuthStore } from '../stores/auth';
+import { usePerformanceStore } from '../stores/performance.ts';
+import { useAuthStore } from '../stores/auth.ts';
 import {
   TrophyIcon,
   StarIcon,
@@ -182,10 +182,10 @@ const getTrendColor = (trend: string) => {
 };
 
 const updateLeaderboard = () => {
-  performanceStore.fetchLeaderboard(selectedPeriod.value, selectedDepartment.value);
+  performanceStore.fetchLeaderboard();
 };
 
 onMounted(() => {
-  performanceStore.fetchLeaderboard(selectedPeriod.value, selectedDepartment.value);
+  performanceStore.fetchLeaderboard();
 });
 </script>

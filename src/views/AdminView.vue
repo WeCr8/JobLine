@@ -593,7 +593,7 @@
                     <div class="text-sm text-gray-900">{{ log.message }}</div>
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap">
-                    <div class="text-sm text-gray-900">{{ getUserName(log.userId) || 'System' }}</div>
+                    <div class="text-sm text-gray-900">{{ getUserName(log.user_id) || 'System' }}</div>
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap">
                     <div class="text-sm text-gray-900">{{ log.ipAddress || '-' }}</div>
@@ -809,7 +809,7 @@ Performance analytics"
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted } from 'vue';
 import { format } from 'date-fns';
-import { useAdminStore } from '../stores/admin';
+import { useAdminStore } from '../stores/admin.ts';
 import type { SubscriptionPlan, Organization, User } from '../stores/admin';
 import {
   UserGroupIcon,
@@ -820,8 +820,7 @@ import {
   ArrowPathIcon,
   Cog6ToothIcon,
   DocumentTextIcon,
-  CreditCardIcon,
-  BriefcaseIcon
+  CreditCardIcon
 } from '@heroicons/vue/24/outline';
 
 const adminStore = useAdminStore();

@@ -1,3 +1,5 @@
+import type { AIRecommendation } from './integration.ts';
+
 export interface Job {
   id: string;
   jobNumber: string;
@@ -23,6 +25,7 @@ export interface Job {
   tooling: ToolingRequirement[];
   materials: MaterialRequirement[];
   drawings: Drawing[];
+  aiRecommendation?: AIRecommendation;
   createdAt: string;
   updatedAt: string;
 }
@@ -170,6 +173,7 @@ export interface User {
   is_active: boolean;
   last_login?: string;
   created_at: string;
+  is_developer?: boolean;
 }
 
 export type UserRole = 'operator' | 'lead' | 'supervisor' | 'manager' | 'admin' | 'customer' | 'organization_admin';

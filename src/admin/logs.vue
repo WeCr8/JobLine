@@ -109,8 +109,9 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { format, subDays } from 'date-fns';
-import { useAdminStore } from '../stores/admin';
+import { useAdminStore } from '../stores/admin.ts';
 import { ArrowPathIcon } from '@heroicons/vue/24/outline';
+import type { User } from '../types/admin';
 
 const adminStore = useAdminStore();
 const logLevel = ref('all');
@@ -133,7 +134,7 @@ const getLogLevelClass = (level: string) => {
 
 const getUserName = (userId: string | undefined) => {
   if (!userId) return null;
-  const user = adminStore.users.find(u => u.id === userId);
+  const user = adminStore.users.find((u: User) => u.id === userId);
   return user ? user.name : null;
 };
 

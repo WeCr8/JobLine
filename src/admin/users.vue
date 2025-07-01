@@ -15,6 +15,7 @@
           Refresh
         </button>
         <button
+          v-if="isDeveloper"
           @click="showAddUserModal = true"
           class="bg-primary-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary-700 transition-colors duration-200"
         >
@@ -145,7 +146,7 @@
     </div>
 
     <!-- Add User Modal -->
-    <div v-if="showAddUserModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div v-if="showAddUserModal && isDeveloper" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div class="bg-white rounded-lg p-6 w-full max-w-md mx-4">
         <h3 class="text-lg font-semibold text-gray-900 mb-4">Add Platform Admin</h3>
         
@@ -245,7 +246,7 @@
             <label class="block text-sm font-medium text-gray-700 mb-2">Organization</label>
             <select
               v-model="editingUser.organization_id"
-              :required="editingUser.role !== 'admin'"
+              :required="true"
               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
             >
               <option value="">None (Platform Admin)</option>
@@ -289,11 +290,13 @@
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted } from 'vue';
 import { format } from 'date-fns';
-import { useAdminStore } from '../stores/admin';
-import type { User } from '../stores/admin';
+import { useAdminStore } from '../stores/admin.ts';
+import type { User, UserRole } from '../types';
 import { ArrowPathIcon } from '@heroicons/vue/24/outline';
+import { useAuthStore } from '../stores/auth.ts';
 
 const adminStore = useAdminStore();
+const authStore = useAuthStore();
 const showAddUserModal = ref(false);
 const showEditUserModal = ref(false);
 const addingUser = ref(false);
@@ -301,6 +304,7 @@ const savingUser = ref(false);
 const searchQuery = ref('');
 const roleFilter = ref('all');
 const statusFilter = ref('all');
+const isDeveloper = authStore.isDeveloper;
 
 const newUser = reactive({
   email: '',
@@ -312,7 +316,7 @@ const editingUser = reactive<User>({
   id: '',
   name: '',
   email: '',
-  role: '',
+  role: 'operator',
   department: '',
   is_active: true,
   created_at: ''
@@ -324,7 +328,7 @@ const filteredUsers = computed(() => {
   // Apply search filter
   if (searchQuery.value) {
     const query = searchQuery.value.toLowerCase();
-    filtered = filtered.filter(user => 
+    filtered = filtered.filter((user: User) => 
       user.name.toLowerCase().includes(query) || 
       user.email.toLowerCase().includes(query)
     );
@@ -332,12 +336,12 @@ const filteredUsers = computed(() => {
   
   // Apply role filter
   if (roleFilter.value !== 'all') {
-    filtered = filtered.filter(user => user.role === roleFilter.value);
+    filtered = filtered.filter((user: User) => user.role === roleFilter.value);
   }
   
   // Apply status filter
   if (statusFilter.value !== 'all') {
-    filtered = filtered.filter(user => 
+    filtered = filtered.filter((user: User) => 
       (statusFilter.value === 'active' && user.is_active) || 
       (statusFilter.value === 'inactive' && !user.is_active)
     );
@@ -413,7 +417,7 @@ const editUser = (user: User) => {
 const saveUser = async () => {
   savingUser.value = true;
   try {
-    await adminStore.updateUser(editingUser);
+    await adminStore.updateUser({ ...editingUser, role: editingUser.role as UserRole });
     showEditUserModal.value = false;
   } catch (error) {
     console.error('Error saving user:', error);
@@ -424,7 +428,7 @@ const saveUser = async () => {
 
 const toggleUserStatus = async (user: User) => {
   try {
-    const updatedUser = { ...user, is_active: !user.is_active };
+    const updatedUser = { ...user, is_active: !user.is_active, role: user.role as UserRole };
     await adminStore.updateUser(updatedUser);
   } catch (error) {
     console.error('Error toggling user status:', error);
@@ -440,4 +444,3 @@ onMounted(async () => {
   await refreshData();
 });
 </script>
-```

@@ -23,7 +23,7 @@
                 :key="item.name"
                 :to="item.href"
                 class="inline-flex items-center px-1 pt-1 text-sm font-medium transition-colors duration-200"
-                :class="$route.name === item.name 
+                :class="$route.path.startsWith(item.href) 
                   ? 'border-b-2 border-primary-500 text-gray-900' 
                   : 'text-gray-500 hover:text-gray-700 hover:border-gray-300'"
               >
@@ -79,6 +79,13 @@
                   {{ authStore.user?.email }}
                 </div>
                 <router-link
+                  to="/settings"
+                  @click="showUserMenu = false"
+                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200"
+                >
+                  Settings
+                </router-link>
+                <router-link
                   to="/performance"
                   @click="showUserMenu = false"
                   class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200"
@@ -93,7 +100,7 @@
                   Subscription
                 </router-link>
                 <router-link
-                  v-if="isPlatformAdmin"
+                  v-if="isDeveloper"
                   to="/admin/dashboard"
                   @click="showUserMenu = false"
                   class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200"
@@ -122,7 +129,7 @@
     </nav>
 
     <!-- Main Content -->
-    <main class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 pb-20 md:pb-6">
+    <main class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 pb-20 md:pb-6 safe-area-left safe-area-right">
       <router-view />
     </main>
   </div>
@@ -131,9 +138,9 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { useAuthStore } from '../stores/auth';
-import { usePerformanceStore } from '../stores/performance';
-import { useSubscriptionStore } from '../stores/subscription';
+import { useAuthStore } from '../stores/auth.ts';
+import { usePerformanceStore } from '../stores/performance.ts';
+import { useSubscriptionStore } from '../stores/subscription.ts';
 import MobileNavigation from './MobileNavigation.vue';
 import {
   HomeIcon,
@@ -147,7 +154,8 @@ import {
   LightBulbIcon,
   TrophyIcon,
   CheckCircleIcon,
-  Cog6ToothIcon
+  Cog6ToothIcon,
+  UserIcon
 } from '@heroicons/vue/24/outline';
 
 const router = useRouter();
@@ -165,6 +173,7 @@ const navigation = [
   { name: 'Performance', href: '/performance', icon: TrophyIcon, roles: ['operator', 'lead', 'supervisor', 'manager', 'admin', 'organization_admin'] },
   { name: 'Optimization', href: '/optimization', icon: LightBulbIcon, roles: ['lead', 'supervisor', 'manager', 'admin', 'organization_admin'] },
   { name: 'Integration', href: '/integration', icon: CircleStackIcon, roles: ['manager', 'admin', 'organization_admin'] },
+  { name: 'Settings', href: '/settings', icon: UserIcon, roles: ['operator', 'lead', 'supervisor', 'manager', 'admin', 'organization_admin'] },
   { name: 'Admin', href: '/admin/dashboard', icon: Cog6ToothIcon, roles: ['admin'] },
 ];
 
@@ -173,12 +182,12 @@ const visibleNavigation = computed(() => {
   return navigation.filter(item => item.roles.includes(authStore.user!.role));
 });
 
-const isPlatformAdmin = computed(() => {
-  return authStore.isPlatformAdmin;
-});
-
 const isOrgAdmin = computed(() => {
   return authStore.isOrgAdmin;
+});
+
+const isDeveloper = computed(() => {
+  return authStore.isDeveloper;
 });
 
 const handleLogout = async () => {
@@ -199,7 +208,7 @@ onMounted(() => {
   
   // Load user performance data
   if (authStore.user) {
-    performanceStore.fetchUserMetrics(authStore.user.id);
+    performanceStore.fetchUserMetrics();
     subscriptionStore.fetchSubscription();
   }
 });

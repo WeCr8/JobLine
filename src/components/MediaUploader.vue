@@ -204,7 +204,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue';
 import { format } from 'date-fns';
-import { useOptimizationStore } from '../stores/optimization';
+import { useOptimizationStore } from '../stores/optimization.ts';
 import type { MediaUpload } from '../types/optimization';
 import {
   CameraIcon,
@@ -395,7 +395,7 @@ const startVideoRecording = () => {
   isRecordingVideo.value = true;
   recordingDuration.value = 0;
 
-  recordingTimer = setInterval(() => {
+  recordingTimer = window.setInterval(() => {
     recordingDuration.value += 1;
   }, 1000);
 };

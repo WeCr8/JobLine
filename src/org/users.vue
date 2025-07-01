@@ -329,7 +329,7 @@
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted } from 'vue';
 import { format } from 'date-fns';
-import { useOrganizationStore } from '../stores/organization';
+import { useOrganizationStore } from '../stores/organization.ts';
 import type { User, Invite } from '../types';
 import { ArrowPathIcon, EnvelopeIcon } from '@heroicons/vue/24/outline';
 
@@ -355,7 +355,7 @@ const editingUser = reactive<User>({
   id: '',
   name: '',
   email: '',
-  role: '',
+  role: 'operator',
   department: '',
   is_active: true,
   created_at: ''

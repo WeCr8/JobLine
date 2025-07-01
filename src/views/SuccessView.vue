@@ -68,7 +68,7 @@
 <script setup lang="ts">
 import { onMounted } from 'vue';
 import { useRoute } from 'vue-router';
-import { useSubscriptionStore } from '../stores/subscription';
+import { useSubscriptionStore } from '../stores/subscription.ts';
 import { CheckCircleIcon } from '@heroicons/vue/24/outline';
 
 const route = useRoute();

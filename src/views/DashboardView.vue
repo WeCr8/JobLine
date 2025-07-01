@@ -240,9 +240,9 @@
 import { onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { format } from 'date-fns';
-import { useJobsStore } from '../stores/jobs';
-import { useChatStore } from '../stores/chat';
-import { usePassdownStore } from '../stores/passdown';
+import { useJobsStore } from '../stores/jobs.ts';
+import { useChatStore } from '../stores/chat.ts';
+import { usePassdownStore } from '../stores/passdown.ts';
 import ChartWidget from '../components/ChartWidget.vue';
 import type { KPI, Machine, ChartData, ChartType } from '../types';
 import {
@@ -251,7 +251,6 @@ import {
   CheckCircleIcon,
   ExclamationTriangleIcon,
   ChatBubbleLeftRightIcon,
-  CogIcon
 } from '@heroicons/vue/24/outline';
 
 const router = useRouter();

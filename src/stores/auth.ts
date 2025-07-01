@@ -1,12 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import { createClient } from '@supabase/supabase-js';
+import { authService } from '../services/auth.service.ts';
 import type { User } from '../types';
-
-const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_ANON_KEY
-);
 
 export const useAuthStore = defineStore('auth', () => {
   const user = ref<User | null>(null);
@@ -15,6 +10,7 @@ export const useAuthStore = defineStore('auth', () => {
   const isAuthenticated = computed(() => !!user.value);
   const isPlatformAdmin = computed(() => user.value?.role === 'admin' && !user.value?.organization_id);
   const isOrgAdmin = computed(() => user.value?.role === 'organization_admin' || (user.value?.role === 'admin' && !!user.value?.organization_id));
+  const isDeveloper = computed(() => user.value?.is_developer === true);
 
   const signUp = async (email: string, password: string, name: string) => {
     loading.value = true;
@@ -46,13 +42,13 @@ export const useAuthStore = defineStore('auth', () => {
           console.error('Error checking for invites:', inviteError);
         }
 
-        let role: User['role'] = 'operator';
+        let role = 'operator';
         let organization_id = null;
         let department = null;
 
         // If there's an invite, use its role and organization
         if (inviteData) {
-          role = inviteData.role as User['role'];
+          role = inviteData.role;
           organization_id = inviteData.organization_id;
           department = inviteData.department;
         }
@@ -102,18 +98,18 @@ export const useAuthStore = defineStore('auth', () => {
         }
 
         user.value = {
-          id: data.user.id,
-          email: data.user.email!,
-          name,
-          role,
-          department,
-          organization_id,
+          id: result.data.user.id,
+          email: result.data.user.email!,
+          name: userData?.name || name,
+          role: userData?.role || 'operator',
+          department: userData?.department,
+          organization_id: userData?.organization_id,
           is_active: true,
           created_at: new Date().toISOString()
         };
       }
-
-      return { data, error: null };
+      
+      return { data: result.data, error: null };
     } catch (err: any) {
       error.value = err.message;
       return { data: null, error: err.message };
@@ -127,34 +123,23 @@ export const useAuthStore = defineStore('auth', () => {
     error.value = null;
     
     try {
-      const { data, error: signInError } = await supabase.auth.signInWithPassword({
-        email,
-        password
-      });
-
-      if (signInError) throw signInError;
-
-      if (data.user) {
-        // Fetch user profile
-        const { data: profile } = await supabase
-          .from('users')
-          .select('*')
-          .eq('id', data.user.id)
-          .single();
-
+      const result = await authService.signIn(email, password);
+      
+      if (result.error) {
+        error.value = result.error;
+        return { data: null, error: result.error };
+      }
+      
+      if (result.data.user) {
+        // Set user from profile data
+        const profile = await authService.getCurrentUser();
         if (profile) {
           user.value = profile;
-          
-          // Update last login
-          await supabase
-            .from('users')
-            .update({ last_login: new Date().toISOString() })
-            .eq('id', data.user.id);
         } else {
           user.value = {
-            id: data.user.id,
-            email: data.user.email!,
-            name: data.user.user_metadata?.name || 'User',
+            id: result.data.user.id,
+            email: result.data.user.email!,
+            name: result.data.user.user_metadata?.name || 'User',
             role: 'operator',
             department: 'Manufacturing',
             is_active: true,
@@ -162,8 +147,8 @@ export const useAuthStore = defineStore('auth', () => {
           };
         }
       }
-
-      return { data, error: null };
+      
+      return { data: result.data, error: null };
     } catch (err: any) {
       error.value = err.message;
       return { data: null, error: err.message };
@@ -177,8 +162,17 @@ export const useAuthStore = defineStore('auth', () => {
     error.value = null;
     
     try {
-      const { error: signOutError } = await supabase.auth.signOut();
-      if (signOutError) throw signOutError;
+      const result = await authService.signOut();
+      
+      if (result.error) {
+        error.value = result.error;
+        return { error: result.error };
+      }
+      
+      // Clear demo user email
+      if (import.meta.env.VITE_DEMO_MODE === 'true') {
+        localStorage.removeItem('demoUserEmail');
+      }
       
       user.value = null;
       return { error: null };
@@ -194,23 +188,19 @@ export const useAuthStore = defineStore('auth', () => {
     loading.value = true;
     
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const session = await authService.getSession();
       
       if (session?.user) {
         // Fetch user profile
-        const { data: profile } = await supabase
-          .from('users')
-          .select('*')
-          .eq('id', session.user.id)
-          .single();
-
+        const profile = await authService.getCurrentUser();
+        
         if (profile) {
           user.value = profile;
         } else {
           user.value = {
             id: session.user.id,
             email: session.user.email!,
-            name: session.user.user_metadata?.name || 'User',
+            name: (session.user as any).user_metadata?.name || 'User',
             role: 'operator',
             department: 'Manufacturing',
             is_active: true,
@@ -226,21 +216,17 @@ export const useAuthStore = defineStore('auth', () => {
     }
 
     // Listen for auth changes
-    supabase.auth.onAuthStateChange(async (event, session) => {
+    authService.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_IN' && session?.user) {
-        const { data: profile } = await supabase
-          .from('users')
-          .select('*')
-          .eq('id', session.user.id)
-          .single();
-
+        const profile = await authService.getCurrentUser();
+        
         if (profile) {
           user.value = profile;
         } else {
           user.value = {
             id: session.user.id,
             email: session.user.email!,
-            name: session.user.user_metadata?.name || 'User',
+            name: (session.user as any).user_metadata?.name || 'User',
             role: 'operator',
             department: 'Manufacturing',
             is_active: true,
@@ -269,6 +255,7 @@ export const useAuthStore = defineStore('auth', () => {
     isAuthenticated,
     isPlatformAdmin,
     isOrgAdmin,
+    isDeveloper,
     signUp,
     signIn,
     signOut,

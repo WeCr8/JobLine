@@ -1,16 +1,3 @@
-export interface ConnectionConfig {
-  id: string;
-  name: string;
-  type: ConnectionType;
-  status: 'active' | 'inactive' | 'error' | 'testing';
-  config: ConnectionSettings;
-  complianceLevel: ComplianceLevel;
-  lastSync?: string;
-  errorCount: number;
-  createdAt: string;
-  updatedAt: string;
-}
-
 export type ConnectionType = 
   | 'google-sheets'
   | 'csv-upload'
@@ -36,7 +23,7 @@ export interface ConnectionSettings {
   
   // SQL/ODBC
   connectionString?: string;
-  database?: string;
+  databaseName?: string;
   table?: string;
   query?: string;
   
@@ -44,12 +31,14 @@ export interface ConnectionSettings {
   sapHost?: string;
   sapClient?: string;
   sapUser?: string;
+  sapPassword?: string;
   sapSystem?: string;
   
   // SFTP
   host?: string;
   port?: number;
   username?: string;
+  password?: string;
   privateKey?: string;
   remotePath?: string;
   
@@ -57,8 +46,14 @@ export interface ConnectionSettings {
   endpoint?: string;
   secret?: string;
   
+  // CSV Upload
+  fileFormat?: 'csv' | 'tsv' | 'excel';
+  delimiter?: string;
+  hasHeaderRow?: boolean;
+  
   // Common settings
   pollInterval?: number;
+  pollIntervalMinutes?: number;
   batchSize?: number;
   retryAttempts?: number;
   timeout?: number;
@@ -72,18 +67,18 @@ export interface ImportMapping {
   complianceFlag?: boolean;
 }
 
-export interface ImportJob {
+export interface ConnectionConfig {
   id: string;
-  connectionId: string;
-  type: ImportType;
-  status: 'pending' | 'running' | 'completed' | 'failed';
+  name: string;
+  type: ConnectionType;
+  status: 'active' | 'inactive' | 'error' | 'testing';
+  config: ConnectionSettings;
+  complianceLevel: ComplianceLevel;
+  lastSync?: string;
+  errorCount: number;
   mapping: ImportMapping[];
-  recordsProcessed: number;
-  recordsSuccess: number;
-  recordsError: number;
-  errors: ImportError[];
-  startedAt?: string;
-  completedAt?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export type ImportType = 
@@ -95,20 +90,24 @@ export type ImportType =
 
 export interface ImportError {
   row: number;
-  field: string;
-  value: any;
+  field?: string;
+  value?: any;
   error: string;
   severity: 'warning' | 'error' | 'critical';
 }
 
-export interface ComplianceRule {
+export interface ImportJob {
   id: string;
-  name: string;
-  type: ComplianceType;
-  condition: string;
-  action: ComplianceAction;
-  message: string;
-  enabled: boolean;
+  connectionId: string;
+  type: ImportType;
+  status: 'pending' | 'running' | 'completed' | 'failed';
+  mapping: ImportMapping[];
+  recordsProcessed: number;
+  recordsSuccess: number;
+  recordsError: number;
+  errors: ImportError[];
+  startedAt?: string;
+  completedAt?: string | null;
 }
 
 export type ComplianceType = 'itar' | 'ear' | 'dfars' | 'cmmc' | 'custom';
@@ -133,4 +132,21 @@ export interface ExportControlFlag {
   authorizedPersonnel: string[];
   expirationDate?: string;
   notes?: string;
+}
+
+export interface AIRecommendation {
+  machine?: string;
+  operator?: string;
+  confidence?: number;
+  reason?: string;
+}
+
+export interface ScheduleResult {
+  jobId: string;
+  jobNumber: string;
+  success: boolean;
+  machine?: string;
+  operator?: string;
+  status?: string;
+  error?: string;
 }

@@ -200,8 +200,8 @@
 
 <script setup lang="ts">
 import { ref, reactive } from 'vue';
-import { useChatStore } from '../stores/chat';
-import type { IntegrationConfig } from '../types/chat';
+import { useChatStore } from '../stores/chat.ts';
+import type { IntegrationConfig, IntegrationTrigger } from '../types/chat';
 import {
   ChatBubbleLeftRightIcon,
   BoltIcon,
@@ -212,7 +212,7 @@ const chatStore = useChatStore();
 const showAddModal = ref(false);
 const testing = ref<string | null>(null);
 const emailRecipients = ref('');
-const selectedTriggers = ref<string[]>([]);
+const selectedTriggers = ref<IntegrationTrigger['event'][]>([]);
 
 const newIntegration = reactive<IntegrationConfig>({
   id: '',
@@ -220,15 +220,17 @@ const newIntegration = reactive<IntegrationConfig>({
   type: 'slack',
   enabled: true,
   config: {},
-  triggers: []
+  triggers: [],
+  createdAt: '',
+  updatedAt: ''
 });
 
 const availableTriggers = [
-  { event: 'job-status-change', label: 'Job Status Changes' },
-  { event: 'urgent-job', label: 'Urgent Job Alerts' },
-  { event: 'quality-issue', label: 'Quality Issues' },
-  { event: 'machine-down', label: 'Machine Downtime' },
-  { event: 'chat-mention', label: 'Chat Mentions' }
+  { event: 'job-status-change' as const, label: 'Job Status Changes' },
+  { event: 'urgent-job' as const, label: 'Urgent Job Alerts' },
+  { event: 'quality-issue' as const, label: 'Quality Issues' },
+  { event: 'machine-down' as const, label: 'Machine Downtime' },
+  { event: 'chat-mention' as const, label: 'Chat Mentions' }
 ];
 
 const getIntegrationIcon = (type: string) => {
@@ -290,7 +292,9 @@ const cancelAdd = () => {
     type: 'slack',
     enabled: true,
     config: {},
-    triggers: []
+    triggers: [],
+    createdAt: '',
+    updatedAt: ''
   });
   emailRecipients.value = '';
   selectedTriggers.value = [];

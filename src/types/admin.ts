@@ -117,41 +117,6 @@ export interface SystemSettings {
   };
 }
 
-export interface SystemLog {
-  id: string;
-  level: 'INFO' | 'WARN' | 'ERROR' | 'DEBUG';
-  message: string;
-  context?: any;
-  userId?: string;
-  ipAddress?: string;
-  timestamp: string;
-}
-
-export interface AdminUser {
-  id: string;
-  name: string;
-  email: string;
-  role: string;
-  department?: string;
-  is_active: boolean;
-  last_login?: string;
-  created_at: string;
-}
-
-export interface AdminAnalytics {
-  totalRevenue: number;
-  revenueGrowth: number;
-  activeUsers: number;
-  userGrowth: number;
-  conversionRate: number;
-  conversionGrowth: number;
-  churnRate: number;
-  churnChange: number;
-  monthlyRevenue: number[];
-  monthlyUsers: number[];
-  planDistribution: Record<string, number>;
-}
-
 export interface AppSettings {
   appName: string;
   supportEmail: string;
@@ -181,4 +146,10 @@ export interface SystemInfo {
     lastBackup: string;
   };
   logs: SystemLog[];
+}
+
+export interface SystemLog {
+  level: 'INFO' | 'WARN' | 'ERROR' | 'DEBUG';
+  timestamp: string;
+  message: string;
 }
