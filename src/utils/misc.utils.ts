@@ -1,0 +1,46 @@
+// UUID v4 (RFC4122 compliant)
+export function uuidv4(): string {
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    return crypto.randomUUID()
+  }
+  // Fallback
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+    const r = Math.random() * 16 | 0
+    const v = c === 'x' ? r : (r & 0x3 | 0x8)
+    return v.toString(16)
+  })
+}
+
+// Idle detection (returns a stop function)
+export function onIdle(timeout: number, callback: () => void): () => void {
+  let timer: number | undefined
+  const reset = () => {
+    if (timer) clearTimeout(timer)
+    timer = window.setTimeout(callback, timeout)
+  }
+  ['mousemove', 'keydown', 'mousedown', 'touchstart'].forEach(evt => {
+    window.addEventListener(evt, reset)
+  })
+  reset()
+  return () => {
+    if (timer) clearTimeout(timer)
+    ['mousemove', 'keydown', 'mousedown', 'touchstart'].forEach(evt => {
+      window.removeEventListener(evt, reset)
+    })
+  }
+}
+
+// Visibility detection
+export function onVisibilityChange(callback: (visible: boolean) => void): () => void {
+  const handler = () => callback(!document.hidden)
+  document.addEventListener('visibilitychange', handler)
+  return () => document.removeEventListener('visibilitychange', handler)
+}
+
+// Performance measurement
+export function measurePerformance<T>(fn: () => T): { result: T; duration: number } {
+  const start = performance.now()
+  const result = fn()
+  const duration = performance.now() - start
+  return { result, duration }
+} 
