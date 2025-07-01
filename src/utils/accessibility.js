@@ -1,5 +1,5 @@
 import { disableBodyScroll, enableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock';
-const createFocusTrap = require('focus-trap');
+import createFocusTrap from 'focus-trap';
 /**
  * Accessibility utilities for cross-platform compatibility
  */
