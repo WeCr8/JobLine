@@ -1,8 +1,8 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import { authService } from '../services/auth.service.ts';
+import { authService } from '../services/auth.service';
 import type { User } from '../types';
-import { supabase } from '../lib/supabase.ts';
+import { supabase } from '../lib/supabase';
 
 export const useAuthStore = defineStore('auth', () => {
   const user = ref<User | null>(null);

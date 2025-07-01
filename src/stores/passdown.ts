@@ -1,9 +1,9 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import { passdownService } from '../services/passdown.service.ts';
+import { passdownService } from '../services/passdown.service';
 import type { PassdownNote } from '../types';
-import { demoService } from '../services/demo.service.ts';
-import { useAuthStore } from './auth.ts';
+import { demoService } from '../services/demo.service';
+import { useAuthStore } from './auth';
 
 export const usePassdownStore = defineStore('passdown', () => {
   const notes = ref<PassdownNote[]>([]);

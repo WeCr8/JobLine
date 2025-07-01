@@ -1,4 +1,4 @@
-import { supabase } from './api.service.ts';
+import { supabase } from './api.service';
 import type { UserSettings } from '../stores/settings';
 
 export const settingsService = {

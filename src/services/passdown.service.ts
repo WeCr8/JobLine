@@ -1,4 +1,4 @@
-import { supabase } from './api.service.ts';
+import { supabase } from './api.service';
 import type { PassdownNote } from '../types';
 
 export const passdownService = {
