@@ -593,7 +593,7 @@
                     <div class="text-sm text-gray-900">{{ log.message }}</div>
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap">
-                    <div class="text-sm text-gray-900">{{ getUserName(log.user_id) || 'System' }}</div>
+                    <div class="text-sm text-gray-900">{{ getUserName(log.userId) || 'System' }}</div>
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap">
                     <div class="text-sm text-gray-900">{{ log.ipAddress || '-' }}</div>
@@ -820,7 +820,8 @@ import {
   ArrowPathIcon,
   Cog6ToothIcon,
   DocumentTextIcon,
-  CreditCardIcon
+  CreditCardIcon,
+  BriefcaseIcon
 } from '@heroicons/vue/24/outline';
 
 const adminStore = useAdminStore();
