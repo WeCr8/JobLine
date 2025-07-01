@@ -9,6 +9,7 @@ import type {
 } from '../types/integration';
 import axios from 'axios';
 import { storeOfflineData, getOfflineData, registerBackgroundSync } from '../utils/offline';
+import { validateJob, validateOperation, validatePart } from '../utils/validate.utils';
 
 export const integrationService = {
   /**
@@ -682,6 +683,51 @@ export const integrationService = {
             if (record[map.sourceField] === undefined || record[map.sourceField] === null) {
               throw new Error(`Compliance field ${map.sourceField} is required for ${complianceLevel} compliance level`);
             }
+          }
+        }
+        
+        // Validate mapped record based on importType
+        if (importType === 'job-data') {
+          // Map to minimal Job for validation
+          const validationJob = {
+            id: mappedRecord.id || mappedRecord.job_number || '',
+            name: mappedRecord.name || mappedRecord.job_number || '',
+            status: mappedRecord.status,
+            dueDate: mappedRecord.due_date || mappedRecord.dueDate,
+            startDate: mappedRecord.start_date || mappedRecord.startDate,
+            completedDate: mappedRecord.completed_date || mappedRecord.completedDate,
+            priority: mappedRecord.priority,
+            assignedTo: mappedRecord.operator_id || mappedRecord.assignedTo,
+            organizationId: mappedRecord.organization_id || '',
+            itemIds: mappedRecord.itemIds,
+            lastUpdated: mappedRecord.updated_at || new Date().toISOString(),
+            customFields: mappedRecord.customFields,
+            description: mappedRecord.description,
+          };
+          const jobErrors = validateJob(validationJob);
+          if (jobErrors.length) {
+            throw new Error('Job validation failed: ' + jobErrors.join('; '));
+          }
+        } else if (importType === 'routing-operations') {
+          const validationOp = {
+            id: mappedRecord.id || mappedRecord.operation_id || '',
+            jobId: mappedRecord.job_id || mappedRecord.jobId || '',
+            name: mappedRecord.name || mappedRecord.operation_name || '',
+            status: mappedRecord.status,
+            sequence: mappedRecord.sequence || mappedRecord.operation_number || 0,
+            plannedStart: mappedRecord.planned_start,
+            plannedEnd: mappedRecord.planned_end,
+            actualStart: mappedRecord.actual_start,
+            actualEnd: mappedRecord.actual_end,
+            resourceId: mappedRecord.resource_id,
+            description: mappedRecord.description,
+            durationMinutes: mappedRecord.duration_minutes,
+            partId: mappedRecord.part_id,
+            customFields: mappedRecord.customFields,
+          };
+          const opErrors = validateOperation(validationOp);
+          if (opErrors.length) {
+            throw new Error('Operation validation failed: ' + opErrors.join('; '));
           }
         }
         
