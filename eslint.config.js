@@ -19,7 +19,7 @@ const compat = new FlatCompat({
 
 export default [
   // Base JS configuration
-  js.configs.recommended,
+  ...compat.config({ extends: ['eslint:recommended'] }),
   
   // TypeScript configuration
   {
