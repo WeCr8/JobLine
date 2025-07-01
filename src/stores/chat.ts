@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
-import { ref, computed } from 'vue';
-import type { ChatMessage, VoiceMessage, PartMatch, ImageAnalysis, IntegrationConfig } from '../types/chat';
+import { ref } from 'vue';
+import type { ChatMessage, PartMatch, IntegrationConfig } from '../types/chat';
 import { useJobsStore } from './jobs';
 
 export const useChatStore = defineStore('chat', () => {
@@ -213,7 +213,7 @@ export const useChatStore = defineStore('chat', () => {
           `**${match.partNumber}** (${Math.round(match.similarity * 100)}% match)\n` +
           `• ${match.partName}\n` +
           `• Material: ${match.material}\n` +
-          `• Current Jobs: ${match.currentJobs.length > 0 ? match.currentJobs.join(', ') : 'None'}\n` +
+          `• Current Jobs: ${(match.currentJobs?.length ?? 0) > 0 ? (match.currentJobs ?? []).join(', ') : 'None'}\n` +
           `• Last Used: ${match.lastUsed}`
         ).join('\n\n');
       
