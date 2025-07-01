@@ -10,6 +10,7 @@ import type {
   SystemSettings 
 } from '../types/admin';
 import type { User } from '../types';
+import type { UserRole } from '../types/index';
 
 export type { Organization, SubscriptionPlan, SystemSettings, SystemLog, Analytics };
 export type { User, Subscription, Invoice } from '../types/admin';
@@ -147,7 +148,7 @@ export const useAdminStore = defineStore('admin', () => {
 
     try {
       const fetchedUsers = await adminService.fetchUsers();
-      users.value = fetchedUsers;
+      users.value = fetchedUsers.map(u => ({ ...u, role: u.role as UserRole }));
     } catch (err: any) {
       error.value = err.message;
       console.error('Error fetching users:', err);
@@ -276,6 +277,7 @@ export const useAdminStore = defineStore('admin', () => {
     error.value = null;
 
     try {
+      user.role = user.role as UserRole;
       const success = await adminService.updateUser(user);
       
       if (!success) {

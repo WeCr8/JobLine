@@ -508,8 +508,10 @@ import {
   XMarkIcon,
   ClockIcon,
   CircleStackIcon,
-  InformationCircleIcon
+  InformationCircleIcon,
+  DocumentArrowUpIcon
 } from '@heroicons/vue/24/outline';
+import type { ImportType, ConnectionConfig, ImportMapping } from '../types/integration';
 
 const integrationStore = useIntegrationStore();
 const jobsStore = useJobsStore();
@@ -606,7 +608,7 @@ const tabs = [
 const connectionTypes = [
   { value: 'rest-api', label: 'REST API' },
   { value: 'google-sheets', label: 'Google Sheets' },
-  { value: 'csv-upload', label: 'CSV Upload' },
+  { value: 'csv-upload', label: 'CSV Upload', icon: DocumentArrowUpIcon },
   { value: 'sql-odbc', label: 'SQL/ODBC' },
   { value: 'sap-bapi', label: 'SAP BAPI' },
   { value: 'webhook', label: 'Webhook' },
@@ -851,7 +853,7 @@ const getImportTypeLabel = (type: ImportType) => {
     'cost-tracking': 'Cost Tracking',
     'customer-association': 'Customer Association'
   };
-  return types[type] || type;
+  return (types as Record<string, string>)[type] || type;
 };
 
 onMounted(() => {

@@ -1,4 +1,4 @@
-import { supabase, handleApiError } from './api.service';
+import { supabase } from './api.service';
 import type { UserSettings } from '../stores/settings';
 
 export const settingsService = {

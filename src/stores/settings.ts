@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { ref, reactive } from 'vue';
+import { ref } from 'vue';
 import { settingsService } from '../services/settings.service';
 
 export interface UserSettings {

@@ -291,7 +291,7 @@
 import { ref, reactive, computed, onMounted } from 'vue';
 import { format } from 'date-fns';
 import { useAdminStore } from '../stores/admin';
-import type { User } from '../types/admin';
+import type { User, UserRole } from '../types';
 import { ArrowPathIcon } from '@heroicons/vue/24/outline';
 import { useAuthStore } from '../stores/auth';
 
@@ -316,7 +316,7 @@ const editingUser = reactive<User>({
   id: '',
   name: '',
   email: '',
-  role: '',
+  role: 'operator',
   department: '',
   is_active: true,
   created_at: ''
@@ -417,7 +417,7 @@ const editUser = (user: User) => {
 const saveUser = async () => {
   savingUser.value = true;
   try {
-    await adminStore.updateUser(editingUser);
+    await adminStore.updateUser({ ...editingUser, role: editingUser.role as UserRole });
     showEditUserModal.value = false;
   } catch (error) {
     console.error('Error saving user:', error);
@@ -428,7 +428,7 @@ const saveUser = async () => {
 
 const toggleUserStatus = async (user: User) => {
   try {
-    const updatedUser = { ...user, is_active: !user.is_active };
+    const updatedUser = { ...user, is_active: !user.is_active, role: user.role as UserRole };
     await adminStore.updateUser(updatedUser);
   } catch (error) {
     console.error('Error toggling user status:', error);

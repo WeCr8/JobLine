@@ -46,7 +46,7 @@ if ('serviceWorker' in navigator) {
 }
 
 // Handle app installation
-window.addEventListener('appinstalled', (evt) => {
+window.addEventListener('appinstalled', () => {
   console.log('App was installed');
   window.dispatchEvent(new CustomEvent('pwaInstalled'));
 });

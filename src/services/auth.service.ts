@@ -1,9 +1,9 @@
-import { supabase, handleApiError } from './api.service';
+import { supabase } from './api.service';
 import type { User } from '../types';
 import { demoService } from './demo.service';
 
 // Demo accounts for testing
-const demoAccounts = {
+const demoAccounts: Record<string, User> = {
   'demo-org-admin@wecr8.info': {
     id: 'demo-admin-id',
     email: 'demo-org-admin@wecr8.info',
@@ -12,7 +12,8 @@ const demoAccounts = {
     department: 'Administration',
     organization_id: 'org-1',
     is_active: true,
-    created_at: '2024-01-01T00:00:00Z'
+    created_at: '2024-01-01T00:00:00Z',
+    is_developer: false
   },
   'demo-operator@wecr8.info': {
     id: 'demo-operator-id',
@@ -22,7 +23,8 @@ const demoAccounts = {
     department: 'cnc-machining',
     organization_id: 'org-1',
     is_active: true,
-    created_at: '2024-01-01T00:00:00Z'
+    created_at: '2024-01-01T00:00:00Z',
+    is_developer: false
   }
 };
 

@@ -182,10 +182,6 @@ const visibleNavigation = computed(() => {
   return navigation.filter(item => item.roles.includes(authStore.user!.role));
 });
 
-const isPlatformAdmin = computed(() => {
-  return authStore.isPlatformAdmin;
-});
-
 const isOrgAdmin = computed(() => {
   return authStore.isOrgAdmin;
 });

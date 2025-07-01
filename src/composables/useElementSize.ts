@@ -33,7 +33,7 @@ export function useElementSize(elementRef: Ref<HTMLElement | null>) {
     }
     
     // Watch for element reference changes
-    const unwatch = watch(elementRef, (newEl, oldEl) => {
+    watch(elementRef, (newEl, oldEl) => {
       if (resizeObserver) {
         if (oldEl) {
           resizeObserver.unobserve(oldEl);

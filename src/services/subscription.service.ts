@@ -1,4 +1,4 @@
-import { supabase, handleApiError } from './api.service';
+import { supabase } from './api.service';
 import type { Product } from '../stripe-config';
 
 export const subscriptionService = {

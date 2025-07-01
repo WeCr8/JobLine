@@ -68,11 +68,6 @@ import SettingsToggle from './SettingsToggle.vue';
 
 const verificationCode = ref('');
 
-const props = defineProps<{
-  twoFactorEnabled: boolean;
-  sessionTimeout: string;
-}>();
-
 defineEmits<{
   'update:twoFactorEnabled': [value: boolean];
   'update:sessionTimeout': [value: string];

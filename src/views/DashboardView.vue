@@ -251,7 +251,6 @@ import {
   CheckCircleIcon,
   ExclamationTriangleIcon,
   ChatBubbleLeftRightIcon,
-  CogIcon
 } from '@heroicons/vue/24/outline';
 
 const router = useRouter();

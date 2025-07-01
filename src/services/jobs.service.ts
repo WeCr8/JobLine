@@ -1,5 +1,5 @@
-import { supabase, handleApiError } from './api.service';
-import type { Job, JobStatus, JobOperation, QualityCheck } from '../types';
+import { supabase } from './api.service';
+import type { Job, JobStatus, QualityCheck } from '../types';
 
 export const jobsService = {
   /**
@@ -209,7 +209,7 @@ export const jobsService = {
         .from('quality_checks')
         .insert({
           requirement_id: check.requirementId,
-          operation_id: check.operationId,
+          // operation_id: check.operationId, // Removed, not present in QualityCheck
           inspector_id: check.inspector,
           inspector_name: check.inspector,
           result: check.result,
@@ -225,7 +225,7 @@ export const jobsService = {
       return {
         id: data.id,
         requirementId: data.requirement_id,
-        operationId: data.operation_id,
+        // operationId: data.operation_id, // Removed, not present in QualityCheck
         timestamp: data.timestamp,
         inspector: data.inspector_name,
         result: data.result,

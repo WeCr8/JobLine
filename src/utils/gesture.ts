@@ -4,6 +4,10 @@ import Hammer from 'hammerjs';
  * Gesture utilities for cross-platform touch interactions
  */
 
+declare global {
+  type HammerInput = any;
+}
+
 // Add swipe gesture to an element
 export const addSwipeGesture = (
   element: HTMLElement, 

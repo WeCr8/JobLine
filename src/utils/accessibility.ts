@@ -1,5 +1,5 @@
 import { disableBodyScroll, enableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock';
-import { createFocusTrap } from 'focus-trap';
+import createFocusTrap from 'focus-trap';
 
 /**
  * Accessibility utilities for cross-platform compatibility
@@ -21,9 +21,7 @@ export const createAccessibleFocusTrap = (element: HTMLElement) => {
 
 // Lock body scroll for modals
 export const lockBodyScroll = (element: HTMLElement) => {
-  disableBodyScroll(element, {
-    reserveScrollBarGap: true
-  });
+  disableBodyScroll(element);
   
   return () => {
     enableBodyScroll(element);

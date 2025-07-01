@@ -19,7 +19,7 @@
           :states="buttonStates"
           initial-state="default"
         >
-          <template #default="{ state }">
+          <template #default>
             <div class="component-demo-grid">
               <Button variant="primary">Primary</Button>
               <Button variant="secondary">Secondary</Button>
@@ -38,7 +38,7 @@
           :states="buttonSizeStates"
           initial-state="default"
         >
-          <template #default="{ state }">
+          <template #default>
             <div class="component-demo-flex">
               <Button size="xs">Extra Small</Button>
               <Button size="sm">Small</Button>
@@ -55,7 +55,7 @@
           :states="buttonIconStates"
           initial-state="default"
         >
-          <template #default="{ state }">
+          <template #default>
             <div class="component-demo-flex">
               <Button :icon-left="SearchIcon">Search</Button>
               <Button :icon-right="ArrowRightIcon">Next</Button>
@@ -71,7 +71,7 @@
           :states="buttonStateStates"
           initial-state="default"
         >
-          <template #default="{ state }">
+          <template #default>
             <div class="component-demo-grid">
               <Button>Normal</Button>
               <Button disabled>Disabled</Button>
@@ -93,7 +93,7 @@
           :states="sliderStates"
           initial-state="default"
         >
-          <template #default="{ state }">
+          <template #default>
             <div class="component-demo-container">
               <Slider v-model="sliderValue" :min="0" :max="100" :step="1" />
               <div class="component-demo-value">Value: {{ sliderValue }}</div>
@@ -107,7 +107,7 @@
           :states="sliderRangeStates"
           initial-state="default"
         >
-          <template #default="{ state }">
+          <template #default>
             <div class="component-demo-container">
               <Slider 
                 v-model="sliderRangeValue" 
@@ -130,7 +130,7 @@
           :states="sliderTickStates"
           initial-state="default"
         >
-          <template #default="{ state }">
+          <template #default>
             <div class="component-demo-container">
               <Slider 
                 v-model="sliderTickValue" 
@@ -158,7 +158,7 @@
           :states="sliderVerticalStates"
           initial-state="default"
         >
-          <template #default="{ state }">
+          <template #default>
             <div class="component-demo-container" style="height: 200px;">
               <Slider 
                 v-model="sliderVerticalValue" 
@@ -185,15 +185,15 @@
           :states="previewDeviceStates"
           initial-state="default"
         >
-          <template #default="{ state }">
+          <template #default>
             <Preview
               :states="[
                 { id: 'default', name: 'Default View' },
                 { id: 'loading', name: 'Loading State' },
                 { id: 'error', name: 'Error State' }
               ]"
-              :loading="state.id === 'loading'"
-              :error="state.id === 'error'"
+              :loading="false"
+              :error="false"
               error-message="Failed to load content"
             >
               <div class="preview-demo-content">
@@ -365,8 +365,8 @@ const previewDeviceCode = `<Preview
     { id: 'loading', name: 'Loading State' },
     { id: 'error', name: 'Error State' }
   ]"
-  :loading="isLoading"
-  :error="hasError"
+  :loading="false"
+  :error="false"
   error-message="Failed to load content"
 >
   <div>

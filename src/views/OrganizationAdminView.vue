@@ -635,8 +635,6 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue';
 import { format } from 'date-fns';
-import { useAuthStore } from '../stores/auth';
-import type { User, UserRole } from '../types';
 import {
   UserGroupIcon,
   BuildingOfficeIcon,
@@ -645,7 +643,6 @@ import {
   Cog6ToothIcon
 } from '@heroicons/vue/24/outline';
 
-const authStore = useAuthStore();
 const activeTab = ref('overview');
 const showAddUserModal = ref(false);
 const showEditUserModal = ref(false);
@@ -684,7 +681,7 @@ const organization = reactive({
   updatedAt: '2024-01-12T00:00:00Z'
 });
 
-const users = ref<User[]>([
+const users = ref([
   {
     id: 'user-1',
     name: 'John Smith',
@@ -746,7 +743,7 @@ const newUser = reactive({
   department: ''
 });
 
-const editingUser = reactive<User>({
+const editingUser = reactive({
   id: '',
   name: '',
   email: '',
@@ -825,11 +822,11 @@ const addUser = async () => {
     console.log('Add user:', newUser);
     
     // Simulate adding a user
-    const newUserObj: User = {
+    const newUserObj = {
       id: `user-${Date.now()}`,
       name: newUser.name,
       email: newUser.email,
-      role: newUser.role as UserRole,
+      role: newUser.role,
       department: newUser.department,
       is_active: true,
       created_at: new Date().toISOString()
@@ -852,12 +849,12 @@ const addUser = async () => {
   }
 };
 
-const editUser = (user: User) => {
+const editUser = (user: any) => {
   Object.assign(editingUser, user);
   showEditUserModal.value = true;
 };
 
-const toggleUserStatus = async (user: User) => {
+const toggleUserStatus = async (user: any) => {
   try {
     // In a real app, you would implement this
     console.log('Toggle user status:', user);

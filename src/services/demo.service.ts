@@ -1,5 +1,3 @@
-import { supabase, handleApiError } from './api.service';
-
 export const demoService = {
   /**
    * Seed demo data for the application
