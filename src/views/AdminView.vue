@@ -27,10 +27,11 @@
           :class="activeTab === tab.id 
             ? 'border-primary-500 text-primary-600' 
             : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
-          class="py-4 px-1 border-b-2 font-medium text-sm transition-colors duration-200"
+          class="py-4 px-1 border-b-2 font-medium text-sm transition-colors duration-200 relative"
         >
           <component :is="tab.icon" class="w-4 h-4 mr-2 inline" />
           {{ tab.name }}
+          <span v-if="tab.id === 'flags' && unresolvedCriticalCount > 0" class="absolute -top-1 -right-2 bg-red-600 text-white text-xs rounded-full px-2 py-0.5 font-bold">{{ unresolvedCriticalCount }}</span>
         </button>
       </nav>
     </div>
@@ -615,6 +616,25 @@
           Refresh
         </button>
       </div>
+      <!-- Filter/Search Controls -->
+      <div class="flex flex-wrap gap-4 items-center mb-2">
+        <select v-model="filterType" class="border rounded px-2 py-1 text-sm">
+          <option value="">All Types</option>
+          <option v-for="type in uniqueTypes" :key="type" :value="type">{{ type }}</option>
+        </select>
+        <select v-model="filterSeverity" class="border rounded px-2 py-1 text-sm">
+          <option value="">All Severities</option>
+          <option value="error">Error</option>
+          <option value="warning">Warning</option>
+          <option value="info">Info</option>
+        </select>
+        <select v-model="filterResolved" class="border rounded px-2 py-1 text-sm">
+          <option value="">All Statuses</option>
+          <option value="false">Unresolved</option>
+          <option value="true">Resolved</option>
+        </select>
+        <input v-model="searchText" type="text" placeholder="Search resource/notes..." class="border rounded px-2 py-1 text-sm flex-1 min-w-[200px]" />
+      </div>
       <div class="bg-white rounded-lg shadow-sm border border-gray-200">
         <div class="overflow-x-auto">
           <table class="min-w-full divide-y divide-gray-200">
@@ -629,7 +649,7 @@
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
-              <tr v-for="flag in adminStore.flaggedIssues" :key="flag.id">
+              <tr v-for="flag in filteredFlags" :key="flag.id">
                 <td class="px-6 py-4 whitespace-nowrap">{{ flag.type }}</td>
                 <td class="px-6 py-4 whitespace-nowrap">
                   <span :class="flag.severity === 'error' ? 'text-red-600 font-bold' : flag.severity === 'warning' ? 'text-yellow-600' : 'text-gray-700'">
@@ -640,15 +660,36 @@
                 <td class="px-6 py-4 whitespace-nowrap">{{ formatDate(flag.detected_at) }}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-xs text-gray-700">{{ flag.notes }}</td>
                 <td class="px-6 py-4 whitespace-nowrap">
-                  <!-- Future: Add resolve, view context, etc. -->
-                  <button class="text-primary-600 hover:underline text-xs">View</button>
+                  <button class="text-primary-600 hover:underline text-xs" @click="openFlagModal(flag)">View</button>
                 </td>
               </tr>
-              <tr v-if="adminStore.flaggedIssues.length === 0">
+              <tr v-if="filteredFlags.length === 0">
                 <td colspan="6" class="px-6 py-4 text-center text-gray-500">No flagged issues found.</td>
               </tr>
             </tbody>
           </table>
+        </div>
+      </div>
+      <!-- Flag Details Modal -->
+      <div v-if="showFlagModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+        <div class="bg-white rounded-lg shadow-lg max-w-2xl w-full p-6 relative">
+          <button class="absolute top-2 right-2 text-gray-400 hover:text-gray-600" @click="closeFlagModal">&times;</button>
+          <h3 class="text-lg font-semibold mb-2">Flagged Issue Details</h3>
+          <div class="mb-2"><b>Type:</b> {{ selectedFlag.type }}</div>
+          <div class="mb-2"><b>Severity:</b> <span :class="selectedFlag.severity === 'error' ? 'text-red-600 font-bold' : selectedFlag.severity === 'warning' ? 'text-yellow-600' : 'text-gray-700'">{{ selectedFlag.severity }}</span></div>
+          <div class="mb-2"><b>Resource:</b> {{ selectedFlag.resource_type }} <span class="text-xs text-gray-500">{{ selectedFlag.resource_id }}</span></div>
+          <div class="mb-2"><b>Detected:</b> {{ formatDate(selectedFlag.detected_at) }}</div>
+          <div class="mb-2"><b>Notes:</b> {{ selectedFlag.notes }}</div>
+          <div class="mb-2"><b>Detected By:</b> {{ selectedFlag.detected_by }}</div>
+          <div class="mb-2"><b>Resolved:</b> <span :class="selectedFlag.resolved ? 'text-green-600' : 'text-red-600'">{{ selectedFlag.resolved ? 'Yes' : 'No' }}</span></div>
+          <div class="mb-4">
+            <b>Context:</b>
+            <pre class="bg-gray-100 rounded p-2 text-xs overflow-x-auto max-h-64">{{ prettyPrint(selectedFlag.context) }}</pre>
+          </div>
+          <div class="flex justify-end space-x-2">
+            <button v-if="!selectedFlag.resolved" @click="resolveFlag(selectedFlag)" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Resolve</button>
+            <button @click="closeFlagModal" class="bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300">Close</button>
+          </div>
         </div>
       </div>
     </div>
@@ -880,6 +921,8 @@ const savingPlan = ref(false);
 const savingSettings = ref(false);
 const backupInProgress = ref(false);
 const logLevel = ref('all');
+const showFlagModal = ref(false);
+const selectedFlag = ref<any>({});
 
 const tabs = [
   { id: 'dashboard', name: 'Dashboard', icon: ArrowTrendingUpIcon },
@@ -941,6 +984,31 @@ const filteredLogs = computed(() => {
   }
   return adminStore.systemLogs.filter(log => log.level === logLevel.value);
 });
+
+const filterType = ref('');
+const filterSeverity = ref('');
+const filterResolved = ref('');
+const searchText = ref('');
+const uniqueTypes = computed(() => Array.from(new Set(adminStore.flaggedIssues.map(f => f.type).filter(Boolean))));
+const filteredFlags = computed(() => {
+  return adminStore.flaggedIssues.filter(flag => {
+    if (filterType.value && flag.type !== filterType.value) return false;
+    if (filterSeverity.value && flag.severity !== filterSeverity.value) return false;
+    if (filterResolved.value !== '' && String(flag.resolved) !== filterResolved.value) return false;
+    if (searchText.value) {
+      const search = searchText.value.toLowerCase();
+      return (
+        (flag.resource_id && String(flag.resource_id).toLowerCase().includes(search)) ||
+        (flag.notes && flag.notes.toLowerCase().includes(search))
+      );
+    }
+    return true;
+  });
+});
+
+const unresolvedCriticalCount = computed(() =>
+  adminStore.flaggedIssues.filter(f => f.severity === 'error' && !f.resolved).length
+);
 
 const refreshData = async () => {
   try {
@@ -1142,6 +1210,32 @@ const triggerBackup = async () => {
     backupInProgress.value = false;
   }
 };
+
+function openFlagModal(flag: any) {
+  selectedFlag.value = flag;
+  showFlagModal.value = true;
+}
+
+function closeFlagModal() {
+  showFlagModal.value = false;
+  selectedFlag.value = {};
+}
+
+function prettyPrint(json: any) {
+  try {
+    if (typeof json === 'string') return JSON.stringify(JSON.parse(json), null, 2);
+    return JSON.stringify(json, null, 2);
+  } catch {
+    return String(json);
+  }
+}
+
+async function resolveFlag(flag: any) {
+  // Mark as resolved in DB
+  await adminStore.resolveFlag(flag.id);
+  await adminStore.fetchFlaggedIssues();
+  closeFlagModal();
+}
 
 onMounted(async () => {
   await refreshData();

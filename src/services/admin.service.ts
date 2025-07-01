@@ -411,5 +411,25 @@ export const adminService = {
       console.error('Error fetching consistency flags:', err);
       return [];
     }
+  },
+
+  /**
+   * Resolve a flagged consistency/data issue
+   */
+  async resolveFlag(flagId: string, userId?: string): Promise<{ error: any }> {
+    try {
+      const { error } = await supabase
+        .from('consistency_flags')
+        .update({
+          resolved: true,
+          resolved_at: new Date().toISOString(),
+          resolved_by: userId || null
+        })
+        .eq('id', flagId);
+      return { error };
+    } catch (err) {
+      console.error('Error resolving flagged issue:', err);
+      return { error: err };
+    }
   }
 };

@@ -411,6 +411,21 @@ export const useAdminStore = defineStore('admin', () => {
     }
   };
 
+  // Resolve a flagged issue
+  const resolveFlag = async (flagId: string) => {
+    loading.value = true;
+    error.value = null;
+    try {
+      const { error: updateError } = await adminService.resolveFlag(flagId);
+      if (updateError) throw updateError;
+    } catch (err: any) {
+      error.value = err.message;
+      console.error('Error resolving flagged issue:', err);
+    } finally {
+      loading.value = false;
+    }
+  };
+
   // Computed properties
   const totalUsers = computed(() => users.value.length);
   const activeUsers = computed(() => users.value.filter(u => u.is_active).length);
@@ -453,6 +468,7 @@ export const useAdminStore = defineStore('admin', () => {
     saveOrganization,
     cancelSubscription,
     saveSystemSettings,
-    triggerManualBackup
+    triggerManualBackup,
+    resolveFlag
   };
 });
