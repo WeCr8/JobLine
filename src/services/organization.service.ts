@@ -1,5 +1,7 @@
 import { supabase } from './api.service';
 import type { Organization, User, Invite } from '../types';
+import { canAccess } from '../utils/security.utils';
+import { logAudit } from './api.service';
 
 export const organizationService = {
   /**
@@ -200,8 +202,18 @@ export const organizationService = {
   /**
    * Update organization
    */
-  async updateOrganization(organizationId: string, updates: Partial<Organization>): Promise<boolean> {
+  async updateOrganization(user: any, organizationId: string, updates: Partial<Organization>): Promise<boolean> {
     try {
+      // Fetch current org for before state and permission check
+      const { data: org, error: orgError } = await supabase
+        .from('organizations')
+        .select('*')
+        .eq('id', organizationId)
+        .single();
+      if (orgError) throw orgError;
+      if (!canAccess(user, 'organization:update', org)) {
+        throw new Error('Permission denied: organization:update');
+      }
       const { error } = await supabase
         .from('organizations')
         .update({
@@ -218,9 +230,17 @@ export const organizationService = {
           updated_at: new Date().toISOString()
         })
         .eq('id', organizationId);
-      
       if (error) throw error;
-      
+      // Audit log
+      await logAudit({
+        userId: user?.id || null,
+        action: 'organization.update',
+        resourceType: 'organization',
+        resourceId: organizationId,
+        before: org,
+        after: { ...org, ...updates },
+        // No explicit reason field in updates
+      });
       return true;
     } catch (err) {
       console.error('Error updating organization:', err);

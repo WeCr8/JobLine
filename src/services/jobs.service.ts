@@ -1,5 +1,9 @@
 import { supabase } from './api.service';
-import type { Job, JobStatus, QualityCheck } from '../types';
+import type { JobStatus, QualityCheck } from '../types';
+import type { Job } from '../types/job';
+import { validateJob } from '../utils/validate.utils';
+import { canAccess } from '../utils/security.utils';
+import { logAudit, logConsistencyFlag } from './api.service';
 
 export const jobsService = {
   /**
@@ -123,8 +127,33 @@ export const jobsService = {
   /**
    * Update job status
    */
-  async updateJobStatus(jobId: string, status: JobStatus, notes?: string): Promise<boolean> {
+  async updateJobStatus(user: any, jobId: string, status: JobStatus, notes?: string): Promise<boolean> {
     try {
+      // Fetch job for validation
+      const { data: job, error: fetchError } = await supabase
+        .from('jobs')
+        .select('*')
+        .eq('id', jobId)
+        .single();
+      if (fetchError) throw fetchError;
+      // Permission check
+      if (!canAccess(user, 'job:update', job)) {
+        throw new Error('Permission denied: job:update');
+      }
+      const validationJob = mapDbJobToValidationJob({ ...job, status });
+      const errors = validateJob(validationJob);
+      if (errors.length) {
+        await logConsistencyFlag({
+          type: 'validation',
+          severity: 'error',
+          resourceType: 'job',
+          resourceId: jobId,
+          context: { errors, job, attemptedStatus: status },
+          detectedBy: 'jobsService.updateJobStatus',
+          notes: 'Job validation failed during status update.'
+        });
+        throw new Error('Job validation failed: ' + errors.join('; '));
+      }
       const { error } = await supabase
         .from('jobs')
         .update({
@@ -133,9 +162,17 @@ export const jobsService = {
           updated_at: new Date().toISOString()
         })
         .eq('id', jobId);
-      
       if (error) throw error;
-      
+      // Audit log
+      await logAudit({
+        userId: user?.id || null,
+        action: 'job.updateStatus',
+        resourceType: 'job',
+        resourceId: jobId,
+        before: job,
+        after: { ...job, status, notes },
+        reason: notes
+      });
       return true;
     } catch (err) {
       console.error('Error updating job status:', err);
@@ -150,16 +187,18 @@ export const jobsService = {
     try {
       const { data: job, error: fetchError } = await supabase
         .from('jobs')
-        .select('quantity')
+        .select('*')
         .eq('id', jobId)
         .single();
-      
       if (fetchError) throw fetchError;
-      
       // Ensure completed quantity doesn't exceed total quantity
       const validQuantity = Math.min(completedQuantity, job.quantity);
-      
-      // Update the job
+      // Validate with updated completedQuantity
+      const validationJob = mapDbJobToValidationJob({ ...job, completedQuantity: validQuantity });
+      const errors = validateJob(validationJob);
+      if (errors.length) {
+        throw new Error('Job validation failed: ' + errors.join('; '));
+      }
       const { error } = await supabase
         .from('jobs')
         .update({
@@ -168,9 +207,7 @@ export const jobsService = {
           updated_at: new Date().toISOString()
         })
         .eq('id', jobId);
-      
       if (error) throw error;
-      
       return true;
     } catch (err) {
       console.error('Error updating job progress:', err);
@@ -239,3 +276,22 @@ export const jobsService = {
     }
   }
 };
+
+// Helper to map DB job to minimal Job for validation only
+function mapDbJobToValidationJob(job: any): import('../types/job').Job {
+  return {
+    id: job.id,
+    name: job.name || job.jobNumber || '',
+    status: job.status,
+    dueDate: job.due_date || job.dueDate,
+    startDate: job.start_date || job.startDate,
+    completedDate: job.completed_date || job.completedDate,
+    priority: job.priority,
+    assignedTo: job.operator_id || job.assignedTo,
+    organizationId: job.organization_id || job.organizationId || '',
+    itemIds: job.itemIds,
+    lastUpdated: job.updated_at || job.lastUpdated || new Date().toISOString(),
+    customFields: job.customFields,
+    description: job.description,
+  };
+}

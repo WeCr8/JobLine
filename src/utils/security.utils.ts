@@ -1,3 +1,5 @@
+import { supabase } from '../services/api.service';
+
 // XSS-safe HTML escaping
 export function escapeHtml(str: string): string {
   return str
@@ -39,4 +41,62 @@ export function isJwtValid(token: string): boolean {
   if (payload.nbf && now < payload.nbf) return false
   if (payload.iat && now < payload.iat) return false
   return true
+}
+
+// Permission checking utility (full RBAC)
+export async function canAccess(user: any, permission: string, resource?: any): Promise<boolean> {
+  if (!user || !user.id) {
+    console.warn('[RBAC] No user provided');
+    return false;
+  }
+  // Get all user_roles for this user (optionally scoped to resource)
+  let userRolesQuery = supabase
+    .from('user_roles')
+    .select('role_id, resource_id, resource_type');
+  userRolesQuery = userRolesQuery.eq('user_id', user.id);
+  if (resource && resource.id && resource.type) {
+    userRolesQuery = userRolesQuery.eq('resource_id', resource.id).eq('resource_type', resource.type);
+  }
+  const { data: userRoles, error: userRolesError } = await userRolesQuery;
+  if (userRolesError) {
+    console.error('[RBAC] Failed to fetch user_roles:', userRolesError);
+    return false;
+  }
+  if (!userRoles || userRoles.length === 0) {
+    console.warn('[RBAC] No roles found for user', user.id);
+    return false;
+  }
+  // Get all permissions for these roles
+  const roleIds = userRoles.map((ur: any) => ur.role_id);
+  const { data: rolePerms, error: rolePermsError } = await supabase
+    .from('role_permissions')
+    .select('permission_id')
+    .in('role_id', roleIds);
+  if (rolePermsError) {
+    console.error('[RBAC] Failed to fetch role_permissions:', rolePermsError);
+    return false;
+  }
+  if (!rolePerms || rolePerms.length === 0) {
+    console.warn('[RBAC] No permissions found for user roles', roleIds);
+    return false;
+  }
+  const permIds = rolePerms.map((rp: any) => rp.permission_id);
+  const { data: perms, error: permsError } = await supabase
+    .from('permissions')
+    .select('name')
+    .in('id', permIds);
+  if (permsError) {
+    console.error('[RBAC] Failed to fetch permissions:', permsError);
+    return false;
+  }
+  if (!perms || perms.length === 0) {
+    console.warn('[RBAC] No permissions found for user', user.id);
+    return false;
+  }
+  const permNames = perms.map((p: any) => p.name);
+  const hasPerm = permNames.includes(permission);
+  if (!hasPerm) {
+    console.warn('[RBAC] Permission denied', { user: user.id, permission, resource });
+  }
+  return hasPerm;
 } 
