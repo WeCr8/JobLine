@@ -52,7 +52,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="prop in props" :key="prop.name">
+            <tr v-for="prop in filteredProps" :key="prop.name">
               <td>{{ prop.name }}</td>
               <td><code>{{ prop.type }}</code></td>
               <td><code>{{ prop.default }}</code></td>
@@ -114,6 +114,13 @@ const previewStates = computed(() => {
     return [{ id: 'default', name: 'Default' }];
   }
   return props.states;
+});
+
+const filteredProps = computed(() => {
+  if (Array.isArray(props) && props.length && typeof props[0] === 'object' && 'name' in props[0]) {
+    return props as Prop[];
+  }
+  return [];
 });
 </script>
 

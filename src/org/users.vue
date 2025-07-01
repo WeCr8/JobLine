@@ -355,7 +355,7 @@ const editingUser = reactive<User>({
   id: '',
   name: '',
   email: '',
-  role: '',
+  role: 'operator',
   department: '',
   is_active: true,
   created_at: ''

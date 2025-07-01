@@ -15,6 +15,7 @@
           Refresh
         </button>
         <button
+          v-if="isDeveloper"
           @click="showAddUserModal = true"
           class="bg-primary-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary-700 transition-colors duration-200"
         >
@@ -145,7 +146,7 @@
     </div>
 
     <!-- Add User Modal -->
-    <div v-if="showAddUserModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div v-if="showAddUserModal && isDeveloper" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div class="bg-white rounded-lg p-6 w-full max-w-md mx-4">
         <h3 class="text-lg font-semibold text-gray-900 mb-4">Add Platform Admin</h3>
         
@@ -292,8 +293,10 @@ import { format } from 'date-fns';
 import { useAdminStore } from '../stores/admin';
 import type { User } from '../types/admin';
 import { ArrowPathIcon } from '@heroicons/vue/24/outline';
+import { useAuthStore } from '../stores/auth';
 
 const adminStore = useAdminStore();
+const authStore = useAuthStore();
 const showAddUserModal = ref(false);
 const showEditUserModal = ref(false);
 const addingUser = ref(false);
@@ -301,6 +304,7 @@ const savingUser = ref(false);
 const searchQuery = ref('');
 const roleFilter = ref('all');
 const statusFilter = ref('all');
+const isDeveloper = authStore.isDeveloper;
 
 const newUser = reactive({
   email: '',

@@ -39,7 +39,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, onMounted, onUnmounted } from 'vue';
+import { computed, ref } from 'vue';
 import { prefersReducedMotion } from '../../utils/accessibility';
 
 interface Props {
@@ -137,14 +137,6 @@ const createRippleEffect = (event: MouseEvent) => {
     ripple.remove();
   }, 600);
 };
-
-// Clean up any remaining ripples
-onUnmounted(() => {
-  if (rippleRef.value) {
-    const ripples = rippleRef.value.querySelectorAll('.button-ripple');
-    ripples.forEach(r => r.remove());
-  }
-});
 </script>
 
 <style scoped>

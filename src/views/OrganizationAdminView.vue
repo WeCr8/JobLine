@@ -636,7 +636,7 @@
 import { ref, reactive, onMounted } from 'vue';
 import { format } from 'date-fns';
 import { useAuthStore } from '../stores/auth';
-import type { User } from '../types';
+import type { User, UserRole } from '../types';
 import {
   UserGroupIcon,
   BuildingOfficeIcon,
@@ -750,7 +750,7 @@ const editingUser = reactive<User>({
   id: '',
   name: '',
   email: '',
-  role: '',
+  role: 'operator',
   department: '',
   is_active: true,
   created_at: ''
@@ -829,7 +829,7 @@ const addUser = async () => {
       id: `user-${Date.now()}`,
       name: newUser.name,
       email: newUser.email,
-      role: newUser.role,
+      role: newUser.role as UserRole,
       department: newUser.department,
       is_active: true,
       created_at: new Date().toISOString()

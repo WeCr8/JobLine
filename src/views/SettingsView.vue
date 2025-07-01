@@ -498,8 +498,16 @@ const integrationSettings = reactive({
   webhookSecret: Math.random().toString(36).substring(2, 15)
 });
 
+interface ConnectedService {
+  id: string;
+  name: string;
+  status: 'connected' | 'disconnected';
+  icon: any;
+  bgColor: string;
+}
+
 // Connected services
-const connectedServices = reactive([
+const connectedServices = reactive<ConnectedService[]>([
   {
     id: 'google-sheets',
     name: 'Google Sheets',

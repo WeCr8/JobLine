@@ -64,7 +64,7 @@
           @click="showUserMenu = !showUserMenu"
           class="flex items-center space-x-2 text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 tap-highlight"
           aria-label="User menu"
-          aria-expanded="showUserMenu"
+          :aria-expanded="showUserMenu"
           aria-controls="user-menu"
         >
           <div class="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">

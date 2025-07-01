@@ -10,6 +10,7 @@ export const useAuthStore = defineStore('auth', () => {
   const isAuthenticated = computed(() => !!user.value);
   const isPlatformAdmin = computed(() => user.value?.role === 'admin' && !user.value?.organization_id);
   const isOrgAdmin = computed(() => user.value?.role === 'organization_admin' || (user.value?.role === 'admin' && !!user.value?.organization_id));
+  const isDeveloper = computed(() => user.value?.is_developer === true);
 
   const signUp = async (email: string, password: string, name: string) => {
     loading.value = true;
@@ -189,6 +190,7 @@ export const useAuthStore = defineStore('auth', () => {
     isAuthenticated,
     isPlatformAdmin,
     isOrgAdmin,
+    isDeveloper,
     signUp,
     signIn,
     signOut,

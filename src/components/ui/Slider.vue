@@ -33,7 +33,7 @@
           :style="minThumbStyle"
           :aria-valuemin="min"
           :aria-valuemax="max"
-          :aria-valuenow="modelValue[0]"
+          :aria-valuenow="Array.isArray(modelValue) ? modelValue[0] : modelValue"
           :aria-labelledby="ariaLabelledby"
           :aria-label="ariaLabel ? `${ariaLabel} minimum value` : undefined"
           :aria-disabled="disabled"
@@ -54,7 +54,7 @@
           :style="maxThumbStyle"
           :aria-valuemin="min"
           :aria-valuemax="max"
-          :aria-valuenow="modelValue[1]"
+          :aria-valuenow="Array.isArray(modelValue) ? modelValue[1] : modelValue"
           :aria-labelledby="ariaLabelledby"
           :aria-label="ariaLabel ? `${ariaLabel} maximum value` : undefined"
           :aria-disabled="disabled"
@@ -78,7 +78,7 @@
           :style="thumbStyle"
           :aria-valuemin="min"
           :aria-valuemax="max"
-          :aria-valuenow="modelValue"
+          :aria-valuenow="Array.isArray(modelValue) ? undefined : modelValue"
           :aria-labelledby="ariaLabelledby"
           :aria-label="ariaLabel"
           :aria-disabled="disabled"
@@ -93,7 +93,7 @@
     
     <!-- Value display -->
     <div v-if="showValue" class="slider-value">
-      <span v-if="range">{{ modelValue[0] }} - {{ modelValue[1] }}</span>
+      <span v-if="range && Array.isArray(modelValue)">{{ modelValue[0] }} - {{ modelValue[1] }}</span>
       <span v-else>{{ modelValue }}</span>
     </div>
     
@@ -113,9 +113,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import { useElementSize } from '../../composables/useElementSize';
-import { prefersReducedMotion } from '../../utils/accessibility';
 
 interface Props {
   modelValue: number | number[];

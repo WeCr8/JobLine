@@ -422,8 +422,7 @@ import {
   ChevronDownIcon,
   MinusIcon,
   LightBulbIcon,
-  ShieldCheckIcon,
-  ClockIcon
+  ShieldCheckIcon
 } from '@heroicons/vue/24/outline';
 
 const performanceStore = usePerformanceStore();

@@ -100,7 +100,7 @@
                   Subscription
                 </router-link>
                 <router-link
-                  v-if="isPlatformAdmin"
+                  v-if="isDeveloper"
                   to="/admin/dashboard"
                   @click="showUserMenu = false"
                   class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200"
@@ -188,6 +188,10 @@ const isPlatformAdmin = computed(() => {
 
 const isOrgAdmin = computed(() => {
   return authStore.isOrgAdmin;
+});
+
+const isDeveloper = computed(() => {
+  return authStore.isDeveloper;
 });
 
 const handleLogout = async () => {

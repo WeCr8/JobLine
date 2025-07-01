@@ -431,12 +431,12 @@
     </div>
 
     <!-- Import Modal -->
-    <div v-if="showImportModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div v-if="showImportModalVisible" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div class="bg-white rounded-lg p-6 w-full max-w-md mx-4">
         <div class="flex items-center justify-between mb-6">
           <h3 class="text-lg font-semibold text-gray-900">Run Import</h3>
           <button
-            @click="showImportModal = false"
+            @click="showImportModalVisible = false"
             class="text-gray-400 hover:text-gray-600"
           >
             <XMarkIcon class="w-6 h-6" />
@@ -480,7 +480,7 @@
             </button>
             <button
               type="button"
-              @click="showImportModal = false"
+              @click="showImportModalVisible = false"
               class="flex-1 bg-gray-100 text-gray-700 px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-200 transition-colors duration-200"
             >
               Cancel
@@ -497,8 +497,6 @@ import { ref, reactive, computed, onMounted } from 'vue';
 import { format } from 'date-fns';
 import { useIntegrationStore } from '../stores/integration';
 import { useJobsStore } from '../stores/jobs';
-import { integrationService } from '../services/integration.service';
-import type { ConnectionConfig, ImportType, ImportMapping } from '../types/integration';
 import IntegrationConnectionCard from '../components/IntegrationConnectionCard.vue';
 import IntegrationFileUploader from '../components/IntegrationFileUploader.vue';
 import IntegrationDataMapper from '../components/IntegrationDataMapper.vue';
@@ -510,12 +508,6 @@ import {
   XMarkIcon,
   ClockIcon,
   CircleStackIcon,
-  CloudIcon,
-  DocumentArrowUpIcon,
-  GlobeAltIcon,
-  BuildingOfficeIcon,
-  BoltIcon,
-  ServerIcon,
   InformationCircleIcon
 } from '@heroicons/vue/24/outline';
 
@@ -525,7 +517,7 @@ const jobsStore = useJobsStore();
 // State
 const activeTab = ref('connections');
 const showAddConnectionModal = ref(false);
-const showImportModal = ref(false);
+const showImportModalVisible = ref(false);
 const testingConnection = ref<string | null>(null);
 const importingConnection = ref<string | null>(null);
 const saving = ref(false);
@@ -706,7 +698,7 @@ const testConnection = async (connectionId: string) => {
 
 const showImportModal = (connectionId: string) => {
   importingConnection.value = connectionId;
-  showImportModal.value = true;
+  showImportModalVisible.value = true;
 };
 
 const confirmImport = async () => {
@@ -715,7 +707,7 @@ const confirmImport = async () => {
   importing.value = true;
   try {
     await integrationStore.runImport(importingConnection.value, importSettings.type);
-    showImportModal.value = false;
+    showImportModalVisible.value = false;
     alert('Import job started successfully!');
   } catch (error) {
     console.error('Error running import:', error);

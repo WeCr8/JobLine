@@ -171,7 +171,7 @@ const startRecording = async () => {
     isRecording.value = true;
 
     // Start timer
-    recordingTimer = setInterval(() => {
+    recordingTimer = window.setInterval(() => {
       recordingDuration.value += 1;
     }, 1000);
 

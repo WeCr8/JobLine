@@ -94,7 +94,7 @@
               </div>
               <div>
                 <h3 class="font-medium text-gray-900">{{ type.label }}</h3>
-                <p class="text-sm text-gray-600">{{ integrationStore.connectionsByType[type.value] }} active</p>
+                <p class="text-sm text-gray-600">{{ integrationStore.connectionsByType[type.value as ConnectionType] }} active</p>
               </div>
             </div>
             <p class="text-sm text-gray-600 mb-4">{{ type.description }}</p>
@@ -210,7 +210,7 @@
             </div>
           </div>
 
-          <div v-if="selectedConnectionId && importSettings.type === 'csv-upload' && selectedConnection?.type === 'csv-upload'">
+          <div v-if="selectedConnectionId && selectedConnection?.type === 'csv-upload'">
             <label class="block text-sm font-medium text-gray-700 mb-2">Upload CSV File</label>
             <div
               class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors duration-200"
@@ -260,7 +260,7 @@
 import { ref, computed, reactive, onMounted } from 'vue';
 import { format } from 'date-fns';
 import { useIntegrationStore } from '../stores/integration';
-import type { ImportType } from '../types/integration';
+import type { ImportType, ConnectionType } from '../types/integration';
 import {
   GlobeAltIcon,
   ArrowDownTrayIcon,

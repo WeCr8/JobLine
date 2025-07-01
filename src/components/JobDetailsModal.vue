@@ -673,7 +673,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { format } from 'date-fns';
-import type { Job, JobOperation, DNCProgram, QualityRequirement, QualityCheck, JobHistoryEntry } from '../types';
+import type { Job, JobOperation, DNCProgram } from '../types';
 import { useAuthStore } from '../stores/auth';
 import { useJobsStore } from '../stores/jobs';
 import {

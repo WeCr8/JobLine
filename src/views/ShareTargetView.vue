@@ -294,7 +294,7 @@ const parseShareTarget = async () => {
     sharedTitle.value = params.get('title') || '';
     
     // Check if this is a form submission with files
-    if (window.location.pathname === '/share-target' && window.location.method === 'POST') {
+    if (window.location.pathname === '/share-target') {
       try {
         const formData = await new Promise<FormData>((resolve) => {
           // Wait for the form data to be available

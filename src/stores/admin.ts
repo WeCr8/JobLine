@@ -9,6 +9,7 @@ import type {
   Analytics, 
   SystemSettings 
 } from '../types/admin';
+import type { User } from '../types';
 
 export type { Organization, SubscriptionPlan, SystemSettings, SystemLog, Analytics };
 export type { User, Subscription, Invoice } from '../types/admin';

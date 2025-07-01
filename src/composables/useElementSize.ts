@@ -1,7 +1,8 @@
 /**
  * Composable for tracking element size changes
  */
-import { ref, onMounted, onUnmounted, Ref } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
+import type { Ref } from 'vue';
 
 export function useElementSize(elementRef: Ref<HTMLElement | null>) {
   const width = ref(0);

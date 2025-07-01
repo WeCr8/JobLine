@@ -66,12 +66,12 @@ import { QrCodeIcon } from '@heroicons/vue/24/outline';
 import SettingsSection from './SettingsSection.vue';
 import SettingsToggle from './SettingsToggle.vue';
 
+const verificationCode = ref('');
+
 const props = defineProps<{
   twoFactorEnabled: boolean;
   sessionTimeout: string;
 }>();
-
-const verificationCode = ref('');
 
 defineEmits<{
   'update:twoFactorEnabled': [value: boolean];

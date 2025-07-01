@@ -395,7 +395,7 @@ const startVideoRecording = () => {
   isRecordingVideo.value = true;
   recordingDuration.value = 0;
 
-  recordingTimer = setInterval(() => {
+  recordingTimer = window.setInterval(() => {
     recordingDuration.value += 1;
   }, 1000);
 };

@@ -294,7 +294,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed } from 'vue';
 import { format } from 'date-fns';
 import { integrationService } from '../services/integration.service';
 import type { Job } from '../types';
