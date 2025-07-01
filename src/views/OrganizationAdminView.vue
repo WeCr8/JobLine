@@ -156,12 +156,20 @@
         <div class="p-6 border-b border-gray-200">
           <div class="flex items-center justify-between">
             <h3 class="text-lg font-semibold text-gray-900">Organization Users</h3>
-            <button
-              @click="showAddUserModal = true"
-              class="bg-primary-600 text-white px-3 py-1 rounded text-sm hover:bg-primary-700 transition-colors duration-200"
-            >
-              Add User
-            </button>
+            <div class="flex space-x-2">
+              <button
+                @click="showAddUserModal = true"
+                class="bg-primary-600 text-white px-3 py-1 rounded text-sm hover:bg-primary-700 transition-colors duration-200"
+              >
+                Add User
+              </button>
+              <button
+                @click="showInviteUserModal = true"
+                class="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 transition-colors duration-200"
+              >
+                Invite User
+              </button>
+            </div>
           </div>
         </div>
         <div class="p-6">
@@ -221,6 +229,41 @@
                 </tr>
               </tbody>
             </table>
+          </div>
+          <div v-if="isAdmin && pendingInvites.length" class="mt-10">
+            <h4 class="text-md font-semibold text-gray-900 mb-2">Pending Invites</h4>
+            <div class="overflow-x-auto">
+              <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                  <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sent</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Invited By</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                  </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                  <tr v-for="invite in pendingInvites" :key="invite.id">
+                    <td class="px-6 py-4 whitespace-nowrap">{{ invite.email }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">{{ invite.role_name }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Pending</span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">{{ formatDistanceToNow(new Date(invite.created_at), { addSuffix: true }) }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">{{ invite.invited_by_name || '—' }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <button @click="revokeInvite(invite)" :disabled="invite.loading" class="text-red-600 hover:text-red-900 mr-3">Revoke</button>
+                      <button @click="resendInvite(invite)" :disabled="invite.loading" class="text-blue-600 hover:text-blue-900">Resend</button>
+                      <button @click="copyInviteLink(invite)" class="text-gray-600 hover:text-gray-900 ml-2" title="Copy invite link">Copy Link</button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <p v-if="inviteListError" class="text-red-600 mt-2">{{ inviteListError }}</p>
+              <p v-if="inviteListSuccess" class="text-green-600 mt-2">{{ inviteListSuccess }}</p>
+            </div>
           </div>
         </div>
       </div>
@@ -629,11 +672,34 @@
         </form>
       </div>
     </div>
+
+    <!-- Invite User Modal -->
+    <div v-if="showInviteUserModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+      <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
+        <h3 class="text-lg font-semibold mb-4">Invite User</h3>
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+          <input v-model="inviteEmail" type="email" class="w-full border rounded px-3 py-2" placeholder="user@email.com" />
+        </div>
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 mb-1">Role</label>
+          <select v-model="inviteRoleId" class="w-full border rounded px-3 py-2">
+            <option v-for="role in availableRoles" :key="role.id" :value="role.id">{{ role.name }}</option>
+          </select>
+        </div>
+        <div class="flex justify-end space-x-2">
+          <button @click="showInviteUserModal = false" class="px-4 py-2 bg-gray-200 rounded">Cancel</button>
+          <button @click="sendInvite" :disabled="inviteLoading" class="px-4 py-2 bg-primary-600 text-white rounded">Send Invite</button>
+        </div>
+        <p v-if="inviteError" class="text-red-600 mt-2">{{ inviteError }}</p>
+        <p v-if="inviteSuccess" class="text-green-600 mt-2">Invite sent!</p>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue';
+import { ref, reactive, onMounted, computed, watch } from 'vue';
 import { format } from 'date-fns';
 import {
   UserGroupIcon,
@@ -642,6 +708,10 @@ import {
   ArrowPathIcon,
   Cog6ToothIcon
 } from '@heroicons/vue/24/outline';
+import { supabase } from '../lib/supabase'
+import { useAuthStore } from '../stores/auth';
+import { useToast } from 'vue-toastification'
+import { formatDistanceToNow } from 'date-fns'
 
 const activeTab = ref('overview');
 const showAddUserModal = ref(false);
@@ -651,6 +721,13 @@ const addingUser = ref(false);
 const savingUser = ref(false);
 const addingDepartment = ref(false);
 const savingOrgSettings = ref(false);
+const showInviteUserModal = ref(false)
+const inviteEmail = ref('')
+const inviteRoleId = ref('')
+const inviteLoading = ref(false)
+const inviteError = ref('')
+const inviteSuccess = ref(false)
+const availableRoles = ref<{ id: string; name: string }[]>([])
 
 const tabs = [
   { id: 'overview', name: 'Overview', icon: BuildingOfficeIcon },
@@ -771,6 +848,8 @@ const orgSettings = reactive({
     enableOptimizationModule: true
   }
 });
+
+const authStore = useAuthStore();
 
 const refreshData = async () => {
   // In a real app, you would fetch data from the database
@@ -954,7 +1033,118 @@ const saveOrgSettings = async () => {
   }
 };
 
+const isAdmin = computed(() =>
+  authStore.user?.role === 'admin' || authStore.user?.role === 'organization_admin'
+)
+const pendingInvites = ref<any[]>([])
+const inviteListError = ref('')
+const inviteListSuccess = ref('')
+
+async function fetchPendingInvites() {
+  inviteListError.value = ''
+  try {
+    const { data, error } = await supabase
+      .from('invites')
+      .select('id, email, role_id, created_at, code, created_by, roles(name), users:created_by(name)')
+      .eq('organization_id', organization.id)
+      .is('accepted_at', null)
+      .order('created_at', { ascending: false })
+    if (error) throw error
+    pendingInvites.value = (data || []).map(invite => ({
+      ...invite,
+      role_name: invite.roles?.name || invite.role_id || '',
+      invited_by_name: invite.users?.name || ''
+    }))
+  } catch (e: any) {
+    inviteListError.value = e.message || 'Failed to load invites.'
+  }
+}
+onMounted(fetchPendingInvites)
+
+async function revokeInvite(invite: any) {
+  invite.loading = true
+  inviteListError.value = ''
+  inviteListSuccess.value = ''
+  try {
+    const { error } = await supabase.from('invites').delete().eq('id', invite.id)
+    if (error) throw error
+    inviteListSuccess.value = 'Invite revoked.'
+    await fetchPendingInvites()
+  } catch (e: any) {
+    inviteListError.value = e.message || 'Failed to revoke invite.'
+  } finally {
+    invite.loading = false
+  }
+}
+
+const toast = useToast()
+
+function copyInviteLink(invite: any) {
+  const link = `${window.location.origin}/accept-invite?code=${invite.code}`
+  navigator.clipboard.writeText(link)
+  toast.success('Invite link copied!')
+}
+
+async function resendInvite(invite: any) {
+  invite.loading = true
+  inviteListError.value = ''
+  inviteListSuccess.value = ''
+  try {
+    const { error } = await supabase.functions.invoke('resend-invite', {
+      body: { inviteId: invite.id }
+    })
+    if (error) throw error
+    toast.success('Invite resent!')
+    inviteListSuccess.value = 'Invite resent.'
+  } catch (e: any) {
+    toast.error(e.message || 'Failed to resend invite.')
+    inviteListError.value = e.message || 'Failed to resend invite.'
+  } finally {
+    invite.loading = false
+  }
+}
+
+watch(inviteSuccess, (val) => { if (val) fetchPendingInvites() })
+
 onMounted(async () => {
   await refreshData();
-});
+  // Fetch available roles for the dropdown
+  const { data: roles } = await supabase.from('roles').select('id, name')
+  if (roles && Array.isArray(roles)) {
+    const typedRoles = roles as { id: string; name: string }[];
+    availableRoles.value = typedRoles.map(r => ({ id: r.id, name: r.name }))
+  }
+})
+
+const sendInvite = async () => {
+  inviteLoading.value = true
+  inviteError.value = ''
+  inviteSuccess.value = false
+  try {
+    if (!inviteEmail.value || !inviteRoleId.value) {
+      throw new Error('Please enter an email and select a role.')
+    }
+    // Generate a unique code for the invite
+    const code = Math.random().toString(36).substring(2, 10) + Date.now().toString(36)
+    // Use the current org id (assume organization.id is available in this view)
+    if (!organization || !organization.id) throw new Error('Organization context missing.')
+    if (!authStore.user || !authStore.user.id) throw new Error('User context missing.')
+    const { error } = await supabase.from('invites').insert({
+      email: inviteEmail.value,
+      organization_id: organization.id,
+      role_id: inviteRoleId.value,
+      code,
+      created_by: authStore.user.id
+    })
+    if (error) throw error
+    inviteSuccess.value = true
+    inviteEmail.value = ''
+    inviteRoleId.value = ''
+    // Optionally refresh invites/users list here
+  } catch (e: any) {
+    inviteError.value = e.message || 'Failed to send invite.'
+  } finally {
+    inviteLoading.value = false
+  }
+}
 </script>

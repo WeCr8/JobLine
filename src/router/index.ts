@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import { useAuthStore } from '../stores/auth';
+import { supabase } from '../lib/supabase';
 
 const router = createRouter({
   history: createWebHistory(),
@@ -221,6 +222,12 @@ const router = createRouter({
       component: () => import('../views/ShareTargetView.vue'),
       meta: { requiresAuth: true }
     },
+    {
+      path: '/onboarding',
+      name: 'Onboarding',
+      component: () => import('../views/OnboardingView.vue'),
+      meta: { requiresAuth: true }
+    },
     // Catch-all route for 404
     {
       path: '/:pathMatch(.*)*',
@@ -230,27 +237,37 @@ const router = createRouter({
   ]
 });
 
-router.beforeEach((to, _from, next) => {
+router.beforeEach(async (to, _from, next) => {
   const authStore = useAuthStore();
-  
+  // Wait for auth to be ready if needed
   if (to.meta.requiresAuth && !authStore.isAuthenticated) {
-    next('/login');
-  } else if (to.meta.requiresGuest && authStore.isAuthenticated) {
-    next('/dashboard');
-  } else if (to.meta.requiresRole && authStore.user) {
-    const requiredRoles = to.meta.requiresRole as string[];
-    
-    // Check if route requires platform admin (no organization)
-    if (to.meta.requiresPlatformAdmin && authStore.user.organization_id) {
-      next('/dashboard'); // Redirect if user is not a platform admin
-    } else if (!requiredRoles.includes(authStore.user.role)) {
-      next('/dashboard'); // Redirect if user doesn't have required role
-    } else {
-      next();
-    }
-  } else {
-    next();
+    return next('/login');
   }
+  if (to.meta.requiresGuest && authStore.isAuthenticated) {
+    return next('/dashboard');
+  }
+  // Onboarding enforcement
+  if (authStore.isAuthenticated && to.path !== '/onboarding') {
+    // Fetch onboarding_complete from profile
+    const { data: profile, error } = await supabase
+      .from('profiles')
+      .select('onboarding_complete')
+      .eq('id', authStore.user?.id)
+      .single();
+    if (!error && profile && profile.onboarding_complete === false) {
+      return next('/onboarding');
+    }
+  }
+  // Role-based access
+  if (to.meta.requiresRole && authStore.user) {
+    const requiredRoles = to.meta.requiresRole as string[];
+    if (to.meta.requiresPlatformAdmin && authStore.user.organization_id) {
+      return next('/dashboard');
+    } else if (!requiredRoles.includes(authStore.user.role)) {
+      return next('/dashboard');
+    }
+  }
+  next();
 });
 
 export default router;
