@@ -1,4 +1,4 @@
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, h } from 'vue';
 import Button from './Button.vue';
 const props = withDefaults(defineProps(), {
     title: '',
@@ -8,36 +8,6 @@ const props = withDefaults(defineProps(), {
     error: false,
     errorMessage: '',
     retryEnabled: true,
-    devices: () => [
-        {
-            id: 'desktop',
-            name: 'Desktop',
-            width: 1280,
-            height: 800,
-            icon: DesktopIcon
-        },
-        {
-            id: 'tablet',
-            name: 'Tablet',
-            width: 768,
-            height: 1024,
-            icon: TabletIcon
-        },
-        {
-            id: 'iphone',
-            name: 'iPhone',
-            width: 375,
-            height: 812,
-            icon: MobileIcon
-        },
-        {
-            id: 'android',
-            name: 'Android',
-            width: 360,
-            height: 800,
-            icon: AndroidIcon
-        }
-    ],
     initialDevice: 'desktop'
 });
 const emit = defineEmits();
@@ -46,8 +16,38 @@ const currentState = ref(props.initialState || (props.states.length > 0 ? props.
 const currentDevice = ref(props.initialDevice);
 const darkMode = ref(false);
 const zoom = ref(1);
+const defaultDevices = [
+    {
+        id: 'desktop',
+        name: 'Desktop',
+        width: 1280,
+        height: 800,
+        icon: DesktopIcon
+    },
+    {
+        id: 'tablet',
+        name: 'Tablet',
+        width: 768,
+        height: 1024,
+        icon: TabletIcon
+    },
+    {
+        id: 'iphone',
+        name: 'iPhone',
+        width: 375,
+        height: 812,
+        icon: MobileIcon
+    },
+    {
+        id: 'android',
+        name: 'Android',
+        width: 360,
+        height: 800,
+        icon: AndroidIcon
+    }
+];
 // Computed
-const availableDevices = computed(() => props.devices);
+const availableDevices = computed(() => (props.devices && props.devices.length > 0 ? props.devices : defaultDevices));
 const currentStateData = computed(() => {
     const state = props.states.find(s => s.id === currentState.value);
     return state?.data || {};
@@ -138,7 +138,6 @@ function AndroidIcon() {
         })
     ]);
 }
-import { h } from 'vue';
 debugger; /* PartiallyEnd: #3632/scriptSetup.vue */
 const __VLS_withDefaultsArg = (function (t) { return t; })({
     title: '',
@@ -148,36 +147,6 @@ const __VLS_withDefaultsArg = (function (t) { return t; })({
     error: false,
     errorMessage: '',
     retryEnabled: true,
-    devices: () => [
-        {
-            id: 'desktop',
-            name: 'Desktop',
-            width: 1280,
-            height: 800,
-            icon: DesktopIcon
-        },
-        {
-            id: 'tablet',
-            name: 'Tablet',
-            width: 768,
-            height: 1024,
-            icon: TabletIcon
-        },
-        {
-            id: 'iphone',
-            name: 'iPhone',
-            width: 375,
-            height: 812,
-            icon: MobileIcon
-        },
-        {
-            id: 'android',
-            name: 'Android',
-            width: 360,
-            height: 800,
-            icon: AndroidIcon
-        }
-    ],
     initialDevice: 'desktop'
 });
 const __VLS_ctx = {};

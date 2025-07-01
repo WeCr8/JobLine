@@ -196,7 +196,10 @@ export default defineConfig({
                     database: ['@supabase/supabase-js']
                 }
             },
-            external: ['body-scroll-lock', 'focus-trap', 'hammerjs']
+            external: [
+                'focus-trap',
+                'hammerjs'
+            ]
         }
     },
     optimizeDeps: {
