@@ -9,7 +9,8 @@
     "dist",
     "**/*.vue.js",
     "**/*.vue.ts",
-    "supabase/functions"
+    "supabase/functions",
+    "src/sw.ts"
   ],
   "compilerOptions": {
     "module": "ESNext",

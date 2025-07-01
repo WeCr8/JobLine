@@ -112,6 +112,10 @@ export default defineConfig({
           }
         ]
       },
+      injectManifest: {
+        swSrc: 'src/sw.ts',
+        swDest: 'dist/sw.js'
+      },
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
         runtimeCaching: [

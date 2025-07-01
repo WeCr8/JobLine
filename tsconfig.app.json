@@ -13,10 +13,7 @@
     "noFallthroughCasesInSwitch": true,
     "allowImportingTsExtensions": false,
     "lib": ["ES2022", "DOM"],
-    "types": ["vite/client"],
-    "paths": {
-      "workbox-core": ["src/types/empty-module"]
-    }
+    "types": ["vite/client"]
   },
   "include": [
     "src/**/*.ts",
@@ -26,6 +23,7 @@
   ],
   "exclude": [
     "../supabase/functions",
-    "node_modules/workbox-core"
+    "node_modules/workbox-core",
+    "src/sw.ts"
   ]
 }

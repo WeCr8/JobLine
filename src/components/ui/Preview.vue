@@ -149,7 +149,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, h } from 'vue';
 import Button from './Button.vue';
 
 interface State {
@@ -186,36 +186,6 @@ const props = withDefaults(defineProps<Props>(), {
   error: false,
   errorMessage: '',
   retryEnabled: true,
-  devices: () => [
-    {
-      id: 'desktop',
-      name: 'Desktop',
-      width: 1280,
-      height: 800,
-      icon: DesktopIcon
-    },
-    {
-      id: 'tablet',
-      name: 'Tablet',
-      width: 768,
-      height: 1024,
-      icon: TabletIcon
-    },
-    {
-      id: 'iphone',
-      name: 'iPhone',
-      width: 375,
-      height: 812,
-      icon: MobileIcon
-    },
-    {
-      id: 'android',
-      name: 'Android',
-      width: 360,
-      height: 800,
-      icon: AndroidIcon
-    }
-  ],
   initialDevice: 'desktop'
 });
 
@@ -231,8 +201,39 @@ const currentDevice = ref(props.initialDevice);
 const darkMode = ref(false);
 const zoom = ref(1);
 
+const defaultDevices = [
+  {
+    id: 'desktop',
+    name: 'Desktop',
+    width: 1280,
+    height: 800,
+    icon: DesktopIcon
+  },
+  {
+    id: 'tablet',
+    name: 'Tablet',
+    width: 768,
+    height: 1024,
+    icon: TabletIcon
+  },
+  {
+    id: 'iphone',
+    name: 'iPhone',
+    width: 375,
+    height: 812,
+    icon: MobileIcon
+  },
+  {
+    id: 'android',
+    name: 'Android',
+    width: 360,
+    height: 800,
+    icon: AndroidIcon
+  }
+];
+
 // Computed
-const availableDevices = computed(() => props.devices);
+const availableDevices = computed(() => (props.devices && props.devices.length > 0 ? props.devices : defaultDevices));
 
 const currentStateData = computed(() => {
   const state = props.states.find(s => s.id === currentState.value);
@@ -332,8 +333,6 @@ function AndroidIcon() {
     })
   ]);
 }
-
-import { h } from 'vue';
 </script>
 
 <style scoped>
