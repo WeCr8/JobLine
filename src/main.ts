@@ -3,6 +3,8 @@ import { createPinia } from 'pinia';
 import router from './router/index';
 import App from './App.vue';
 import './style.css';
+import Vue3Toastify from 'vue3-toastify';
+import 'vue3-toastify/dist/index.css';
 import { isIOS, isAndroid, getPlatformClass } from './utils/platform';
 import { addConnectivityListeners } from './utils/offline';
 
@@ -11,6 +13,7 @@ const pinia = createPinia();
 
 app.use(pinia);
 app.use(router);
+app.use(Vue3Toastify, { autoClose: 3000 });
 
 // Add platform-specific class to body
 document.body.classList.add(getPlatformClass());
